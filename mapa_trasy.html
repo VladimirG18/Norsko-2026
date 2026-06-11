@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Norsko 2026 — mapa trasy (Modřice → Norsko → Modřice)</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  #map { height: 100%; width: 100%; }
+  .title-box {
+    position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+    z-index: 1000; background: rgba(255,255,255,0.93); padding: 8px 18px;
+    border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    font-size: 16px; font-weight: 700; color: #1a2a4a; text-align: center;
+  }
+  .title-box small { display: block; font-weight: 400; font-size: 12px; color: #555; }
+  .legend {
+    background: rgba(255,255,255,0.93); padding: 10px 14px; border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3); font-size: 13px; line-height: 1.7; color: #222;
+  }
+  .legend .line { display: inline-block; width: 34px; height: 0; border-top: 4px solid; margin-right: 8px; vertical-align: middle; border-radius: 2px; }
+  .legend .dashed { border-top-style: dashed; }
+  .num-icon {
+    background: #d33; color: #fff; border-radius: 50%; border: 2px solid #fff;
+    width: 26px; height: 26px; line-height: 26px; text-align: center;
+    font-weight: 700; font-size: 13px; box-shadow: 0 1px 4px rgba(0,0,0,0.5);
+  }
+  .num-icon.home { background: #1a2a4a; }
+  .num-icon.via { background: #888; width: 20px; height: 20px; line-height: 20px; font-size: 10px; }
+  .leaflet-popup-content { font-size: 13px; }
+  .leaflet-popup-content b { color: #1a2a4a; }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div class="title-box">
+  🚐 Norsko 2026 — Modřice → Norsko → Modřice
+  <small>18. 7. – 2. 8. 2026 · CI Horon 84 M Elite · 4 dospělí + 1 dítě + 1 pes</small>
+</div>
+<script>
+const map = L.map('map');
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 18,
+  attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
+L.control.scale({ imperial: false }).addTo(map);
+
+// ---------- Trasy (průjezdní body podle hlavních tahů) ----------
+
+// TAM: Modřice → Praha → Drážďany → Berlín → Hamburk → Dánsko → Hirtshals (~1100 km, 2 dny)
+const tam = [
+  [49.1247, 16.6116], // Modřice
+  [49.30, 16.62],     // Brno sever (D1)
+  [49.55, 15.93],     // Velké Meziříčí
+  [49.70, 15.27],     // Humpolec
+  [49.95, 14.75],     // D1 ke Praze
+  [50.04, 14.52],     // Praha jih (okruh)
+  [50.12, 14.36],     // Praha sever
+  [50.42, 14.20],     // D8
+  [50.66, 14.03],     // Ústí nad Labem
+  [50.80, 13.95],     // hranice CZ/DE
+  [51.05, 13.74],     // Drážďany
+  [51.55, 13.75],     // A13
+  [52.10, 13.55],     // A13 k Berlínu
+  [52.38, 13.45],     // Berlín jih (okruh)
+  [52.55, 13.20],     // Berlín západ
+  [52.85, 12.55],     // A24
+  [53.20, 11.40],     // A24
+  [53.43, 10.40],     // A24/A1
+  [53.55, 9.99],      // Hamburk
+  [53.90, 9.70],      // A7 sever
+  [54.32, 9.67],      // Rendsburg
+  [54.79, 9.43],      // Flensburg (DE/DK)
+  [55.05, 9.41],      // Aabenraa
+  [55.49, 9.47],      // Kolding
+  [55.86, 9.85],      // Horsens
+  [56.15, 10.20],     // Aarhus
+  [56.46, 10.03],     // Randers
+  [57.05, 9.92],      // Aalborg
+  [57.45, 9.98],      // Hjørring
+  [57.5880, 9.9594]   // Hirtshals
+];
+
+// TRAJEKT: Hirtshals → Kristiansand (Fjord Line / Color Line, ~2,5–3 h)
+const trajekt = [
+  [57.5880, 9.9594],
+  [57.90, 9.30],
+  [58.1467, 7.9956]   // Kristiansand
+];
+
+// NORSKO: itinerář den po dni
+const norsko = [
+  [58.1467, 7.9956],  // Kristiansand (Ne — příjezd ~15:30)
+  [58.25, 7.30],      // E39 Lyngdal
+  [58.30, 6.66],      // Flekkefjord
+  [58.51, 6.13],      // Egersund/E39
+  [58.85, 5.73],      // Sandnes
+  [58.91, 5.95],      // Lauvvik → Rv13
+  [58.95, 6.06],      // Oanes
+  [58.9908, 6.1374],  // Preikestolen parkoviště (Po — výšlap)
+  [59.06, 5.95],      // Jørpeland/Tau
+  [59.23, 6.18],      // Hjelmeland (Rv13)
+  [59.48, 6.26],      // Sand
+  [59.65, 6.55],      // Suldal
+  [59.83, 6.82],      // Røldal
+  [60.07, 6.55],      // Odda
+  [60.12, 6.71],      // Tyssedal
+  [60.1240, 6.7400],  // Trolltunga P2 Skjeggedal (Út — celodenní trek)
+  [60.12, 6.71],      // zpět Tyssedal
+  [60.07, 6.55],      // Odda
+  [60.37, 6.72],      // Kinsarvik (Rv13 podél Sørfjordu)
+  [60.48, 6.83],      // Hardangerský most
+  [60.52, 6.72],      // Granvin
+  [60.63, 6.42],      // Voss
+  [60.6628, 6.4406],  // Tvindefossen (St — vodopád)
+  [60.74, 6.52],      // Oppheim (E16)
+  [60.87, 6.84],      // Gudvangen
+  [60.86, 7.11],      // Flåm
+  [60.906, 7.187],    // Aurland
+  [60.9027, 7.2058],  // Stegastein (St — vyhlídka)
+  [60.906, 7.187],    // zpět Aurland
+  [61.00, 7.30],      // tunel Lærdal
+  [61.10, 7.48],      // Lærdal
+  [61.13, 7.42],      // Fodnes — trajekt Mannheller
+  [61.17, 7.30],      // Kaupanger
+  [61.23, 7.10],      // Sogndal (Čt — Sognefjord)
+  [61.35, 6.95],      // Rv5 sever
+  [61.4426, 6.8094],  // Bøyabreen — ledovec (Čt)
+  [61.50, 6.65],      // Fjærlandský tunel
+  [61.57, 6.49],      // Skei
+  [61.73, 6.51],      // Byrkjelo
+  [61.79, 6.66],      // Utvik
+  [61.83, 6.81],      // Olden
+  [61.8400, 6.9300],  // Lovatnet (Pá — tyrkysové jezero, kajak)
+  [61.83, 6.81],      // zpět Olden
+  [61.87, 6.85],      // Loen
+  [61.91, 6.71],      // Stryn
+  [61.93, 7.10],      // Rv15 Hjelledalen
+  [62.02, 7.40],      // Videseter/Grotli
+  [62.05, 7.55],      // odbočka Rv63
+  [62.03, 7.25],      // Djupvatnet (Rv63)
+  [62.08, 7.23],      // Ørnesvingen sjezd
+  [62.1009, 7.2056],  // Geiranger (So — fjord UNESCO, Sedm sester)
+  [62.18, 7.15],      // Ørnevegen nahoru
+  [62.275, 7.165],    // Eidsdal — trajekt
+  [62.30, 7.21],      // Linge
+  [62.40, 6.95],      // Stordal
+  [62.48, 6.81],      // Sjøholt
+  [62.47, 6.45],      // E39/E136 k Ålesundu
+  [62.4722, 6.1495],  // Ålesund (Ne — Aksla, 418 schodů)
+  [62.47, 6.45],      // zpět
+  [62.48, 6.81],      // Sjøholt
+  [62.40, 6.95],      // Stordal
+  [62.30, 7.21],      // Linge
+  [62.305, 7.26],     // Valldal
+  [62.38, 7.50],      // Rv63 Valldalen
+  [62.4570, 7.6717],  // Trollstigen (Po — serpentiny, ověřit otevření!)
+  [62.5670, 7.6870],  // Åndalsnes
+  [62.50, 7.90],      // E136 Romsdalen
+  [62.30, 8.30],      // Bjorli
+  [62.20, 8.90],      // Lesja
+  [62.07, 9.12],      // Dombås
+  [61.90, 9.30],      // Dovre
+  [61.77, 9.53],      // Otta
+  [61.84, 9.10],      // Vågå (Rv15)
+  [61.838, 8.566],    // Lom (Út–Čt — Jotunheimen)
+  [61.74, 8.40],      // Bøverdalen (Rv55)
+  [61.677, 8.370]     // Galdhøpiggen / Juvasshytta (2469 m)
+];
+
+// ZPĚT: Jotunheimen → Oslo → Göteborg → Malmö → Øresund → Kodaň → Storebælt → Německo → Modřice
+const zpet = [
+  [61.677, 8.370],    // Jotunheimen (Pá — dlouhý přejezd 9–11 h)
+  [61.74, 8.40],      // Bøverdalen
+  [61.838, 8.566],    // Lom
+  [61.84, 9.10],      // Vågå
+  [61.77, 9.53],      // Otta (E6 jih)
+  [61.57, 9.70],      // Vinstra
+  [61.32, 10.05],     // Ringebu
+  [61.115, 10.466],   // Lillehammer
+  [60.79, 10.95],     // Hamar/Mjøsa
+  [60.30, 11.15],     // Eidsvoll
+  [60.00, 11.05],     // Gardermoen
+  [59.9139, 10.7522], // Oslo
+  [59.65, 10.85],     // E6 jih
+  [59.28, 11.10],     // Sarpsborg
+  [59.09, 11.26],     // Svinesund (NO/SE)
+  [58.70, 11.45],     // Tanum
+  [58.25, 11.80],     // Uddevalla
+  [57.71, 11.97],     // Göteborg
+  [57.30, 12.20],     // Kungsbacka
+  [56.90, 12.50],     // Falkenberg
+  [56.67, 12.86],     // Halmstad
+  [56.25, 12.90],     // Ängelholm
+  [55.95, 12.95],     // Landskrona
+  [55.605, 13.004],   // Malmö (nocleh Pá)
+  [55.57, 12.90],     // nájezd na most
+  [55.63, 12.65],     // Øresundský most (mýto!)
+  [55.64, 12.55],     // Kodaň — letiště
+  [55.62, 12.30],     // dálnice E20 západ
+  [55.55, 11.80],     // Ringsted
+  [55.40, 11.20],     // Korsør
+  [55.34, 11.03],     // Storebæltský most (mýto!)
+  [55.36, 10.75],     // Nyborg
+  [55.40, 10.39],     // Odense
+  [55.45, 9.80],      // Middelfart
+  [55.49, 9.47],      // Kolding
+  [55.05, 9.41],      // Aabenraa
+  [54.79, 9.43],      // Flensburg (DK/DE)
+  [54.32, 9.67],      // Rendsburg
+  [53.90, 9.70],      // A7
+  [53.55, 9.99],      // Hamburk
+  [53.43, 10.40],     // A24
+  [53.20, 11.40],     // A24
+  [52.85, 12.55],     // A24
+  [52.55, 13.20],     // Berlín západ
+  [52.38, 13.45],     // Berlín jih
+  [52.10, 13.55],     // A13
+  [51.55, 13.75],     // A13
+  [51.05, 13.74],     // Drážďany
+  [50.80, 13.95],     // hranice DE/CZ
+  [50.66, 14.03],     // Ústí nad Labem
+  [50.42, 14.20],     // D8
+  [50.12, 14.36],     // Praha sever
+  [50.04, 14.52],     // Praha jih
+  [49.95, 14.75],     // D1
+  [49.70, 15.27],     // Humpolec
+  [49.55, 15.93],     // Velké Meziříčí
+  [49.30, 16.62],     // Brno
+  [49.1247, 16.6116]  // Modřice / Rebešovice (Ne do 13:00)
+];
+
+const styleTam     = { color: '#1565c0', weight: 4, opacity: 0.9 };
+const styleTrajekt = { color: '#6a1b9a', weight: 4, opacity: 0.9, dashArray: '8 8' };
+const styleNorsko  = { color: '#2e7d32', weight: 4, opacity: 0.9 };
+const styleZpet    = { color: '#e65100', weight: 4, opacity: 0.85, dashArray: '1 7' };
+
+L.polyline(tam, styleTam).addTo(map).bindPopup('<b>Cesta tam</b><br>Modřice → Hirtshals (~1100 km, 2 dny s noclehem)');
+L.polyline(trajekt, styleTrajekt).addTo(map).bindPopup('<b>Trajekt</b><br>Hirtshals → Kristiansand<br>Fjord Line FSTR ~2 h 25 min / trajekt ~3 h 15 min<br>⚠️ Rezervovat dopředu! Plyn na trajektu vypnutý.');
+L.polyline(norsko, styleNorsko).addTo(map).bindPopup('<b>Norský itinerář</b><br>Kristiansand → Preikestolen → Trolltunga → fjordy → Jotunheimen');
+L.polyline(zpet, styleZpet).addTo(map).bindPopup('<b>Cesta zpět</b><br>Jotunheimen → Oslo → Malmö → Øresund + Storebælt (mýto!) → Modřice');
+
+// ---------- Zastávky ----------
+function numIcon(label, cls) {
+  return L.divIcon({ className: '', html: `<div class="num-icon ${cls||''}">${label}</div>`, iconSize: [26, 26], iconAnchor: [13, 13] });
+}
+
+const stops = [
+  { ll: [49.1247, 16.6116], label: '🏠', cls: 'home', name: 'Modřice — start i cíl', info: 'Výjezd: Stará Cihelna 607. Vyzvednutí vozu ~8:00 Rebešovice (So 18. 7.), vrácení do 13:00 (Ne 2. 8.).' },
+  { ll: [57.5880, 9.9594], label: '⛴', cls: 'home', name: 'Hirtshals (DK)', info: 'Nalodění na trajekt do Kristiansandu. Předem namrazit PET lahve — plyn na trajektu vypnutý!' },
+  { ll: [58.1467, 7.9956], label: '1', name: 'Kristiansand — Ne', info: 'Příjezd trajektem ~15:30. POZOR: KristiansAnd, ne KristiansUnd! Pak přesun k Preikestolen (~3,5 h).' },
+  { ll: [58.9908, 6.1374], label: '2', name: 'Preikestolen — Po', info: 'Výšlap 8 km, ~4–5 h. Nocleh u parkoviště. Odpoledne přesun k Trolltunga.' },
+  { ll: [60.1240, 6.7400], label: '3', name: 'Trolltunga — Út', info: 'Náročný celodenní trek ~28 km, 800 m převýšení. Vyrazit za tmy! Parkoviště P2/P3 rezervovat předem.' },
+  { ll: [60.6628, 6.4406], label: '4', name: 'Tvindefossen — St', info: 'Vodopád přímo u silnice E16 u Vossu.' },
+  { ll: [60.9027, 7.2058], label: '5', name: 'Stegastein — St', info: 'Vyhlídka nad Aurlandsfjordem. ⚠️ Úzká klikatá cesta — se 7,45m obytkou opatrně.' },
+  { ll: [61.23, 7.10], label: '6', name: 'Sognefjord — Čt', info: 'Nejdelší norský fjord (204 km).' },
+  { ll: [61.4426, 6.8094], label: '7', name: 'Bøyabreen — Čt', info: 'Ledovcový splaz hned u cesty, parkování zdarma.' },
+  { ll: [61.8400, 6.9300], label: '8', name: 'Lovatnet — Pá', info: 'Tyrkysové jezero, možnost kajaku. ⚠️ Úzká cesta — s obytkou opatrně.' },
+  { ll: [62.1009, 7.2056], label: '9', name: 'Geirangerfjord — So', info: 'UNESCO. Vyhlídka Ørnesvingen, lodní výlet k vodopádu Sedm sester.' },
+  { ll: [62.4722, 6.1495], label: '10', name: 'Ålesund — Ne', info: 'Secesní město. Výhled z vrchu Aksla — 418 schodů.' },
+  { ll: [62.4570, 7.6717], label: '11', name: 'Trollstigen — Po', info: 'Trolí stezka, 11 serpentin. ⚠️ Ověřit sezónní otevření (sesuvy)!' },
+  { ll: [61.677, 8.370], label: '12', name: 'Jotunheimen — Út–Čt', info: '„Domov obrů". Galdhøpiggen (2469 m), Besseggen, ledovce. 3 dny. Nejsevernější bod cesty.' },
+  { ll: [59.9139, 10.7522], label: '13', name: 'Oslo — Pá (průjezd)', info: 'Součást dlouhého přejezdu Jotunheimen → Malmö (9–11 h jízdy).' },
+  { ll: [55.605, 13.004], label: '14', name: 'Malmö — Pá (nocleh)', info: 'Nocleh po dlouhém přejezdu. Sobota: Malmö → ČR.' },
+  { ll: [55.63, 12.65], label: '€', cls: 'via', name: 'Øresundský most', info: '8 km most + tunel, Malmö → Kodaň. 💰 Placené mýto (DKK) — připravit platbu předem.' },
+  { ll: [55.34, 11.03], label: '€', cls: 'via', name: 'Storebæltský most', info: '💰 Placené mýto (DKK) — připravit platbu předem.' }
+];
+
+stops.forEach(s => {
+  L.marker(s.ll, { icon: numIcon(s.label, s.cls) })
+    .addTo(map)
+    .bindPopup(`<b>${s.name}</b><br>${s.info}`);
+});
+
+// ---------- Legenda ----------
+const legend = L.control({ position: 'bottomright' });
+legend.onAdd = function () {
+  const div = L.DomUtil.create('div', 'legend');
+  div.innerHTML = `
+    <b>Legenda</b><br>
+    <span class="line" style="border-color:#1565c0"></span> Cesta tam (Modřice → Hirtshals)<br>
+    <span class="line dashed" style="border-color:#6a1b9a"></span> Trajekt Hirtshals → Kristiansand<br>
+    <span class="line" style="border-color:#2e7d32"></span> Norský itinerář (Ne → Čt)<br>
+    <span class="line dashed" style="border-color:#e65100"></span> Cesta zpět (přes Oslo a mosty)<br>
+    <span style="font-size:11px;color:#666">Čísla = pořadí zastávek · klikni pro detail</span>
+  `;
+  return div;
+};
+legend.addTo(map);
+
+map.fitBounds(L.latLngBounds([...tam, ...norsko, ...zpet]).pad(0.05));
+</script>
+</body>
+</html>
