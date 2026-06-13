@@ -1,6 +1,6 @@
 # CI Horon 84 M Elite – Přehled informací pro cestu do Norska
 
-> Cesta: 18. 7. – 2. 8. 2026 | Vyzvednutí/vrácení: Rebešovice | Odjezd: Modřice, Stará Cihelna 607  
+> Cesta: 18. 7. – 2. 8. 2026 | Vyzvednutí/vrácení: Rebešovice | Odjezd: Modřice  
 > Osádka: 4 dospělí + 1 dítě + 1 pes
 
 -----
@@ -11,8 +11,8 @@
 |---------|----------------------------------|
 |Model    |CI Horon 84 M Elite 2024          |
 |Typ      |Alkovna                           |
-|SPZ      |1AC J423                          |
-|Pojistník|Patrik Vencl, Brno – Nový Lískovec|
+|SPZ      |[skryto]                          |
+|Pojistník|pronajímatel                      |
 |Půjčovna |KaravanTravel.cz / bezkempu.cz    |
 
 -----
@@ -114,7 +114,7 @@
 |Dokument        |Stav                                                                  |
 |----------------|----------------------------------------------------------------------|
 |Zelená karta    |⚠️ Na fotografii platnost jen do 3/2026 – **nutno ověřit s majitelem!**|
-|Technický průkaz|V pořádku, SPZ 1AC J423                                               |
+|Technický průkaz|V pořádku, SPZ [skryto]                                               |
 |Rozměrový list  |Přiložen (7450 × 2350 × 3200 mm, 485 kg)                              |
 
 -----

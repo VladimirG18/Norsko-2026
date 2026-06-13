@@ -2,7 +2,7 @@
 
 > **Termín:** 18. 7. – 2. 8. 2025 (necelých 16 dní)  
 > **Posádka:** 4 dospělí + 1 dítě + 1 pes  
-> **Výjezd z:** Modřice – Stará Cihelna 607  
+> **Výjezd z:** Modřice  
 > **Vyzvednutí vozidla:** ~8:00 Rebešovice  
 > **Vrácení vozidla:** do 13:00 Rebešovice (2. 8.)
 
@@ -15,8 +15,8 @@
 |Parametr    |Hodnota                                      |
 |------------|---------------------------------------------|
 |Model       |CI Horon 84 M Elite 2024 (alkovna)           |
-|Pronajímatel|Patrik Vencl / KaravanTravel.cz              |
-|SPZ         |1AC J423                                     |
+|Pronajímatel|KaravanTravel.cz / bezkempu.cz                |
+|SPZ         |[skryto]                                     |
 |Motor       |Peugeot Boxer 2.2 diesel, 103 kW, manuál     |
 |Délka       |7 450 mm                                     |
 |Šířka       |2 350 mm                                     |
@@ -113,7 +113,7 @@ Modřice → Německo → Hirtshals (DK) → [trajekt] → Kristiansand (NO)
 
 ## 📋 Administrativa & pojištění
 
-- **Zelená karta:** CZ/0002/6180707434, Patrik Vencl, Peugeot Boxer, SPZ: 1AC J423
+- **Zelená karta:** [číslo skryto], pronajímatel, Peugeot Boxer, SPZ: [skryto]
 - ⚠️ Zelená karta na fotkách platila pouze do 03/2026 – **ověřit aktuální platnost před odjezdem!**
 - Připojistění u vlastní pojišťovny na auto
 
@@ -143,7 +143,7 @@ Modřice → Německo → Hirtshals (DK) → [trajekt] → Kristiansand (NO)
 
 ## ✅ TODO před odjezdem
 
-- [ ] Ověřit platnost zelené karty u Patrika Vencla
+- [ ] Ověřit platnost zelené karty u pronajímatele
 - [ ] Rezervovat trajekty Hirtshals–Kristiansand
 - [ ] Rezervovat parkování Trolltunga (předem!)
 - [ ] Ověřit otevření Trollstigenu (sezónní) v termínu konce července
@@ -152,7 +152,7 @@ Modřice → Německo → Hirtshals (DK) → [trajekt] → Kristiansand (NO)
 - [ ] Nainstalovat aplikaci Saily
 - [ ] Sehnat nepromokavé ponožky DexShell
 - [ ] Dohledat boty Salomony
-- [ ] Ověřit u Patrika: kapacita baterií (Ah), invertor, 12V/USB zásuvky, objem nádrží vody/odpadní, bojler, kapacita kazety WC, GPS model (filtrování výšky?), Pioneer head unit (CarPlay/Android Auto?), rozměry pneumatik, umístění výfuku Trumy, povolení převozu na trajektech, limit km, kontakt na asistenci v zahraničí
+- [ ] Ověřit u pronajímatele: kapacita baterií (Ah), invertor, 12V/USB zásuvky, objem nádrží vody/odpadní, bojler, kapacita kazety WC, GPS model (filtrování výšky?), Pioneer head unit (CarPlay/Android Auto?), rozměry pneumatik, umístění výfuku Trumy, povolení převozu na trajektech, limit km, kontakt na asistenci v zahraničí
 
 -----
 

@@ -7,7 +7,7 @@
 |**Termín**         |18. 7. – 2. 8. 2026 (necelých 16 dní) |
 |**Vyzvednutí vozu**|cca 8:00 v Rebešovicích               |
 |**Vrácení vozu**   |do 13:00 v Rebešovicích (neděle 2. 8.)|
-|**Výjezd z**       |Modřice – Stará Cihelna 607           |
+|**Výjezd z**       |Modřice                               |
 |**Posádka**        |4 dospělí + 1 dítě + 1 pes            |
 
 -----
@@ -64,8 +64,8 @@ Z Jotunheimu → **Oslo** → dál na jih a přes:
 
 ### Pronájem
 
-- Pronajato od majitele **Patrik Vencl** přes bezkempu.cz / KaravanTravel.cz
-- **SPZ:** 1AC J423
+- Pronajato od pronajímatele přes bezkempu.cz / KaravanTravel.cz
+- **SPZ:** [skryto]
 
 ### Technické údaje
 
@@ -116,7 +116,7 @@ Z Jotunheimu → **Oslo** → dál na jih a přes:
 
 ### Pojištění a doklady
 
-- [ ] **Ověřit platnost pojištění** — zelená karta v minulosti platná jen do 03/2026, potvrdit aktuální krytí s Patrikem Vencl
+- [ ] **Ověřit platnost pojištění** — zelená karta v minulosti platná jen do 03/2026, potvrdit aktuální krytí s pronajímatelem
 - [ ] Mezinárodní pojistná karta (CZ/0002), osvědčení o registraci vozidla
 
 ### Otevřené otázky na majitele
