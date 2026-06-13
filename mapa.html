@@ -13,26 +13,49 @@
        justify-content:space-between;flex-wrap:wrap;gap:8px}
   #bar a{color:#cfe6f5;text-decoration:none;font-size:.9rem}
   #bar b{font-size:1.05rem}
+  #bar .right{display:flex;gap:12px;align-items:center}
+  #ptoggle{background:#fff;color:var(--modra);border:0;padding:6px 12px;border-radius:8px;
+           font-weight:600;cursor:pointer;font-size:.85rem}
   #legend{font-size:.8rem;display:flex;gap:12px;flex-wrap:wrap;background:#fff;color:#333;
           padding:8px 16px;border-bottom:1px solid #dce6ee}
   #legend span{display:inline-flex;align-items:center;gap:5px}
   .dot{width:12px;height:12px;border-radius:50%;display:inline-block}
   #map{position:absolute;top:0;bottom:0;left:0;right:0}
   #wrap{position:absolute;top:0;bottom:0;left:0;right:0;display:flex;flex-direction:column}
-  #mapwrap{flex:1;position:relative}
+  #mapwrap{flex:1;position:relative;overflow:hidden}
   .leaflet-popup-content{font-size:.9rem;line-height:1.45}
   .leaflet-popup-content h3{margin:0 0 4px;color:var(--modra);font-size:1rem}
   .leaflet-popup-content .den{display:inline-block;background:#e8f1f7;color:var(--modra);
        font-weight:600;font-size:.75rem;padding:1px 8px;border-radius:10px;margin-bottom:6px}
   .leaflet-popup-content .warn{color:#c0392b;font-weight:600}
   .leaflet-popup-content .wimg{display:none;width:100%;border-radius:6px;margin-top:8px}
+  /* boční panel s úseky */
+  #panel{position:absolute;top:0;right:0;bottom:0;width:330px;max-width:85%;background:#fff;
+         box-shadow:-3px 0 14px rgba(0,0,0,.15);transform:translateX(100%);transition:.25s;
+         z-index:1000;display:flex;flex-direction:column}
+  #panel.open{transform:none}
+  .phead{background:var(--modra);color:#fff;padding:12px 14px;font-weight:600;
+         display:flex;justify-content:space-between;align-items:center}
+  .phead #pclose{cursor:pointer;font-size:1.1rem}
+  #prows{overflow:auto;flex:1;padding:4px 0}
+  .prow{display:flex;justify-content:space-between;gap:10px;padding:8px 14px;
+        border-bottom:1px solid #eef3f7;font-size:.85rem}
+  .prow .pn{color:#1c2733}
+  .prow .pv{color:var(--modra);font-weight:600;white-space:nowrap;text-align:right}
+  .prow .pv.est{color:#b07a00}
+  #ptot{padding:12px 14px;border-top:2px solid #e8f1f7;font-size:.88rem;background:#f7fafc}
+  #ptot .grand{margin-top:5px;color:var(--modra);font-size:1.02rem}
+  .pnote{padding:10px 14px;font-size:.72rem;color:#5b6b7a}
 </style>
 </head>
 <body>
 <div id="wrap">
   <div id="bar">
     <b>🗺️ Norsko 2026 — mapa cesty</b>
-    <a href="index.html">← zpět na rozcestník</a>
+    <span class="right">
+      <button id="ptoggle">📊 Úseky &amp; km</button>
+      <a href="index.html">← rozcestník</a>
+    </span>
   </div>
   <div id="legend">
     <span><i class="dot" style="background:#27ae60"></i> start / cíl</span>
@@ -43,9 +66,17 @@
     <span><i class="dot" style="background:#e67e22"></i> město / serpentiny</span>
     <span><i style="display:inline-block;width:20px;height:0;border-top:4px solid #0b3d66;vertical-align:middle"></i> trasa tam (autem)</span>
     <span><i style="display:inline-block;width:20px;height:0;border-top:4px solid #16689c;vertical-align:middle"></i> trasa zpět (autem)</span>
-    <span><i style="display:inline-block;width:20px;height:0;border-top:3px dashed #0b3d66;vertical-align:middle"></i> trajekt + norská část</span>
+    <span><i style="display:inline-block;width:20px;height:0;border-top:3px dashed #2980b9;vertical-align:middle"></i> trajekt</span>
   </div>
-  <div id="mapwrap"><div id="map"></div></div>
+  <div id="mapwrap">
+    <div id="map"></div>
+    <div id="panel">
+      <div class="phead">📊 Úseky trasy <span id="pclose">✕</span></div>
+      <div id="prows"></div>
+      <div id="ptot"></div>
+      <div class="pnote">Vzdálenosti a časy se počítají z routovací služby OSRM přímo v prohlížeči. „~" = záložní odhad, pokud služba neodpoví. Časy jsou čistá jízda bez přestávek.</div>
+    </div>
+  </div>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -53,11 +84,11 @@
 <script>
 const barvy={start:'#27ae60',ferry:'#2980b9',trek:'#c0392b',view:'#8e44ad',ice:'#16a085',city:'#e67e22'};
 
-// Zastávky v pořadí itineráře. Souřadnice jsou orientační (slavná místa).
+// Zastávky (značky + popup s fotkou). Souřadnice orientační (slavná místa).
 const stops=[
  {n:'Modřice — start',c:[49.13,16.61],t:'start',den:'',w:'Modřice',lang:'cs',d:'Výjezd z Modřic. Vyzvednutí vozu ~8:00 v Rebešovicích.'},
- {n:'Hirtshals (DK) — přístav',c:[57.59,9.96],t:'ferry',den:'cesta tam',w:'Hirtshals',d:'~1100 km z Modřic (2 dny s noclehem). Odtud trajekt Fjord Line / Color Line do Kristiansandu. <b>Rezervovat dopředu!</b>'},
- {n:'Kristiansand (NO) — příjezd',c:[58.15,7.99],t:'ferry',den:'Ne',w:'Kristiansand',d:'Příjezd trajektem ~15:30. <span class="warn">Pozor: Kristiansand (jih), ne KristiansUnd!</span> Pak ~3,5 h k Preikestolen.'},
+ {n:'Hirtshals (DK) — přístav',c:[57.59,9.96],t:'ferry',den:'cesta tam',w:'Hirtshals',d:'Odtud trajekt Fjord Line / Color Line do Kristiansandu. <b>Rezervovat dopředu!</b>'},
+ {n:'Kristiansand (NO) — příjezd',c:[58.15,7.99],t:'ferry',den:'Ne',w:'Kristiansand',d:'Příjezd trajektem ~15:30. <span class="warn">Pozor: Kristiansand (jih), ne KristiansUnd!</span> Pak k Preikestolen.'},
  {n:'Preikestolen',c:[58.987,6.188],t:'trek',den:'Po',w:'Preikestolen',d:'Výšlap na slavnou „kazatelnu" — 8 km, ~4–5 h. Nocleh u parkoviště.'},
  {n:'Trolltunga',c:[60.124,6.740],t:'trek',den:'Út',w:'Trolltunga',d:'Náročný celodenní trek ~28 km, 800 m převýšení. <span class="warn">Vyrazit brzy ráno, parkoviště P2/P3 rezervovat předem.</span>'},
  {n:'Tvindefossen',c:[60.766,6.476],t:'view',den:'St',w:'Tvindefossen',d:'Vodopád hned u silnice. V kombinaci se Stegasteinem.'},
@@ -68,37 +99,64 @@ const stops=[
  {n:'Ålesund',c:[62.47,6.16],t:'city',den:'Ne',w:'Ålesund',d:'Secesní město, výhled z vrchu Aksla (418 schodů).'},
  {n:'Trollstigen',c:[62.46,7.67],t:'city',den:'Po',w:'Trollstigen',d:'Trolí stezka — serpentiny s 11 zatáčkami. <span class="warn">Ověřit sezónní otevření (sesuvy).</span>'},
  {n:'Jotunheimen (Galdhøpiggen)',c:[61.636,8.313],t:'trek',den:'Út–Čt',w:'Jotunheimen',d:'„Domov obrů" — nejvyšší vrchol Norska 2469 m, Besseggen, ledovce (3 dny). Nejsevernější bod cesty.'},
- {n:'Oslo',c:[59.91,10.75],t:'city',den:'Pá',w:'Oslo',d:'Průjezd na cestě zpět. <span class="warn">Velmi dlouhá jízda Jotunheimen → Malmö (9–11 h).</span>'},
+ {n:'Oslo',c:[59.91,10.75],t:'city',den:'Pá',w:'Oslo',d:'Začátek cesty zpět. <span class="warn">Dlouhý přejezd na jih.</span>'},
  {n:'Øresundský most',c:[55.57,12.85],t:'ferry',den:'cesta zpět',w:'Øresund Bridge',d:'Malmö → Kodaň: 8 km most + tunel, placené mýto. Dále Storebælt a Německem domů.'},
- {n:'Malmö',c:[55.60,13.00],t:'city',den:'Pá',w:'Malmö',d:'Nocleh. Druhý den Malmö → ČR, v neděli vrácení vozu do 13:00 v Rebešovicích.'},
+ {n:'Malmö',c:[55.60,13.00],t:'city',den:'Pá',w:'Malmö',d:'Možný nocleh cestou zpět přes Švédsko.'},
  {n:'Modřice — cíl',c:[49.13,16.61],t:'start',den:'Ne',w:'Modřice',lang:'cs',d:'Vrácení vozu do 13:00 v Rebešovicích.'},
+];
+
+// Úseky trasy. coords = body [lat,lon] (start, mezilehlé, cíl).
+// mode 'drive' = pokus o reálnou silniční trasu přes OSRM; 'ferry' = rovná přerušovaná.
+// kmFallback / hFallback = záložní odhad, když routovací služba neodpoví.
+const segments=[
+ {nazev:'Modřice → Hirtshals (přes Berlin)', color:'#0b3d66', mode:'drive', kmFallback:1180, hFallback:13.5,
+  coords:[[49.13,16.60],[50.08,14.44],[51.05,13.74],[52.52,13.40],[53.55,10.00],[54.04,9.92],[54.78,9.43],[57.05,9.92],[57.587,9.967]]},
+ {nazev:'Hirtshals → Kristiansand (trajekt)', color:'#2980b9', mode:'ferry', kmFallback:135, hFallback:3.25,
+  coords:[[57.587,9.967],[58.146,7.997]]},
+ {nazev:'Kristiansand → Preikestolen', color:'#0b3d66', mode:'drive', kmFallback:190, hFallback:3.7,
+  coords:[[58.146,7.997],[58.987,6.188]]},
+ {nazev:'Preikestolen → Trolltunga', color:'#0b3d66', mode:'drive', kmFallback:150, hFallback:3.5,
+  coords:[[58.987,6.188],[60.124,6.740]]},
+ {nazev:'Trolltunga → Tvindefossen', color:'#0b3d66', mode:'drive', kmFallback:80, hFallback:1.7,
+  coords:[[60.124,6.740],[60.766,6.476]]},
+ {nazev:'Tvindefossen → Stegastein', color:'#0b3d66', mode:'drive', kmFallback:85, hFallback:1.7,
+  coords:[[60.766,6.476],[60.904,7.275]]},
+ {nazev:'Stegastein → Sognefjord/Bøyabreen', color:'#0b3d66', mode:'drive', kmFallback:95, hFallback:2.2,
+  coords:[[60.904,7.275],[61.47,6.83]]},
+ {nazev:'Bøyabreen → Lovatnet', color:'#0b3d66', mode:'drive', kmFallback:80, hFallback:1.6,
+  coords:[[61.47,6.83],[61.83,6.86]]},
+ {nazev:'Lovatnet → Geirangerfjord', color:'#0b3d66', mode:'drive', kmFallback:80, hFallback:2.2,
+  coords:[[61.83,6.86],[62.11,7.18]]},
+ {nazev:'Geirangerfjord → Ålesund', color:'#0b3d66', mode:'drive', kmFallback:115, hFallback:2.6,
+  coords:[[62.11,7.18],[62.47,6.16]]},
+ {nazev:'Ålesund → Trollstigen', color:'#0b3d66', mode:'drive', kmFallback:110, hFallback:2.5,
+  coords:[[62.47,6.16],[62.46,7.67]]},
+ {nazev:'Trollstigen → Jotunheimen', color:'#0b3d66', mode:'drive', kmFallback:150, hFallback:3.2,
+  coords:[[62.46,7.67],[61.636,8.313]]},
+ {nazev:'Jotunheimen → Oslo', color:'#0b3d66', mode:'drive', kmFallback:330, hFallback:5.0,
+  coords:[[61.636,8.313],[59.91,10.75]]},
+ {nazev:'Oslo → Modřice (přes mosty)', color:'#16689c', mode:'drive', kmFallback:1750, hFallback:20.5,
+  coords:[[59.91,10.75],[57.71,11.97],[56.05,12.69],[55.60,13.00],[55.68,12.57],[55.34,11.03],[55.40,10.39],[55.49,9.47],[54.04,9.92],[53.55,10.00],[52.52,13.40],[51.05,13.74],[50.08,14.44],[49.13,16.60]]},
 ];
 
 const map=L.map('map');
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
   maxZoom:18, attribution:'© OpenStreetMap'}).addTo(map);
 
-// Fotka místa — načte se po rozkliknutí z Wikipedie (REST API, bez klíče, v prohlížeči).
+// ---- značky se zastávkami + fotka z Wikipedie ----
 const imgCache={};
 function loadPhoto(s, el){
   if(!s.w || !el) return;
-  const img=el.querySelector('.wimg');
-  if(!img) return;
-  const lang=s.lang||'en';
-  const key=lang+':'+s.w;
+  const img=el.querySelector('.wimg'); if(!img) return;
+  const lang=s.lang||'en', key=lang+':'+s.w;
   if(key in imgCache){ if(imgCache[key]){img.src=imgCache[key];img.style.display='block';} return; }
   fetch(`https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(s.w)}`)
     .then(r=>r.ok?r.json():null)
-    .then(d=>{
-      const src=d&&d.thumbnail&&d.thumbnail.source;
-      imgCache[key]=src||'';
-      if(src){img.src=src;img.style.display='block';}
-    }).catch(()=>{imgCache[key]='';});
+    .then(d=>{ const src=d&&d.thumbnail&&d.thumbnail.source; imgCache[key]=src||'';
+      if(src){img.src=src;img.style.display='block';} })
+    .catch(()=>{imgCache[key]='';});
 }
-
-const latlngs=[];
 stops.forEach((s,i)=>{
-  latlngs.push(s.c);
   const m=L.circleMarker(s.c,{radius:9,color:'#fff',weight:2,
      fillColor:barvy[s.t],fillOpacity:1}).addTo(map);
   const den=s.den?`<span class="den">${s.den}</span><br>`:'';
@@ -106,57 +164,76 @@ stops.forEach((s,i)=>{
   m.on('popupopen',()=>loadPhoto(s, m.getPopup().getElement()));
 });
 
-// Cesta TAM po silnici: Modřice → Praha → Drážďany → Berlin → Padenstedt → Emmersbæk → Hirtshals
-const cestaTam=[
- [49.13,16.60],  // Modřice
- [50.08,14.44],  // Praha
- [51.05,13.74],  // Drážďany
- [52.52,13.40],  // Berlin
- [53.55,10.00],  // Hamburg (na trase)
- [54.04,9.92],   // Padenstedt
- [54.78,9.43],   // Flensburg (hranice DE/DK)
- [57.05,9.92],   // Aalborg (na trase Jutskem)
- [57.573,9.985], // Emmersbæk
- [57.587,9.967]  // Hirtshals (trajekt)
-];
-const lineTam=L.polyline(cestaTam,{color:'#0b3d66',weight:4,opacity:.85}).addTo(map);
+// ---- vykreslení úseků + šipky směru + panel s km/časem ----
+function fmtH(h){ const m=Math.round(h*60), hh=Math.floor(m/60), mm=m%60;
+  return (hh?hh+' h ':'')+(mm||!hh?mm+' min':'').trim(); }
 
-// Cesta ZPĚT po silnici: Oslo → Göteborg → Helsingborg → Malmö → mosty → Kolding → Padenstedt → Berlin → Drážďany → Praha → Modřice
-const cestaZpet=[
- [59.91,10.75], // Oslo
- [57.71,11.97], // Göteborg
- [56.05,12.69], // Helsingborg
- [55.60,13.00], // Malmö
- [55.57,12.85], // Øresundský most
- [55.68,12.57], // Kodaň
- [55.34,11.03], // Storebæltský most
- [55.40,10.39], // Odense (Fyn)
- [55.49,9.47],  // Kolding (přes Lillebælt)
- [54.04,9.92],  // Padenstedt
- [53.55,10.00], // Hamburg (na trase)
- [52.52,13.40], // Berlin
- [51.05,13.74], // Drážďany
- [50.08,14.44], // Praha
- [49.13,16.60]  // Modřice
-];
-const lineZpet=L.polyline(cestaZpet,{color:'#16689c',weight:4,opacity:.85}).addTo(map);
-
-// Trajekt + norská část (Hirtshals → Kristiansand → norské zastávky → Oslo) — přerušovaně
-const lineNor=L.polyline(latlngs.slice(1,14),{color:'#0b3d66',weight:3,opacity:.5,dashArray:'6,8'}).addTo(map);
-
-// Směrové šipky ukazující směr jízdy (sledují pořadí bodů na trase)
-function smerovky(line,color){
-  L.polylineDecorator(line,{patterns:[{
-    offset:25, repeat:80,
+function decorate(line,color){
+  return L.polylineDecorator(line,{patterns:[{offset:25,repeat:80,
     symbol:L.Symbol.arrowHead({pixelSize:10,polygon:false,
-      pathOptions:{stroke:true,color:color,weight:2,opacity:.9}})
-  }]}).addTo(map);
+      pathOptions:{stroke:true,color:color,weight:2,opacity:.9}})}]}).addTo(map);
 }
-smerovky(lineTam,'#0b3d66');
-smerovky(lineZpet,'#16689c');
-smerovky(lineNor,'#0b3d66');
+function osrm(coords){
+  const s=coords.map(c=>c[1]+','+c[0]).join(';');
+  return fetch(`https://router.project-osrm.org/route/v1/driving/${s}?overview=full&geometries=geojson`)
+    .then(r=>r.ok?r.json():null)
+    .then(d=>{ if(d&&d.routes&&d.routes[0]){const r=d.routes[0];
+        return {km:r.distance/1000, h:r.duration/3600, geom:r.geometry.coordinates.map(p=>[p[1],p[0]])};}
+      return null; });
+}
 
-map.fitBounds(L.latLngBounds([...cestaTam,...cestaZpet,...latlngs]).pad(0.08));
+const rowsEl=document.getElementById('prows');
+const allPts=[];
+segments.forEach((seg,i)=>{
+  const ferry=seg.mode==='ferry';
+  seg._line=L.polyline(seg.coords,{color:seg.color,weight:ferry?3:4,
+     opacity:ferry?.6:.85,dashArray:ferry?'6,8':null}).addTo(map);
+  seg._dec=decorate(seg._line,seg.color);
+  seg.coords.forEach(c=>allPts.push(c));
+  seg._km=seg.kmFallback; seg._h=seg.hFallback; seg._real=false;
+  const row=document.createElement('div'); row.className='prow';
+  row.innerHTML=`<span class="pn">${i+1}. ${seg.nazev}</span>`+
+                `<span class="pv est" id="pv${i}">~${Math.round(seg._km)} km · ${fmtH(seg._h)}</span>`;
+  rowsEl.appendChild(row);
+  seg._line.bindTooltip(`${seg.nazev}`,{sticky:true});
+});
+map.fitBounds(L.latLngBounds(allPts).pad(0.08));
+
+function recompute(){
+  let dk=0,dh=0,fk=0,fh=0;
+  segments.forEach(s=>{ if(s.mode==='ferry'){fk+=s._km;fh+=s._h;} else {dk+=s._km;dh+=s._h;} });
+  document.getElementById('ptot').innerHTML=
+    `<div><b>🚗 Jízda autem:</b> ${Math.round(dk)} km · ${fmtH(dh)}</div>`+
+    `<div><b>⛴️ Trajekt:</b> ${Math.round(fk)} km · ${fmtH(fh)}</div>`+
+    `<div class="grand"><b>Celkem:</b> ${Math.round(dk+fk)} km · ${fmtH(dh+fh)}</div>`;
+}
+recompute();
+
+// postupně dotáhnout reálné silniční trasy (šetrně k veřejnému serveru)
+(async()=>{
+  for(let i=0;i<segments.length;i++){
+    const seg=segments[i];
+    if(seg.mode!=='drive') continue;
+    try{
+      const res=await osrm(seg.coords);
+      if(res){
+        seg._line.setLatLngs(res.geom);
+        map.removeLayer(seg._dec); seg._dec=decorate(seg._line,seg.color);
+        seg._km=res.km; seg._h=res.h; seg._real=true;
+        const el=document.getElementById('pv'+i);
+        el.classList.remove('est');
+        el.textContent=`${Math.round(res.km)} km · ${fmtH(res.h)}`;
+        seg._line.setTooltipContent(`${seg.nazev}: ${Math.round(res.km)} km · ${fmtH(res.h)}`);
+        recompute();
+      }
+    }catch(e){}
+    await new Promise(r=>setTimeout(r,350));
+  }
+})();
+
+// ovládání panelu
+document.getElementById('ptoggle').onclick=()=>document.getElementById('panel').classList.toggle('open');
+document.getElementById('pclose').onclick=()=>document.getElementById('panel').classList.remove('open');
 </script>
 </body>
 </html>
