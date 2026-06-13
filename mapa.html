@@ -29,6 +29,9 @@
        font-weight:600;font-size:.75rem;padding:1px 8px;border-radius:10px;margin-bottom:6px}
   .leaflet-popup-content .warn{color:#c0392b;font-weight:600}
   .leaflet-popup-content .wimg{display:none;width:100%;border-radius:6px;margin-top:8px}
+  .leaflet-popup-content .tp{margin-top:6px;background:#fff1e0;color:#b06a00;
+       padding:3px 8px;border-radius:8px;display:inline-block;font-size:.85rem}
+  .leaflet-popup-content .tp span{color:#5b6b7a;font-size:.78rem}
   /* boční panel s úseky */
   #panel{position:absolute;top:0;right:0;bottom:0;width:330px;max-width:85%;background:#fff;
          box-shadow:-3px 0 14px rgba(0,0,0,.15);transform:translateX(100%);transition:.25s;
@@ -87,23 +90,23 @@ const barvy={start:'#27ae60',ferry:'#2980b9',trek:'#c0392b',view:'#8e44ad',ice:'
 
 // Zastávky (značky + popup s fotkou). Souřadnice orientační (slavná místa).
 const stops=[
- {n:'Modřice — start',c:[49.13,16.61],t:'start',den:'',w:'Modřice',lang:'cs',d:'Výjezd z Modřic. Vyzvednutí vozu ~8:00 v Rebešovicích.'},
- {n:'Hirtshals (DK) — přístav',c:[57.59,9.96],t:'ferry',den:'cesta tam',w:'Hirtshals',d:'Odtud trajekt Fjord Line / Color Line do Kristiansandu. <b>Rezervovat dopředu!</b>'},
- {n:'Kristiansand (NO) — příjezd',c:[58.15,7.99],t:'ferry',den:'Ne',w:'Kristiansand',d:'Příjezd trajektem ~15:30. <span class="warn">Pozor: Kristiansand (jih), ne KristiansUnd!</span> Pak k Preikestolen.'},
- {n:'Preikestolen',c:[58.987,6.188],t:'trek',den:'Po',w:'Preikestolen',d:'Výšlap na slavnou „kazatelnu" — 8 km, ~4–5 h. Nocleh u parkoviště.'},
- {n:'Trolltunga',c:[60.124,6.740],t:'trek',den:'Út',w:'Trolltunga',d:'Náročný celodenní trek ~28 km, 800 m převýšení. <span class="warn">Vyrazit brzy ráno, parkoviště P2/P3 rezervovat předem.</span>'},
- {n:'Tvindefossen',c:[60.766,6.476],t:'view',den:'St',w:'Tvindefossen',d:'Vodopád hned u silnice. V kombinaci se Stegasteinem.'},
- {n:'Stegastein',c:[60.904,7.275],t:'view',den:'St',w:'Stegastein',d:'Vyhlídka nad Aurlandsfjordem. <span class="warn">Úzká klikatá cesta — s obytkou opatrně.</span>'},
- {n:'Bøyabreen / Sognefjord',c:[61.47,6.83],t:'ice',den:'Čt',w:'Sognefjord',d:'Nejdelší norský fjord + ledovec Bøyabreen hned u cesty, parkování zdarma.'},
- {n:'Lovatnet',c:[61.83,6.86],t:'ice',den:'Pá',w:'Lovatnet',d:'Tyrkysové jezero, možnost kajaku. <span class="warn">Úzká cesta — pozor s obytkou.</span>'},
- {n:'Geirangerfjord',c:[62.11,7.18],t:'view',den:'So',w:'Geirangerfjorden',d:'UNESCO. Vyhlídka Ørnesvingen, lodní výlet k vodopádu Sedm sester.'},
- {n:'Ålesund',c:[62.47,6.16],t:'city',den:'Ne',w:'Ålesund',d:'Secesní město, výhled z vrchu Aksla (418 schodů).'},
- {n:'Trollstigen',c:[62.46,7.67],t:'city',den:'Po',w:'Trollstigen',d:'Trolí stezka — serpentiny s 11 zatáčkami. <span class="warn">Ověřit sezónní otevření (sesuvy).</span>'},
- {n:'Jotunheimen (Galdhøpiggen)',c:[61.636,8.313],t:'trek',den:'Út–Čt',w:'Jotunheimen',d:'„Domov obrů" — nejvyšší vrchol Norska 2469 m, Besseggen, ledovce (3 dny). Nejsevernější bod cesty.'},
- {n:'Oslo',c:[59.91,10.75],t:'city',den:'Pá',w:'Oslo',d:'Začátek cesty zpět. <span class="warn">Dlouhý přejezd na jih.</span>'},
- {n:'Øresundský most',c:[55.57,12.85],t:'ferry',den:'cesta zpět',w:'Øresund Bridge',d:'Malmö → Kodaň: 8 km most + tunel, placené mýto. Dále Storebælt a Německem domů.'},
- {n:'Malmö',c:[55.60,13.00],t:'city',den:'Pá',w:'Malmö',d:'Možný nocleh cestou zpět přes Švédsko.'},
- {n:'Modřice — cíl',c:[49.13,16.61],t:'start',den:'Ne',w:'Modřice',lang:'cs',d:'Vrácení vozu do 13:00 v Rebešovicích.'},
+ {n:'Modřice — start',c:[49.13,16.61],t:'start',den:'',w:'Modřice',lang:'cs',tp:'~25 °C',d:'Výjezd z Modřic. Vyzvednutí vozu ~8:00 v Rebešovicích.'},
+ {n:'Hirtshals (DK) — přístav',c:[57.59,9.96],t:'ferry',den:'cesta tam',w:'Hirtshals',tp:'~18 °C',d:'Odtud trajekt Fjord Line / Color Line do Kristiansandu. <b>Rezervovat dopředu!</b>'},
+ {n:'Kristiansand (NO) — příjezd',c:[58.15,7.99],t:'ferry',den:'Ne',w:'Kristiansand',tp:'~19 °C',d:'Příjezd trajektem ~15:30. <span class="warn">Pozor: Kristiansand (jih), ne KristiansUnd!</span> Pak k Preikestolen.'},
+ {n:'Preikestolen',c:[58.987,6.188],t:'trek',den:'Po',w:'Preikestolen',tp:'~16 °C',d:'Výšlap na slavnou „kazatelnu" — 8 km, ~4–5 h. Nocleh u parkoviště.'},
+ {n:'Trolltunga',c:[60.124,6.740],t:'trek',den:'Út',w:'Trolltunga',tp:'~13 °C',d:'Náročný celodenní trek ~28 km, 800 m převýšení. <span class="warn">Vyrazit brzy ráno, parkoviště P2/P3 rezervovat předem.</span>'},
+ {n:'Tvindefossen',c:[60.766,6.476],t:'view',den:'St',w:'Tvindefossen',tp:'~17 °C',d:'Vodopád hned u silnice. V kombinaci se Stegasteinem.'},
+ {n:'Stegastein',c:[60.904,7.275],t:'view',den:'St',w:'Stegastein',tp:'~16 °C',d:'Vyhlídka nad Aurlandsfjordem. <span class="warn">Úzká klikatá cesta — s obytkou opatrně.</span>'},
+ {n:'Bøyabreen / Sognefjord',c:[61.47,6.83],t:'ice',den:'Čt',w:'Sognefjord',tp:'~17 °C',d:'Nejdelší norský fjord + ledovec Bøyabreen hned u cesty, parkování zdarma.'},
+ {n:'Lovatnet',c:[61.83,6.86],t:'ice',den:'Pá',w:'Lovatnet',tp:'~17 °C',d:'Tyrkysové jezero, možnost kajaku. <span class="warn">Úzká cesta — pozor s obytkou.</span>'},
+ {n:'Geirangerfjord',c:[62.11,7.18],t:'view',den:'So',w:'Geirangerfjorden',tp:'~17 °C',d:'UNESCO. Vyhlídka Ørnesvingen, lodní výlet k vodopádu Sedm sester.'},
+ {n:'Ålesund',c:[62.47,6.16],t:'city',den:'Ne',w:'Ålesund',tp:'~16 °C',d:'Secesní město, výhled z vrchu Aksla (418 schodů).'},
+ {n:'Trollstigen',c:[62.46,7.67],t:'city',den:'Po',w:'Trollstigen',tp:'~12 °C',d:'Trolí stezka — serpentiny s 11 zatáčkami. <span class="warn">Ověřit sezónní otevření (sesuvy).</span>'},
+ {n:'Jotunheimen (Galdhøpiggen)',c:[61.636,8.313],t:'trek',den:'Út–Čt',w:'Jotunheimen',tp:'~11 °C',d:'„Domov obrů" — nejvyšší vrchol Norska 2469 m, Besseggen, ledovce (3 dny). Nejsevernější bod cesty.'},
+ {n:'Oslo',c:[59.91,10.75],t:'city',den:'Pá',w:'Oslo',tp:'~22 °C',d:'Začátek cesty zpět. <span class="warn">Dlouhý přejezd na jih.</span>'},
+ {n:'Øresundský most',c:[55.57,12.85],t:'ferry',den:'cesta zpět',w:'Øresund Bridge',tp:'~21 °C',d:'Malmö → Kodaň: 8 km most + tunel, placené mýto. Dále Storebælt a Německem domů.'},
+ {n:'Malmö',c:[55.60,13.00],t:'city',den:'Pá',w:'Malmö',tp:'~21 °C',d:'Možný nocleh cestou zpět přes Švédsko.'},
+ {n:'Modřice — cíl',c:[49.13,16.61],t:'start',den:'Ne',w:'Modřice',lang:'cs',tp:'~25 °C',d:'Vrácení vozu do 13:00 v Rebešovicích.'},
 ];
 
 // Úseky trasy. coords = body [lat,lon] (start, mezilehlé, cíl).
@@ -161,7 +164,8 @@ stops.forEach((s,i)=>{
   const m=L.circleMarker(s.c,{radius:9,color:'#fff',weight:2,
      fillColor:barvy[s.t],fillOpacity:1}).addTo(map);
   const den=s.den?`<span class="den">${s.den}</span><br>`:'';
-  m.bindPopup(`<h3>${i+1}. ${s.n}</h3>${den}${s.d}<img class="wimg" alt="" referrerpolicy="no-referrer">`,{maxWidth:240,minWidth:200});
+  const tp=s.tp?`<div class="tp">🌡️ <b>${s.tp}</b> <span>(průměr čvc)</span></div>`:'';
+  m.bindPopup(`<h3>${i+1}. ${s.n}</h3>${den}${s.d}${tp}<img class="wimg" alt="" referrerpolicy="no-referrer">`,{maxWidth:240,minWidth:200});
   m.on('popupopen',()=>loadPhoto(s, m.getPopup().getElement()));
 });
 
