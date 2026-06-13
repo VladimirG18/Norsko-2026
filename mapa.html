@@ -40,8 +40,9 @@
     <span><i class="dot" style="background:#8e44ad"></i> vyhlídka / fjord</span>
     <span><i class="dot" style="background:#16a085"></i> ledovec / jezero</span>
     <span><i class="dot" style="background:#e67e22"></i> město / serpentiny</span>
-    <span><i style="display:inline-block;width:20px;height:0;border-top:4px solid #0b3d66;vertical-align:middle"></i> trasa tam (silnice)</span>
-    <span><i style="display:inline-block;width:20px;height:0;border-top:3px dashed #0b3d66;vertical-align:middle"></i> trajekt / Norsko / zpět</span>
+    <span><i style="display:inline-block;width:20px;height:0;border-top:4px solid #0b3d66;vertical-align:middle"></i> trasa tam (autem)</span>
+    <span><i style="display:inline-block;width:20px;height:0;border-top:4px solid #16689c;vertical-align:middle"></i> trasa zpět (autem)</span>
+    <span><i style="display:inline-block;width:20px;height:0;border-top:3px dashed #0b3d66;vertical-align:middle"></i> trajekt + norská část</span>
   </div>
   <div id="mapwrap"><div id="map"></div></div>
 </div>
@@ -84,34 +85,45 @@ stops.forEach((s,i)=>{
   m.bindPopup(`<h3>${i+1}. ${s.n}</h3>${den}${s.d}`);
 });
 
-// Detailní trasa cesty TAM po silnici: Modřice → Německo → Hirtshals (k moři).
-// Vedeno přes hlavní dálniční tahy (orientační průběh, bez přesné domácí adresy).
+// Cesta TAM po silnici: Modřice → Praha → Drážďany → Berlin → Padenstedt → Emmersbæk → Hirtshals
 const cestaTam=[
- [49.13,16.60], // Modřice
- [49.40,15.59], // Jihlava
- [50.05,14.45], // Praha
- [49.74,13.38], // Plzeň
- [49.67,12.55], // Rozvadov (hranice CZ/DE)
- [49.45,11.08], // Nürnberg
- [49.79,9.95],  // Würzburg
- [50.11,8.68],  // Frankfurt
- [50.94,6.96],  // Köln
- [51.51,7.47],  // Dortmund
- [52.28,8.05],  // Osnabrück
- [53.08,8.80],  // Bremen
- [53.55,10.00], // Hamburg
- [54.78,9.43],  // Flensburg (hranice DE/DK)
- [55.49,9.47],  // Kolding
- [56.16,10.20], // Aarhus
- [57.05,9.92],  // Aalborg
- [57.587,9.967] // Hirtshals (trajekt)
+ [49.13,16.60],  // Modřice
+ [50.08,14.44],  // Praha
+ [51.05,13.74],  // Drážďany
+ [52.52,13.40],  // Berlin
+ [53.55,10.00],  // Hamburg (na trase)
+ [54.04,9.92],   // Padenstedt
+ [54.78,9.43],   // Flensburg (hranice DE/DK)
+ [57.05,9.92],   // Aalborg (na trase Jutskem)
+ [57.573,9.985], // Emmersbæk
+ [57.587,9.967]  // Hirtshals (trajekt)
 ];
 L.polyline(cestaTam,{color:'#0b3d66',weight:4,opacity:.85}).addTo(map);
 
-// Zbytek cesty (trajekt, Norsko, návrat) — tenká přerušovaná čára mezi zastávkami
-L.polyline(latlngs.slice(1),{color:'#0b3d66',weight:3,opacity:.5,dashArray:'6,8'}).addTo(map);
+// Cesta ZPĚT po silnici: Oslo → Göteborg → Helsingborg → Malmö → mosty → Kolding → Padenstedt → Berlin → Drážďany → Praha → Modřice
+const cestaZpet=[
+ [59.91,10.75], // Oslo
+ [57.71,11.97], // Göteborg
+ [56.05,12.69], // Helsingborg
+ [55.60,13.00], // Malmö
+ [55.57,12.85], // Øresundský most
+ [55.68,12.57], // Kodaň
+ [55.34,11.03], // Storebæltský most
+ [55.40,10.39], // Odense (Fyn)
+ [55.49,9.47],  // Kolding (přes Lillebælt)
+ [54.04,9.92],  // Padenstedt
+ [53.55,10.00], // Hamburg (na trase)
+ [52.52,13.40], // Berlin
+ [51.05,13.74], // Drážďany
+ [50.08,14.44], // Praha
+ [49.13,16.60]  // Modřice
+];
+L.polyline(cestaZpet,{color:'#16689c',weight:4,opacity:.85}).addTo(map);
 
-map.fitBounds(L.latLngBounds([...cestaTam,...latlngs]).pad(0.1));
+// Trajekt + norská část (Hirtshals → Kristiansand → norské zastávky → Oslo) — přerušovaně
+L.polyline(latlngs.slice(1,14),{color:'#0b3d66',weight:3,opacity:.5,dashArray:'6,8'}).addTo(map);
+
+map.fitBounds(L.latLngBounds([...cestaTam,...cestaZpet,...latlngs]).pad(0.08));
 </script>
 </body>
 </html>
