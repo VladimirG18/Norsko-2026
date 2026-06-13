@@ -39,7 +39,9 @@
   .phead #pclose{cursor:pointer;font-size:1.1rem}
   #prows{overflow:auto;flex:1;padding:4px 0}
   .prow{display:flex;justify-content:space-between;gap:10px;padding:8px 14px;
-        border-bottom:1px solid #eef3f7;font-size:.85rem}
+        border-bottom:1px solid #eef3f7;font-size:.85rem;cursor:pointer}
+  .prow:hover{background:#f3f8fc}
+  .prow.active{background:#fff1e0;box-shadow:inset 3px 0 0 #ff7a00}
   .prow .pn{color:#1c2733}
   .prow .pv{color:var(--modra);font-weight:600;white-space:nowrap;text-align:right}
   .prow .pv.est{color:#b07a00}
@@ -65,7 +67,7 @@
     <span><i class="dot" style="background:#16a085"></i> ledovec / jezero</span>
     <span><i class="dot" style="background:#e67e22"></i> město / serpentiny</span>
     <span><i style="display:inline-block;width:20px;height:0;border-top:4px solid #0b3d66;vertical-align:middle"></i> trasa tam (autem)</span>
-    <span><i style="display:inline-block;width:20px;height:0;border-top:4px solid #16689c;vertical-align:middle"></i> trasa zpět (autem)</span>
+    <span><i style="display:inline-block;width:20px;height:0;border-top:4px solid #2ecc71;vertical-align:middle"></i> trasa zpět (autem)</span>
     <span><i style="display:inline-block;width:20px;height:0;border-top:3px dashed #2980b9;vertical-align:middle"></i> trajekt</span>
   </div>
   <div id="mapwrap">
@@ -80,7 +82,6 @@
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet-polylinedecorator@1.6.0/dist/leaflet.polylineDecorator.js"></script>
 <script>
 const barvy={start:'#27ae60',ferry:'#2980b9',trek:'#c0392b',view:'#8e44ad',ice:'#16a085',city:'#e67e22'};
 
@@ -135,7 +136,7 @@ const segments=[
   coords:[[62.46,7.67],[61.636,8.313]]},
  {nazev:'Jotunheimen → Oslo', color:'#0b3d66', mode:'drive', kmFallback:330, hFallback:5.0,
   coords:[[61.636,8.313],[59.91,10.75]]},
- {nazev:'Oslo → Modřice (přes mosty)', color:'#16689c', mode:'drive', kmFallback:1750, hFallback:20.5,
+ {nazev:'Oslo → Modřice (přes mosty)', color:'#2ecc71', mode:'drive', kmFallback:1750, hFallback:20.5,
   coords:[[59.91,10.75],[57.71,11.97],[56.05,12.69],[55.60,13.00],[55.68,12.57],[55.34,11.03],[55.40,10.39],[55.49,9.47],[54.04,9.92],[53.55,10.00],[52.52,13.40],[51.05,13.74],[50.08,14.44],[49.13,16.60]]},
 ];
 
@@ -168,11 +169,6 @@ stops.forEach((s,i)=>{
 function fmtH(h){ const m=Math.round(h*60), hh=Math.floor(m/60), mm=m%60;
   return (hh?hh+' h ':'')+(mm||!hh?mm+' min':'').trim(); }
 
-function decorate(line,color){
-  return L.polylineDecorator(line,{patterns:[{offset:25,repeat:80,
-    symbol:L.Symbol.arrowHead({pixelSize:10,polygon:false,
-      pathOptions:{stroke:true,color:color,weight:2,opacity:.9}})}]}).addTo(map);
-}
 function osrm(coords){
   const s=coords.map(c=>c[1]+','+c[0]).join(';');
   return fetch(`https://router.project-osrm.org/route/v1/driving/${s}?overview=full&geometries=geojson`)
@@ -184,20 +180,40 @@ function osrm(coords){
 
 const rowsEl=document.getElementById('prows');
 const allPts=[];
+const HL='#ff7a00';   // zvýrazňovací barva vybraného úseku
+let selected=-1;
 segments.forEach((seg,i)=>{
   const ferry=seg.mode==='ferry';
-  seg._line=L.polyline(seg.coords,{color:seg.color,weight:ferry?3:4,
-     opacity:ferry?.6:.85,dashArray:ferry?'6,8':null}).addTo(map);
-  seg._dec=decorate(seg._line,seg.color);
+  seg._style={color:seg.color,weight:ferry?3:4,opacity:ferry?.6:.85,dashArray:ferry?'6,8':null};
+  seg._hl={color:HL,weight:7,opacity:1,dashArray:ferry?'6,8':null};
+  seg._line=L.polyline(seg.coords,seg._style).addTo(map);
   seg.coords.forEach(c=>allPts.push(c));
   seg._km=seg.kmFallback; seg._h=seg.hFallback; seg._real=false;
-  const row=document.createElement('div'); row.className='prow';
+  const row=document.createElement('div'); row.className='prow'; row.id='prow'+i;
   row.innerHTML=`<span class="pn">${i+1}. ${seg.nazev}</span>`+
                 `<span class="pv est" id="pv${i}">~${Math.round(seg._km)} km · ${fmtH(seg._h)}</span>`;
+  row.onclick=()=>selectSeg(i);
   rowsEl.appendChild(row);
   seg._line.bindTooltip(`${seg.nazev}`,{sticky:true});
+  seg._line.on('click',()=>selectSeg(i));
 });
 map.fitBounds(L.latLngBounds(allPts).pad(0.08));
+
+// Klik na úsek (v panelu i na mapě) ho zvýrazní; druhý klik výběr zruší.
+function selectSeg(i){
+  if(selected>=0){
+    segments[selected]._line.setStyle(segments[selected]._style);
+    const pp=document.getElementById('prow'+selected); if(pp) pp.classList.remove('active');
+  }
+  if(selected===i){ selected=-1; return; }
+  selected=i;
+  const seg=segments[i];
+  seg._line.setStyle(seg._hl); seg._line.bringToFront();
+  const pr=document.getElementById('prow'+i);
+  if(pr){ pr.classList.add('active'); pr.scrollIntoView({block:'nearest'}); }
+  map.fitBounds(seg._line.getBounds().pad(0.15));
+  document.getElementById('panel').classList.add('open');
+}
 
 function recompute(){
   let dk=0,dh=0,fk=0,fh=0;
@@ -218,7 +234,7 @@ recompute();
       const res=await osrm(seg.coords);
       if(res){
         seg._line.setLatLngs(res.geom);
-        map.removeLayer(seg._dec); seg._dec=decorate(seg._line,seg.color);
+        if(selected===i) seg._line.bringToFront();
         seg._km=res.km; seg._h=res.h; seg._real=true;
         const el=document.getElementById('pv'+i);
         el.classList.remove('est');
