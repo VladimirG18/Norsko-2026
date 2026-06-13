@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Norsko 2026 — kalkulačka nosnosti</title>
+<style>
+  :root{--modra:#0b3d66;--led:#e8f1f7;--akcent:#c0392b;--zelena:#27ae60;
+        --text:#1c2733;--slabe:#5b6b7a}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+       color:var(--text);background:var(--led)}
+  .topbar{background:var(--modra);color:#fff;padding:10px 16px}
+  .topbar a{color:#cfe6f5;text-decoration:none;font-size:.9rem}
+  .wrap{max-width:680px;margin:18px auto;padding:0 14px}
+  h1{color:var(--modra);font-size:1.4rem;margin:6px 0}
+  .sub{color:var(--slabe);font-size:.92rem;margin:0 0 18px}
+  .gauge{background:#fff;border-radius:14px;padding:20px;box-shadow:0 4px 16px rgba(11,61,102,.1);
+         margin-bottom:18px;text-align:center}
+  .gauge .num{font-size:2.6rem;font-weight:800;line-height:1}
+  .gauge .cap{color:var(--slabe);font-size:.9rem;margin-top:4px}
+  .bar{height:22px;background:#e3eaf0;border-radius:11px;overflow:hidden;margin:16px 0 6px}
+  .bar .fill{height:100%;width:0;background:var(--zelena);transition:.25s}
+  .scale{display:flex;justify-content:space-between;font-size:.78rem;color:var(--slabe)}
+  .card{background:#fff;border-radius:14px;padding:18px 20px;box-shadow:0 4px 16px rgba(11,61,102,.1);
+        margin-bottom:16px}
+  .card h2{margin:0 0 12px;color:var(--modra);font-size:1.05rem}
+  .row{display:flex;align-items:center;justify-content:space-between;gap:10px;
+       padding:8px 0;border-bottom:1px solid #eef3f7}
+  .row:last-child{border-bottom:0}
+  .row label{flex:1;font-size:.92rem}
+  .row .hint{color:var(--slabe);font-size:.78rem;display:block}
+  input[type=number]{width:80px;padding:7px 8px;border:1px solid #cdd9e3;border-radius:8px;
+       font-size:.95rem;text-align:right}
+  .unit{color:var(--slabe);font-size:.82rem;width:28px}
+  .note{font-size:.82rem;color:var(--slabe);margin-top:6px}
+  .alert{background:#fff4f2;border:1px solid #f3c5bd;color:var(--akcent);border-radius:10px;
+         padding:12px 14px;font-size:.9rem;font-weight:600;display:none}
+</style>
+</head>
+<body>
+<div class="topbar"><a href="index.html">← rozcestník</a></div>
+<div class="wrap">
+  <h1>⚖️ Kalkulačka nosnosti</h1>
+  <p class="sub">CI Horon 84 M Elite — užitečná nosnost (payload) <b>485 kg</b>. Sleduj, kolik ti zbývá.</p>
+
+  <div class="gauge">
+    <div class="num" id="zbyva">485</div>
+    <div class="cap">kg zbývá z limitu 485 kg</div>
+    <div class="bar"><div class="fill" id="fill"></div></div>
+    <div class="scale"><span>0 kg naloženo</span><span id="naloz">0 kg</span><span>485 kg</span></div>
+    <div class="alert" id="alert">⚠️ Překročen limit nosnosti! Je potřeba ubrat.</div>
+  </div>
+
+  <div class="card">
+    <h2>👥 Posádka</h2>
+    <div class="row">
+      <label>Dospělí <span class="hint">průměr 75 kg/os.</span></label>
+      <input type="number" id="dosp" value="4" min="0"><span class="unit">os</span>
+    </div>
+    <div class="row">
+      <label>Děti <span class="hint">průměr 35 kg/dítě</span></label>
+      <input type="number" id="deti" value="1" min="0"><span class="unit">os</span>
+    </div>
+    <div class="row">
+      <label>Pes</label>
+      <input type="number" id="pes" value="20" min="0"><span class="unit">kg</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🎒 Vybavení &amp; zásoby</h2>
+    <div class="row">
+      <label>Oblečení &amp; osobní věci <span class="hint">~8 kg/os.</span></label>
+      <input type="number" id="obleceni" value="40" min="0"><span class="unit">kg</span>
+    </div>
+    <div class="row">
+      <label>Jídlo &amp; nápoje na cestu</label>
+      <input type="number" id="jidlo" value="35" min="0"><span class="unit">kg</span>
+    </div>
+    <div class="row">
+      <label>Voda v nádrži <span class="hint">1 l = 1 kg</span></label>
+      <input type="number" id="voda" value="40" min="0"><span class="unit">kg</span>
+    </div>
+    <div class="row">
+      <label>Outdoor (boty, batohy, treky)</label>
+      <input type="number" id="outdoor" value="25" min="0"><span class="unit">kg</span>
+    </div>
+    <div class="row">
+      <label>Kola na nosiči <span class="hint">~14 kg/kolo</span></label>
+      <input type="number" id="kola" value="0" min="0"><span class="unit">kg</span>
+    </div>
+    <div class="row">
+      <label>Ostatní (AdBlue, plyn, klíny…)</label>
+      <input type="number" id="ostatni" value="20" min="0"><span class="unit">kg</span>
+    </div>
+    <p class="note">Hodnoty jsou orientační — uprav podle reality. Doporučení z podkladů: vůz před odjezdem zvážit na nákladní váze.</p>
+  </div>
+</div>
+
+<script>
+const LIMIT=485;
+const ids=['dosp','deti','pes','obleceni','jidlo','voda','outdoor','kola','ostatni'];
+function num(id){return Math.max(0,parseFloat(document.getElementById(id).value)||0)}
+function prepocet(){
+  const naloz = num('dosp')*75 + num('deti')*35 + num('pes')
+     + num('obleceni')+num('jidlo')+num('voda')+num('outdoor')+num('kola')+num('ostatni');
+  const zbyva = LIMIT - naloz;
+  document.getElementById('naloz').textContent = Math.round(naloz)+' kg';
+  const z=document.getElementById('zbyva');
+  z.textContent = Math.round(zbyva);
+  const pct = Math.min(100, naloz/LIMIT*100);
+  const fill=document.getElementById('fill');
+  fill.style.width = pct+'%';
+  let col = zbyva<0 ? '#c0392b' : zbyva<50 ? '#e0a800' : '#27ae60';
+  fill.style.background = col; z.style.color = col;
+  document.getElementById('alert').style.display = zbyva<0 ? 'block' : 'none';
+}
+ids.forEach(id=>document.getElementById(id).addEventListener('input',prepocet));
+prepocet();
+</script>
+</body>
+</html>

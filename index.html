@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Norsko 2026 — průvodce cestou</title>
+<style>
+  :root{
+    --modra:#0b3d66; --modra2:#16689c; --led:#e8f1f7;
+    --text:#1c2733; --slabe:#5b6b7a; --akcent:#c0392b;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+       color:var(--text);background:var(--led);line-height:1.5}
+  header{background:linear-gradient(135deg,var(--modra),var(--modra2));color:#fff;
+         padding:48px 20px 40px;text-align:center}
+  header h1{margin:0 0 8px;font-size:2.1rem;letter-spacing:.5px}
+  header p{margin:0;opacity:.9;font-size:1.05rem}
+  .flag{font-size:2.4rem;display:block;margin-bottom:10px}
+  .meta{margin-top:18px;display:inline-flex;flex-wrap:wrap;gap:8px;justify-content:center}
+  .meta span{background:rgba(255,255,255,.15);padding:5px 12px;border-radius:20px;font-size:.85rem}
+  main{max-width:920px;margin:-24px auto 40px;padding:0 16px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+  a.card{display:block;background:#fff;border-radius:14px;padding:22px;text-decoration:none;
+         color:inherit;box-shadow:0 4px 14px rgba(11,61,102,.10);transition:.15s;border:1px solid #dce6ee}
+  a.card:hover{transform:translateY(-3px);box-shadow:0 8px 22px rgba(11,61,102,.18)}
+  .card .ico{font-size:2rem}
+  .card h2{margin:10px 0 6px;font-size:1.2rem;color:var(--modra)}
+  .card p{margin:0;color:var(--slabe);font-size:.92rem}
+  .crit{background:#fff4f2;border:1px solid #f3c5bd;border-radius:14px;padding:18px 20px;margin:22px 0 0}
+  .crit h3{margin:0 0 8px;color:var(--akcent);font-size:1rem}
+  .crit ul{margin:0;padding-left:18px;color:var(--text);font-size:.92rem}
+  footer{text-align:center;color:var(--slabe);font-size:.82rem;padding:24px}
+</style>
+</head>
+<body>
+<header>
+  <span class="flag">🇳🇴</span>
+  <h1>Norsko 2026 — průvodce cestou</h1>
+  <p>Cesta obytným vozem · 18. 7. – 2. 8. 2026</p>
+  <div class="meta">
+    <span>📍 Modřice → Norsko → Modřice</span>
+    <span>👨‍👩‍👧 4 dospělí + dítě + pes</span>
+    <span>🚐 CI Horon 84 M Elite</span>
+  </div>
+</header>
+<main>
+  <div class="grid">
+    <a class="card" href="mapa.html">
+      <div class="ico">🗺️</div>
+      <h2>Interaktivní mapa</h2>
+      <p>Všechny zastávky, trasa tam přes trajekt i zpět přes mosty, denní program v popiscích.</p>
+    </a>
+    <a class="card" href="pruvodce.html">
+      <div class="ico">📋</div>
+      <h2>Průvodce & checklist</h2>
+      <p>Itinerář po dnech a odškrtávací seznam rezervací, úkolů a otázek na majitele.</p>
+    </a>
+    <a class="card" href="vuz.html">
+      <div class="ico">🚐</div>
+      <h2>Karta vozu</h2>
+      <p>Rychlá reference do kabiny — limity, tankování, trajekt, paliva. Vhodné k tisku.</p>
+    </a>
+    <a class="card" href="kalkulacka.html">
+      <div class="ico">⚖️</div>
+      <h2>Kalkulačka nosnosti</h2>
+      <p>Hlídej kritických 485 kg — zadej posádku a vybavení, uvidíš zbývající rezervu.</p>
+    </a>
+  </div>
+
+  <div class="crit">
+    <h3>⚠️ Tři věci, na které nikdy nezapomeň</h3>
+    <ul>
+      <li><b>Výška 3,20 m</b> — hlídej tunely a parkoviště, používej GPS s filtrem výšky.</li>
+      <li><b>Nosnost 485 kg</b> — kritický limit, 5 osob + pes + 16 dní vybavení. Viz kalkulačka.</li>
+      <li><b>Kristiansand ≠ Kristiansund</b> — do navigace zadávej <b>Kristiansand</b> (jih).</li>
+    </ul>
+  </div>
+</main>
+<footer>
+  Sestaveno z vlastních podkladů k cestě · poslední aktualizace 2026
+</footer>
+</body>
+</html>

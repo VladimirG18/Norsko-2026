@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Norsko 2026 — průvodce &amp; checklist</title>
+<style>
+  :root{--modra:#0b3d66;--modra2:#16689c;--led:#e8f1f7;--akcent:#c0392b;
+        --zelena:#27ae60;--text:#1c2733;--slabe:#5b6b7a}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+       color:var(--text);background:var(--led);line-height:1.5}
+  .topbar{background:var(--modra);color:#fff;padding:10px 16px;display:flex;
+          justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+  .topbar a{color:#cfe6f5;text-decoration:none;font-size:.9rem}
+  .wrap{max-width:820px;margin:18px auto;padding:0 14px}
+  h1{color:var(--modra);font-size:1.5rem;margin:6px 0 2px}
+  .sub{color:var(--slabe);font-size:.92rem;margin:0 0 16px}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+  .tabs button{border:1px solid #cdd9e3;background:#fff;color:var(--modra);padding:8px 14px;
+       border-radius:20px;cursor:pointer;font-size:.9rem;font-weight:600}
+  .tabs button.on{background:var(--modra);color:#fff;border-color:var(--modra)}
+  .panel{display:none}.panel.on{display:block}
+  .card{background:#fff;border-radius:12px;padding:16px 18px;box-shadow:0 3px 12px rgba(11,61,102,.09);
+        margin-bottom:14px}
+  .card h2{margin:0 0 10px;color:var(--modra);font-size:1.05rem}
+  /* itinerář */
+  .day{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid #eef3f7}
+  .day:last-child{border-bottom:0}
+  .day .d{flex:0 0 64px;font-weight:700;color:var(--modra2)}
+  .day .p{flex:1}
+  .day .p small{color:var(--akcent);display:block;margin-top:2px}
+  /* checklist */
+  .item{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid #eef3f7}
+  .item:last-child{border-bottom:0}
+  .item input{margin-top:3px;width:18px;height:18px;flex:0 0 auto;accent-color:var(--zelena)}
+  .item label{flex:1;font-size:.94rem;cursor:pointer}
+  .item.done label{text-decoration:line-through;color:var(--slabe)}
+  .prog{height:8px;background:#e3eaf0;border-radius:5px;overflow:hidden;margin:4px 0 14px}
+  .prog .f{height:100%;background:var(--zelena);width:0;transition:.2s}
+  .reset{background:none;border:0;color:var(--slabe);font-size:.82rem;cursor:pointer;text-decoration:underline}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <b>📋 Norsko 2026 — průvodce &amp; checklist</b>
+  <a href="index.html">← rozcestník</a>
+</div>
+<div class="wrap">
+  <h1>Průvodce cestou</h1>
+  <p class="sub">18. 7. – 2. 8. 2026 · 4 dospělí + dítě + pes · odškrtnuté položky se ukládají v prohlížeči.</p>
+
+  <div class="tabs">
+    <button class="on" data-t="itin">🗓️ Itinerář</button>
+    <button data-t="check">✅ Co zařídit</button>
+    <button data-t="info">ℹ️ Klíčové info</button>
+  </div>
+
+  <!-- ITINERÁŘ -->
+  <div class="panel on" id="itin">
+    <div class="card">
+      <h2>Norská část po dnech</h2>
+      <div class="day"><div class="d">Ne</div><div class="p">Příjezd trajektem do Kristiansandu ~15:30 → přesun k Preikestolen (~3,5 h), nocleh u parkoviště.</div></div>
+      <div class="day"><div class="d">Po</div><div class="p">Výšlap <b>Preikestolen</b> (8 km, ~4–5 h). Odpoledne přesun k Trolltunze.<small>Parkoviště P2/P3 rezervovat předem.</small></div></div>
+      <div class="day"><div class="d">Út</div><div class="p"><b>Trolltunga</b> — náročný celodenní trek (~28 km, 800 m převýšení).<small>Vyrazit brzy ráno za tmy.</small></div></div>
+      <div class="day"><div class="d">St</div><div class="p">Tvindefossen (vodopád u silnice) + <b>Stegastein</b> (vyhlídka nad Aurlandsfjordem).<small>Úzká klikatá cesta — opatrně.</small></div></div>
+      <div class="day"><div class="d">Čt</div><div class="p"><b>Sognefjord</b> (nejdelší fjord) + ledovec Bøyabreen u cesty, parkování zdarma.</div></div>
+      <div class="day"><div class="d">Pá</div><div class="p"><b>Lovatnet</b> — tyrkysové jezero, možnost kajaku.<small>Úzká cesta — pozor s obytkou.</small></div></div>
+      <div class="day"><div class="d">So</div><div class="p"><b>Geirangerfjord</b> (UNESCO) — vyhlídka Ørnesvingen, loď k Sedmi sestrám.</div></div>
+      <div class="day"><div class="d">Ne</div><div class="p"><b>Ålesund</b> — secesní město, výhled z vrchu Aksla (418 schodů).</div></div>
+      <div class="day"><div class="d">Po</div><div class="p"><b>Trollstigen</b> — serpentiny s 11 zatáčkami.<small>Ověřit sezónní otevření (sesuvy).</small></div></div>
+      <div class="day"><div class="d">Út–Čt</div><div class="p"><b>Jotunheimen</b> — Galdhøpiggen (2469 m), Besseggen, ledovce (3 dny). Nejsevernější bod.</div></div>
+      <div class="day"><div class="d">Pá</div><div class="p">Přejezd Jotunheimen → přes Oslo → Malmö, nocleh.<small>Velmi dlouhá jízda 9–11 h.</small></div></div>
+      <div class="day"><div class="d">So–Ne</div><div class="p">So: Malmö → ČR. Ne: vrácení vozu v Rebešovicích do 13:00.</div></div>
+    </div>
+  </div>
+
+  <!-- CHECKLIST -->
+  <div class="panel" id="check">
+    <div class="prog"><div class="f" id="progfill"></div></div>
+    <div class="card">
+      <h2>Rezervace</h2>
+      <div data-list></div>
+    </div>
+    <div class="card">
+      <h2>Pojištění &amp; doklady</h2>
+      <div data-list></div>
+    </div>
+    <div class="card">
+      <h2>Příprava &amp; výbava</h2>
+      <div data-list></div>
+    </div>
+    <div class="card">
+      <h2>Otázky na majitele (Patrik Vencl)</h2>
+      <div data-list></div>
+    </div>
+    <button class="reset" onclick="resetAll()">vynulovat všechna zaškrtnutí</button>
+  </div>
+
+  <!-- INFO -->
+  <div class="panel" id="info">
+    <div class="card">
+      <h2>⛴️ Trajekt Hirtshals → Kristiansand</h2>
+      Fjord Line (FSTR katamarán ~2:25 / trajekty ~3:15) nebo Color Line SuperSpeed. V sezóně až 4 odjezdy denně. <b>Rezervovat dopředu — vyprodává se.</b> Na trajektu vypnout plyn.
+    </div>
+    <div class="card">
+      <h2>💰 Mýta &amp; měna</h2>
+      Dánské mosty Øresund i Storebælt jsou placené a drahé. Dánsko platí dánskou korunou (ne euro). Norská mýta řešit krabičkou / předem.
+    </div>
+    <div class="card">
+      <h2>📶 Konektivita</h2>
+      Internet: eSIM <b>Saily</b>. Navigace s filtrem výšky vozidla (CamperMate, MagicEarth, Sygic) — kvůli limitu 3,20 m.
+    </div>
+    <div class="card">
+      <h2>🧥 Oblečení</h2>
+      Teplé vrstvy i v létě (čepice, rukavice). Nepromokavé ponožky DexShell DS683, kotníkové boty.
+    </div>
+    <div class="card">
+      <h2>⚠️ Časové upozornění</h2>
+      Tři náročné celodenní výšlapy hned za sebou (Preikestolen, Trolltunga, Jotunheimen) — zvážit oddechový den, hlavně s dítětem. Páteční přejezd do Malmö je 9–11 h za volantem.
+    </div>
+  </div>
+</div>
+
+<script>
+const checklist={
+ 'Rezervace':[
+   'Trajekt Hirtshals–Kristiansand',
+   'Parkování u Trolltunga (P2/P3) — hodně dopředu',
+   'Případné zpáteční přejezdy přes fjordy',
+ ],
+ 'Pojištění & doklady':[
+   'Ověřit platnost pojištění / zelené karty (byla jen do 03/2026!)',
+   'Mezinárodní pojistná karta (CZ/0002)',
+   'Osvědčení o registraci vozidla ve voze',
+ ],
+ 'Příprava & výbava':[
+   'Vyřešit mýtné (krabička + objednat dopředu)',
+   'Nainstalovat eSIM aplikaci Saily',
+   'Navigace s filtrem výšky 3,20 m',
+   'Ověřit otevření Trollstigenu (sezónní)',
+   'Ověřit průjezdnost 7,45 m u Lovatnet a Stegastein',
+   'Nepromokavé ponožky DexShell + kotníkové boty',
+   'Zvážit vůz na nákladní váze (limit 485 kg)',
+   'Namrazit PET lahve před trajektem',
+ ],
+ 'Otázky na majitele (Patrik Vencl)':[
+   'Bude pojištění platit celou cestu (18.7.–2.8.)?',
+   'Kapacita servisní baterie (Ah) + invertor 230V',
+   'Počet a umístění 12V / USB zásuvek',
+   'Objem nádrží (čistá / odpadní voda) + bojler',
+   'Kapacita kazetové toalety + kde se vylévá',
+   'Rozměr pneumatik',
+   'Umístění výfuku Trumy',
+   'GPS model — filtruje výšku 3,20 m?',
+   'Pioneer rádio — CarPlay / Android Auto?',
+   'Kvalita zpětné kamery za šera',
+   'Povolení převozu na trajektu',
+   'Limit kilometrů',
+   'Kontakt na zahraniční asistenci',
+ ],
+};
+const KEY='norsko2026_checklist';
+let state=JSON.parse(localStorage.getItem(KEY)||'{}');
+const sekce=document.querySelectorAll('#check [data-list]');
+let idx=0, total=0;
+Object.keys(checklist).forEach((nazev,si)=>{
+  const cont=sekce[si];
+  checklist[nazev].forEach(text=>{
+    const id='c'+(idx++); total++;
+    const done=state[id];
+    const div=document.createElement('div');
+    div.className='item'+(done?' done':'');
+    div.innerHTML=`<input type="checkbox" id="${id}" ${done?'checked':''}>
+                   <label for="${id}">${text}</label>`;
+    const cb=div.querySelector('input');
+    cb.addEventListener('change',()=>{
+      state[id]=cb.checked; div.classList.toggle('done',cb.checked);
+      localStorage.setItem(KEY,JSON.stringify(state)); prog();
+    });
+    cont.appendChild(div);
+  });
+});
+function prog(){
+  const done=Object.values(state).filter(Boolean).length;
+  document.getElementById('progfill').style.width=(total?done/total*100:0)+'%';
+}
+function resetAll(){state={};localStorage.removeItem(KEY);
+  document.querySelectorAll('#check input').forEach(c=>{c.checked=false;
+    c.closest('.item').classList.remove('done')}); prog();}
+prog();
+
+// taby
+document.querySelectorAll('.tabs button').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('on'));
+    document.querySelectorAll('.panel').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    document.getElementById(b.dataset.t).classList.add('on');
+  });
+});
+</script>
+</body>
+</html>

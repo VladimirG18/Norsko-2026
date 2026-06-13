@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Norsko 2026 — karta vozu</title>
+<style>
+  :root{--modra:#0b3d66;--led:#e8f1f7;--akcent:#c0392b;--text:#1c2733;--slabe:#5b6b7a}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+       color:var(--text);background:var(--led)}
+  .topbar{background:var(--modra);color:#fff;padding:10px 16px;display:flex;
+          justify-content:space-between;align-items:center}
+  .topbar a{color:#cfe6f5;text-decoration:none;font-size:.9rem}
+  .topbar button{background:#fff;color:var(--modra);border:0;padding:6px 14px;border-radius:8px;
+          font-weight:600;cursor:pointer}
+  .sheet{max-width:780px;margin:18px auto;background:#fff;padding:26px 30px;border-radius:12px;
+         box-shadow:0 4px 16px rgba(11,61,102,.12)}
+  h1{margin:0 0 2px;color:var(--modra);font-size:1.5rem}
+  .sub{color:var(--slabe);margin:0 0 18px;font-size:.92rem}
+  .crit{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:0 0 20px}
+  .crit .box{background:#fff4f2;border:2px solid var(--akcent);border-radius:10px;
+             padding:12px;text-align:center}
+  .crit .box .big{font-size:1.6rem;font-weight:800;color:var(--akcent);line-height:1.1}
+  .crit .box .lbl{font-size:.78rem;color:var(--text);margin-top:4px}
+  h2{color:var(--modra);font-size:1.05rem;border-bottom:2px solid var(--led);
+     padding-bottom:5px;margin:22px 0 10px}
+  table{width:100%;border-collapse:collapse;font-size:.9rem}
+  td{padding:6px 8px;border-bottom:1px solid #eef3f7;vertical-align:top}
+  td.k{color:var(--slabe);width:42%}
+  td.v{font-weight:600}
+  .rules{list-style:none;padding:0;margin:0}
+  .rules li{padding:8px 10px;margin-bottom:6px;border-radius:8px;background:#fff8e6;
+            border-left:4px solid #e0a800;font-size:.9rem}
+  .rules li.red{background:#fff4f2;border-left-color:var(--akcent)}
+  .rules li b{color:var(--modra)}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+  @media(max-width:620px){.crit{grid-template-columns:1fr}.cols{grid-template-columns:1fr}}
+  @media print{
+    body{background:#fff}.topbar{display:none}.sheet{box-shadow:none;margin:0;max-width:100%}
+  }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="index.html">← rozcestník</a>
+  <button onclick="window.print()">🖨️ Vytisknout</button>
+</div>
+<div class="sheet">
+  <h1>🚐 CI Horon 84 M Elite 2024 — karta do kabiny</h1>
+  <p class="sub">Alkovna · SPZ 1AC J423 · pronájem Patrik Vencl (KaravanTravel.cz / bezkempu.cz)</p>
+
+  <div class="crit">
+    <div class="box"><div class="big">3,20 m</div><div class="lbl">VÝŠKA — tunely &amp; parkoviště</div></div>
+    <div class="box"><div class="big">485 kg</div><div class="lbl">NOSNOST — kritický limit</div></div>
+    <div class="box"><div class="big">7,45 m</div><div class="lbl">DÉLKA — serpentiny &amp; přívozy</div></div>
+  </div>
+
+  <h2>⚠️ Zlatá pravidla</h2>
+  <ul class="rules">
+    <li class="red"><b>COMBI OFF před tankováním!</b> Vždy vypnout topení Truma (samolepka u nádrže).</li>
+    <li class="red"><b>Plyn vypnout na trajektu.</b> Lednice/mrazák pak na 12V/230V — předem namrazit PET lahve jako zálohu chladu.</li>
+    <li><b>Kristiansand, ne Kristiansund</b> — do navigace zadávej jižní Kristiansand.</li>
+    <li><b>GPS s filtrem výšky 3,20 m</b> — doporučené apps: CamperMate, MagicEarth, Sygic.</li>
+    <li><b>AdBlue</b> — sledovat hladinu, vzít zásobu (5 l kanystr) na odlehlé oblasti.</li>
+    <li><b>Bez rezervního kola</b> — jen opravná sada. Při defektu volat asistenci.</li>
+  </ul>
+
+  <div class="cols">
+    <div>
+      <h2>Technika</h2>
+      <table>
+        <tr><td class="k">Motor</td><td class="v">Peugeot Boxer 2.2 diesel, 103 kW / 140 PS</td></tr>
+        <tr><td class="k">Převodovka</td><td class="v">Manuál, přední pohon</td></tr>
+        <tr><td class="k">Palivo</td><td class="v">Diesel B7 / B10 / B30 + AdBlue</td></tr>
+        <tr><td class="k">Spotřeba</td><td class="v">~15 l / 100 km</td></tr>
+        <tr><td class="k">Rozměry (d×š×v)</td><td class="v">7450 × 2350 × 3200 mm</td></tr>
+      </table>
+
+      <h2>Spaní</h2>
+      <table>
+        <tr><td class="k">Alkovna</td><td class="v">2,09 × 1,60 m</td></tr>
+        <tr><td class="k">Vzadu</td><td class="v">2 jednolůžka (2,06×0,80 / 1,97×0,80)</td></tr>
+        <tr><td class="k">Míst k spaní / sezení</td><td class="v">6 / 5</td></tr>
+      </table>
+    </div>
+    <div>
+      <h2>Systémy</h2>
+      <table>
+        <tr><td class="k">Topení</td><td class="v">Truma Combi 6 kW (diesel / 230V)</td></tr>
+        <tr><td class="k">Lednice/mrazák</td><td class="v">140 l (230V / 12V / plyn)</td></tr>
+        <tr><td class="k">Solár</td><td class="v">120 W panel</td></tr>
+        <tr><td class="k">Plyn</td><td class="v">1× propan 15 kg, 30 mbar (jen vaření)</td></tr>
+        <tr><td class="k">Elektro</td><td class="v">modrá CEE přípojka, 230V, EU redukce</td></tr>
+        <tr><td class="k">Vaření</td><td class="v">Thetford 3 hořáky, Nespresso DeLonghi</td></tr>
+        <tr><td class="k">Sanitace</td><td class="v">oddělená sprcha + kazetové WC Thetford</td></tr>
+        <tr><td class="k">Ostatní</td><td class="v">markýza, nosič na 4 kola, klíny, vodováha</td></tr>
+      </table>
+
+      <h2>Doklady</h2>
+      <table>
+        <tr><td class="k">Zelená karta</td><td class="v" style="color:#c0392b">ⓘ ověřit platnost s majitelem!</td></tr>
+        <tr><td class="k">Technický průkaz</td><td class="v">ve voze, SPZ 1AC J423</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+</body>
+</html>
