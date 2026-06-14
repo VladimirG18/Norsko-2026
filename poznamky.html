@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Norsko 2026 — poznámky</title>
+<style>
+  :root{--modra:#0b3d66;--modra2:#16689c;--led:#e8f1f7;--akcent:#c0392b;
+        --text:#1c2733;--slabe:#5b6b7a}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+       color:var(--text);background:var(--led);line-height:1.5}
+  .topbar{background:var(--modra);color:#fff;padding:10px 16px;display:flex;
+          justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+  .topbar a{color:#cfe6f5;text-decoration:none;font-size:.9rem}
+  .wrap{max-width:820px;margin:18px auto;padding:0 14px}
+  h1{color:var(--modra);font-size:1.5rem;margin:6px 0 2px}
+  .sub{color:var(--slabe);font-size:.92rem;margin:0 0 16px}
+
+  /* formulář poznámky */
+  .noteform{background:#fff;border:1px solid #dce6ee;border-radius:12px;padding:16px;
+            margin:6px 0 22px;box-shadow:0 3px 12px rgba(11,61,102,.09)}
+  .noteform .frow{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+  .noteform label{font-size:.85rem;color:var(--slabe)}
+  .noteform select,.noteform textarea{background:#fff;color:var(--text);border:1px solid #cdd9e3;
+       border-radius:8px;padding:9px 11px;font:inherit}
+  .noteform select{min-width:140px}
+  .noteform textarea{width:100%;min-height:160px;resize:vertical;line-height:1.5}
+  .noteform .send{background:var(--modra);border:1px solid var(--modra);color:#fff;font-weight:600;
+       border-radius:8px;padding:9px 16px;cursor:pointer;font:inherit}
+  .noteform .send:hover{background:var(--modra2);border-color:var(--modra2)}
+
+  /* seznam poznámek */
+  .notelist{display:flex;flex-direction:column;gap:12px}
+  .noteitem{background:#fff;border:1px solid #dce6ee;border-left-width:4px;border-radius:10px;
+            padding:12px 14px;box-shadow:0 3px 12px rgba(11,61,102,.07)}
+  .noteitem .head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
+  .noteitem .who{font-weight:700}
+  .noteitem .when{color:var(--slabe);font-size:.78rem}
+  .noteitem .text{white-space:pre-wrap;line-height:1.5;font-size:.94rem}
+  .noteitem .del{background:none;border:none;color:var(--slabe);cursor:pointer;font-size:.95rem;
+       padding:2px 6px;border-radius:6px}
+  .noteitem .del:hover{color:var(--akcent)}
+  .empty{color:var(--slabe);font-style:italic;padding:14px 0}
+
+  /* barvy autorů */
+  .who-lucka{color:#c0398f}    .border-lucka{border-left-color:#e879c9}
+  .who-vladimir{color:#16689c} .border-vladimir{border-left-color:#4f9eff}
+  .who-jirka{color:#1f8f57}    .border-jirka{border-left-color:#2ec27e}
+  .who-jarka{color:#9a6b00}    .border-jarka{border-left-color:#e3b341}
+
+  .note{margin-top:22px;font-size:.8rem;color:var(--slabe);font-style:italic}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <b>📝 Norsko 2026 — poznámky</b>
+  <a href="index.html">← rozcestník</a>
+</div>
+<div class="wrap">
+  <h1>Poznámky</h1>
+  <p class="sub">Zapiš poznámku a vyber, kdo ji píše. Poznámky se řadí od nejnovější.</p>
+
+  <div class="noteform">
+    <div class="frow">
+      <label for="author">Autor:</label>
+      <select id="author">
+        <option value="Lucka">Lucka</option>
+        <option value="Vladimír">Vladimír</option>
+        <option value="Jirka">Jirka</option>
+        <option value="Jarka">Jarka</option>
+      </select>
+    </div>
+    <textarea id="text" placeholder="Sem napiš poznámku…"></textarea>
+    <div class="frow" style="margin-top:10px;justify-content:flex-end">
+      <button class="send" id="add">Přidat poznámku</button>
+    </div>
+  </div>
+
+  <div class="notelist" id="list"></div>
+
+  <p class="note">Poznámky se ukládají ve tvém prohlížeči (localStorage) na tomto zařízení –
+  zatím se mezi vámi automaticky nesdílejí. Pokud chcete sdílené poznámky napříč zařízeními,
+  lze doplnit malý online backend.</p>
+</div>
+
+<script>
+const KEY = 'norsko2026-poznamky-v1';
+const slug = s => s.toLowerCase().replace('á','a').replace('í','i').replace('ř','r');
+const authorEl = document.getElementById('author');
+const textEl = document.getElementById('text');
+const listEl = document.getElementById('list');
+
+let notes = [];
+try { notes = JSON.parse(localStorage.getItem(KEY)) || []; } catch(e){ notes = []; }
+
+// zapamatuj si naposledy zvoleného autora
+const lastAuthor = localStorage.getItem(KEY + '-author');
+if(lastAuthor) authorEl.value = lastAuthor;
+
+function save(){ localStorage.setItem(KEY, JSON.stringify(notes)); }
+
+function fmt(ts){
+  const d = new Date(ts);
+  return d.toLocaleDateString('cs-CZ') + ' ' + d.toLocaleTimeString('cs-CZ', {hour:'2-digit', minute:'2-digit'});
+}
+
+function render(){
+  listEl.innerHTML = '';
+  if(notes.length === 0){
+    listEl.innerHTML = '<div class="empty">Zatím tu nejsou žádné poznámky.</div>';
+    return;
+  }
+  notes.slice().sort((a,b)=> b.ts - a.ts).forEach(n => {
+    const s = slug(n.author);
+    const div = document.createElement('div');
+    div.className = 'noteitem border-' + s;
+    const head = document.createElement('div');
+    head.className = 'head';
+    head.innerHTML = `<span class="who who-${s}">${n.author}</span>
+      <span style="display:flex;align-items:center;gap:8px">
+        <span class="when">${fmt(n.ts)}</span>
+        <button class="del" title="Smazat">🗑</button></span>`;
+    const text = document.createElement('div');
+    text.className = 'text';
+    text.textContent = n.text;
+    head.querySelector('.del').addEventListener('click', ()=>{
+      if(!confirm('Smazat tuto poznámku?')) return;
+      notes = notes.filter(x => x.id !== n.id);
+      save(); render();
+    });
+    div.appendChild(head); div.appendChild(text);
+    listEl.appendChild(div);
+  });
+}
+
+document.getElementById('add').addEventListener('click', ()=>{
+  const text = textEl.value.trim();
+  if(!text){ textEl.focus(); return; }
+  notes.push({ id: Date.now() + '-' + Math.random().toString(36).slice(2,7),
+               author: authorEl.value, text, ts: Date.now() });
+  localStorage.setItem(KEY + '-author', authorEl.value);
+  save();
+  textEl.value = '';
+  render();
+});
+
+// Ctrl/Cmd + Enter pro rychlé přidání
+textEl.addEventListener('keydown', (e)=>{
+  if((e.ctrlKey || e.metaKey) && e.key === 'Enter') document.getElementById('add').click();
+});
+
+render();
+</script>
+</body>
+</html>
