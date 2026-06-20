@@ -75,6 +75,11 @@
   .badge.p-yellow{background:#fdf6e3;color:var(--yellow);border-color:#e8cf8a}
   .badge.p-green{background:#eafaf1;color:var(--green);border-color:#9bd9b5}
   .tag{font-size:.72rem;color:var(--slabe);background:#eef3f7;border-radius:20px;padding:2px 8px}
+  .answer{margin-top:7px;background:#eafaf1;border:1px solid #bfe6cf;border-radius:8px;
+          padding:7px 10px;font-size:.9rem;cursor:pointer}
+  .answer b{color:var(--green)}
+  .answer .who{color:var(--slabe);font-weight:400;font-size:.8rem}
+  .item.done .answer .atext{text-decoration:none;color:var(--text)}
   .acts{display:flex;gap:2px;flex:none}
   .iconbtn{background:none;border:none;color:var(--slabe);cursor:pointer;font-size:.95rem;
            padding:3px 6px;border-radius:6px;line-height:1}
@@ -97,8 +102,8 @@
 </div>
 <div class="wrap">
   <h1>Dotazy k obytnému vozu</h1>
-  <p class="sub">Co ověřit u majitele před cestou. Odškrtávej hotové, přidávej a maž dotazy,
-     klikem na barevný štítek měň prioritu, přetažením za <b>⠿</b> měň pořadí a nahoře filtruj.</p>
+  <p class="sub">Co ověřit u majitele před cestou. Klikni na <b>💬</b> a zapiš odpověď — dotaz se sám odškrtne.
+     Můžeš taky přidávat, mazat a upravovat dotazy, klikem na štítek měnit prioritu, přetažením za <b>⠿</b> řadit a nahoře filtrovat.</p>
 
   <div id="status" class="statusbar"></div>
 
@@ -133,8 +138,11 @@
       <option value="">Vše</option>
       <option value="open">Jen otevřené</option>
       <option value="done">Jen hotové</option>
+      <option value="answered">Jen zodpovězené</option>
+      <option value="unanswered">Jen nezodpovězené</option>
     </select>
     <button class="btn ghost" id="clearF">Zrušit filtry</button>
+    <button class="btn ghost" id="exportBtn">📋 Odpovědi pro Clauda</button>
     <button class="btn ghost" id="printBtn">🖨️ Tisk</button>
   </div>
   <div class="filternote" id="filterNote"></div>
@@ -239,6 +247,7 @@ for(const c of CATS){
 
 let items = [];               // aktuální data z backendu
 const esc = s => (s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmtDate = ts => ts ? new Date(ts).toLocaleDateString('cs-CZ') : '';
 const filtersActive = () => !!(fSearch.value.trim() || fCat.value || fPrio.value || fStatus.value);
 
 function visibleItems(){
@@ -248,6 +257,8 @@ function visibleItems(){
     if(fPrio.value && it.prio !== fPrio.value) return false;
     if(fStatus.value === 'open' && it.done) return false;
     if(fStatus.value === 'done' && !it.done) return false;
+    if(fStatus.value === 'answered' && !it.answer) return false;
+    if(fStatus.value === 'unanswered' && it.answer) return false;
     if(q && !(it.text||'').toLowerCase().includes(q)) return false;
     return true;
   });
@@ -288,14 +299,28 @@ function render(){
           <span class="badge p-${it.prio}" title="Klikni pro změnu priority">${PRIO_LABEL[it.prio]}</span>
           <span class="tag">${esc(it.cat||'')}</span>
         </div>
+        ${it.answer ? `<div class="answer" title="Klikni pro úpravu odpovědi"><b>✅ Odpověď:</b>
+          <span class="atext">${esc(it.answer)}</span>
+          ${it.answeredAt ? `<span class="who"> — ${fmtDate(it.answeredAt)}</span>` : ''}</div>` : ''}
       </div>
       <div class="acts">
-        <button class="iconbtn edit" title="Upravit text">✏️</button>
+        <button class="iconbtn ans" title="${it.answer?'Upravit odpověď':'Přidat odpověď'}">💬</button>
+        <button class="iconbtn edit" title="Upravit text dotazu">✏️</button>
         <button class="iconbtn del" title="Smazat">🗑</button>
       </div>`;
 
     row.querySelector('input').addEventListener('change', e=> backend.update(it.id, {done: e.target.checked}));
     row.querySelector('.badge').addEventListener('click', ()=> backend.update(it.id, {prio: PRIO_CYCLE[it.prio]}));
+    const respond = ()=>{
+      const a = prompt('Odpověď od majitele (uloží se a dotaz se odškrtne).\nPrázdné pole odpověď smaže a dotaz vrátí mezi otevřené:', it.answer||'');
+      if(a===null) return;
+      const t = a.trim();
+      if(t) backend.update(it.id, {answer:t, done:true, answeredAt:Date.now()});
+      else backend.update(it.id, {answer:'', done:false, answeredAt:null});
+    };
+    row.querySelector('.ans').addEventListener('click', respond);
+    const ansBox = row.querySelector('.answer');
+    if(ansBox) ansBox.addEventListener('click', respond);
     row.querySelector('.edit').addEventListener('click', ()=>{
       const t = prompt('Upravit dotaz:', it.text);
       if(t!=null && t.trim()) backend.update(it.id, {text: t.trim()});
@@ -343,6 +368,21 @@ $('newText').addEventListener('keydown', e=>{ if(e.key==='Enter') $('addBtn').cl
 [fSearch,fCat,fPrio,fStatus].forEach(el=> el.addEventListener('input', render));
 $('clearF').addEventListener('click', ()=>{ fSearch.value=''; fCat.value=''; fPrio.value=''; fStatus.value=''; render(); });
 $('printBtn').addEventListener('click', ()=> window.print());
+
+// Export odpovědí jako markdown – zkopíruje do schránky, ať se dají vložit Claudovi do chatu.
+$('exportBtn').addEventListener('click', async ()=>{
+  const answered = items.filter(i=>i.answer).sort((a,b)=>(a.order||0)-(b.order||0));
+  if(!answered.length){ alert('Zatím není zodpovězený žádný dotaz.'); return; }
+  let md = '# Odpovědi od majitele vozu — Norsko 2026\n\n> Zkopírováno ze stránky dotazů ' + new Date().toLocaleString('cs-CZ') + '\n', cat='';
+  for(const it of answered){
+    if(it.cat!==cat){ cat=it.cat; md += `\n## ${cat}\n\n`; }
+    md += `- **${it.text}**\n  - ${it.answer}\n`;
+  }
+  try{
+    await navigator.clipboard.writeText(md);
+    alert('Zkopírováno do schránky (' + answered.length + ' odpovědí).\nVlož je Claudovi do chatu a napiš „zaznač odpovědi".');
+  }catch(e){ prompt('Zkopíruj ručně (Ctrl+C):', md); }
+});
 
 // ---- lokální záloha ----
 function localBackend(){
