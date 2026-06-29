@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Norsko 2026 — karta vozu</title>
 <style>
-  :root{--modra:#0b3d66;--modra2:#16689c;--led:#e8f1f7;--akcent:#c0392b;--text:#1c2733;--slabe:#5b6b7a}
+  :root{--modra:#0b3d66;--modra2:#16689c;--led:#e8f1f7;--akcent:#c0392b;--text:#1c2733;--slabe:#5b6b7a;--zelena:#1f8f57}
   *{box-sizing:border-box}
   body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
        color:var(--text);background:var(--led)}
@@ -41,7 +41,6 @@
   details.acc>summary:hover{background:#f3f8fc}
   details.acc>summary .chev{margin-left:auto;color:var(--slabe);transition:transform .2s;font-size:.95rem}
   details.acc[open]>summary .chev{transform:rotate(90deg)}
-  details.acc>summary .cnt{margin-left:6px;font-weight:400;color:var(--slabe);font-size:.8rem}
   details.acc .inner{padding:2px 16px 14px}
 
   table{width:100%;border-collapse:collapse;font-size:.9rem}
@@ -49,14 +48,19 @@
   tr:last-child td{border-bottom:0}
   td.k{color:var(--slabe);width:44%}
   td.v{font-weight:600}
-  td.v .todo{color:var(--akcent);font-weight:600}
+  td.v .yes{color:var(--zelena)} td.v .no{color:var(--akcent)} td.v .todo{color:var(--akcent)}
   .rules{list-style:none;padding:0;margin:0}
   .rules li{padding:8px 10px;margin-bottom:6px;border-radius:8px;background:#fff8e6;
             border-left:4px solid #e0a800;font-size:.9rem}
   .rules li:last-child{margin-bottom:0}
   .rules li.red{background:#fff4f2;border-left-color:var(--akcent)}
   .rules li b{color:var(--modra)}
-  @media(max-width:620px){.crit{grid-template-columns:1fr}}
+  .feat{display:grid;grid-template-columns:1fr 1fr;gap:4px 18px;font-size:.9rem;margin:0}
+  .feat div{padding:5px 2px;border-bottom:1px solid #eef3f7}
+  .feat .y::before{content:"✓ ";color:var(--zelena);font-weight:800}
+  .feat .n{color:var(--slabe)} .feat .n::before{content:"✕ ";color:var(--akcent);font-weight:800}
+  .listnote{font-size:.9rem;margin:8px 2px 0;color:var(--text)}
+  @media(max-width:620px){.crit{grid-template-columns:1fr}.feat{grid-template-columns:1fr}}
   @media print{
     body{background:#fff}.topbar,.accctl{display:none}
     .sheet{box-shadow:none;margin:0;max-width:100%;padding:0}
@@ -73,7 +77,7 @@
 </div>
 <div class="sheet">
   <h1>🚐 CI Horon 84 M Elite 2024 — karta do kabiny</h1>
-  <p class="sub">Alkovna · pronájem přes KaravanTravel.cz / <a href="https://www.bezkempu.cz/pujcovna-karavanu/800?date=2026-07-18,2026-08-01#&gid=1&pid=6" target="_blank" rel="noopener">bezkempu.cz</a></p>
+  <p class="sub">Alkovna · Půjčovna obytných vozů Brno (Patrik), Modřice · inzerát na <a href="https://www.bezkempu.cz/pujcovna-karavanu/800?date=2026-07-18,2026-08-01#&gid=1&pid=6" target="_blank" rel="noopener">bezkempu.cz</a></p>
 
   <div class="crit">
     <div class="box"><div class="big">3,20 m</div><div class="lbl">VÝŠKA — tunely &amp; parkoviště</div></div>
@@ -93,9 +97,11 @@
         <li class="red"><b>COMBI OFF před tankováním!</b> Vždy vypnout topení Truma (samolepka u nádrže).</li>
         <li class="red"><b>Plyn vypnout na trajektu.</b> Lednice/mrazák pak na 12V/230V — předem namrazit PET lahve jako zálohu chladu.</li>
         <li><b>Kristiansand, ne Kristiansund</b> — do navigace zadávej jižní Kristiansand.</li>
-        <li><b>GPS s filtrem výšky 3,20 m</b> — doporučené apps: CamperMate, MagicEarth, Sygic.</li>
+        <li><b>GPS s filtrem výšky 3,20 m</b> — vůz má GPS navigaci; přesto si pojisti apps s filtrem rozměrů (CamperMate, MagicEarth, Sygic).</li>
         <li><b>AdBlue</b> — sledovat hladinu, vzít zásobu (5 l kanystr) na odlehlé oblasti.</li>
         <li><b>Bez rezervního kola</b> — jen opravná sada. Při defektu volat asistenci.</li>
+        <li><b>Bez vnitřní klimatizace</b> — obytná část se nechladí (klima je jen v kabině řidiče). Za horka v Německu stínit a větrat.</li>
+        <li><b>Bez ISOFIXu</b> — dětskou sedačku poutat tříbodovým pásem.</li>
       </ul>
     </div>
   </details>
@@ -105,44 +111,72 @@
     <div class="inner">
       <table>
         <tr><td class="k">Rozměry (d×š×v)</td><td class="v">7450 × 2350 × 3200 mm</td></tr>
-        <tr><td class="k">Délka / výška / šířka</td><td class="v">7,45 m / 3,20 m / 2,35 m</td></tr>
-        <tr><td class="k">Nosnost (payload)</td><td class="v">485 kg — kritický limit</td></tr>
+        <tr><td class="k">Délka / šířka / výška</td><td class="v">7,45 m / 2,35 m / 3,20 m</td></tr>
+        <tr><td class="k">Celková hmotnost</td><td class="v">3 500 kg (3,5 t)</td></tr>
+        <tr><td class="k">Nosnost / doložnost</td><td class="v">485 kg — kritický limit</td></tr>
+        <tr><td class="k">Rok výroby</td><td class="v">2024</td></tr>
       </table>
     </div>
   </details>
 
   <details class="acc" open>
-    <summary>🔧 Podvozek &amp; motor <span class="chev">▸</span></summary>
+    <summary>🔧 Podvozek, kabina &amp; jízda <span class="chev">▸</span></summary>
     <div class="inner">
       <table>
         <tr><td class="k">Motor</td><td class="v">Peugeot Boxer 2.2 diesel, 103 kW / 140 PS</td></tr>
-        <tr><td class="k">Převodovka</td><td class="v">Manuál, přední pohon</td></tr>
-        <tr><td class="k">Palivo</td><td class="v">Diesel B7 / B10 / B30 + AdBlue</td></tr>
-        <tr><td class="k">Spotřeba</td><td class="v">~15 l / 100 km</td></tr>
+        <tr><td class="k">Převodovka / pohon</td><td class="v">Manuál / přední pohon</td></tr>
+        <tr><td class="k">Palivo</td><td class="v">Nafta (B7 / B10 / B30) + AdBlue</td></tr>
+        <tr><td class="k">Spotřeba</td><td class="v">~15 l / 100 km (orientačně)</td></tr>
+        <tr><td class="k">Tempomat</td><td class="v"><span class="yes">ano</span> — s omezovačem rychlosti</td></tr>
+        <tr><td class="k">Mlhová světla</td><td class="v"><span class="yes">ano</span></td></tr>
+        <tr><td class="k">Klimatizace kabiny</td><td class="v"><span class="yes">ano</span> — manuální (motorová)</td></tr>
+        <tr><td class="k">Rádio</td><td class="v">2DIN Pioneer 9" DAB</td></tr>
+        <tr><td class="k">Zpětná kamera</td><td class="v">ano — monitor na zpětném zrcátku</td></tr>
+        <tr><td class="k">Navigace</td><td class="v">GPS navigace ve voze <span style="color:#9a6b00">(ⓘ ověřit filtr výšky)</span></td></tr>
+        <tr><td class="k">Kabina řidiče</td><td class="v">plisované zatemnění oken</td></tr>
       </table>
     </div>
   </details>
 
   <details class="acc">
-    <summary>🛏️ Spaní <span class="chev">▸</span></summary>
+    <summary>🛏️ Spaní &amp; bezpečnost <span class="chev">▸</span></summary>
     <div class="inner">
       <table>
-        <tr><td class="k">Alkovna</td><td class="v">2,09 × 1,60 m</td></tr>
-        <tr><td class="k">Vzadu</td><td class="v">2 jednolůžka (2,06×0,80 / 1,97×0,80)</td></tr>
         <tr><td class="k">Míst k spaní / sezení</td><td class="v">6 / 5</td></tr>
+        <tr><td class="k">Alkovna</td><td class="v">2,09 × 1,60 m</td></tr>
+        <tr><td class="k">Zadní lůžka</td><td class="v">2,06 × 0,80 m a 1,97 × 0,80 m</td></tr>
+        <tr><td class="k">ISOFIX</td><td class="v"><span class="no">ne</span> — dětská sedačka na tříbodový pás</td></tr>
+        <tr><td class="k">Ložní prádlo</td><td class="v">povlečení vč. peřin na vyžádání (za příplatek)</td></tr>
+        <tr><td class="k">Chrániče matrací</td><td class="v"><span class="yes">ano</span></td></tr>
       </table>
     </div>
   </details>
 
   <details class="acc">
-    <summary>⚙️ Obytné systémy <span class="chev">▸</span></summary>
+    <summary>⚙️ Vytápění &amp; energie <span class="chev">▸</span></summary>
     <div class="inner">
       <table>
-        <tr><td class="k">Topení</td><td class="v">Truma Combi 6 kW (diesel / 230V)</td></tr>
-        <tr><td class="k">Lednice/mrazák</td><td class="v">140 l (230V / 12V / plyn)</td></tr>
-        <tr><td class="k">Solár</td><td class="v">120 W panel</td></tr>
-        <tr><td class="k">Plyn</td><td class="v">1× propan 15 kg, 30 mbar (jen vaření)</td></tr>
-        <tr><td class="k">Elektro</td><td class="v">modrá CEE přípojka, 230V, EU redukce</td></tr>
+        <tr><td class="k">Topení</td><td class="v">Truma Combi (zimní paket Diesel/230V) — 6000 W combi, 1800 W el.</td></tr>
+        <tr><td class="k">Ovládání topení</td><td class="v">digitální programovatelné Truma CP+</td></tr>
+        <tr><td class="k">Nezávislé topení</td><td class="v"><span class="no">ne</span></td></tr>
+        <tr><td class="k">Solár</td><td class="v">120 W panel + regulátor</td></tr>
+        <tr><td class="k">Elektro přípojka</td><td class="v">modrá CEE, 230 V, EU redukce; kabelový buben + prodlužovák</td></tr>
+        <tr><td class="k">Plyn</td><td class="v">1× propan 15 kg, 30 mbar (vaření; výměnu lahví řeší půjčovna)</td></tr>
+        <tr><td class="k">Baterie (servisní)</td><td class="v" style="color:#9a6b00">ⓘ kapacita neuvedena — ověřit s majitelem</td></tr>
+      </table>
+    </div>
+  </details>
+
+  <details class="acc">
+    <summary>❄️ Lednice &amp; kuchyně <span class="chev">▸</span></summary>
+    <div class="inner">
+      <table>
+        <tr><td class="k">Lednice / mrazák</td><td class="v">automatická 140 l (230V / 12V / plyn)</td></tr>
+        <tr><td class="k">Vařič</td><td class="v">Thetford, 3 hořáky</td></tr>
+        <tr><td class="k">Kávovar</td><td class="v">kapslový (Nespresso DeLonghi); kapsle dorovnává půjčovna</td></tr>
+        <tr><td class="k">Varná konvice</td><td class="v"><span class="yes">ano</span></td></tr>
+        <tr><td class="k">Linka &amp; nádobí</td><td class="v">vybavená — příbory, hrnce, pánev, talíře, hrníčky, misky, nože, utěrky</td></tr>
+        <tr><td class="k">Drobnosti</td><td class="v">odkapávač, přenosný odkapávací koš, ruční vysavač</td></tr>
       </table>
     </div>
   </details>
@@ -151,26 +185,30 @@
     <summary>🚰 Voda &amp; sanitace <span class="chev">▸</span></summary>
     <div class="inner">
       <table>
-        <tr><td class="k">Sanitace</td><td class="v">oddělená sprcha + kazetové WC Thetford</td></tr>
+        <tr><td class="k">Sprcha</td><td class="v">vnitřní (oddělená)</td></tr>
+        <tr><td class="k">WC</td><td class="v">chemické kazetové Thetford + chemie ve výbavě</td></tr>
+        <tr><td class="k">Doplňování vody</td><td class="v">hadice na vodu + konev ve výbavě</td></tr>
+        <tr><td class="k">Objemy nádrží</td><td class="v" style="color:#9a6b00">ⓘ čistá / odpadní / kazeta — v inzerátu neuvedeno, ověřit s majitelem</td></tr>
       </table>
     </div>
   </details>
 
   <details class="acc">
-    <summary>🍳 Kuchyně <span class="chev">▸</span></summary>
+    <summary>🧰 Vnější &amp; ostatní výbava <span class="chev">▸</span></summary>
     <div class="inner">
-      <table>
-        <tr><td class="k">Vaření</td><td class="v">Thetford 3 hořáky, Nespresso DeLonghi</td></tr>
-      </table>
-    </div>
-  </details>
-
-  <details class="acc">
-    <summary>🧰 Vnější výbava <span class="chev">▸</span></summary>
-    <div class="inner">
-      <table>
-        <tr><td class="k">Ostatní</td><td class="v">markýza, nosič na 4 kola, klíny, vodováha</td></tr>
-      </table>
+      <div class="feat">
+        <div class="y">Markýza Thule + LED osvětlení pod markýzu</div>
+        <div class="y">Nosič na 4 kola</div>
+        <div class="y">Kempingový nábytek + vybavení</div>
+        <div class="y">Sušák na prádlo</div>
+        <div class="y">Ručníky</div>
+        <div class="y">Box s hračkami pro děti</div>
+        <div class="y">Dálniční známka ČR</div>
+        <div class="y">Klíny + vodováha</div>
+        <div class="n">Nezávislé topení</div>
+        <div class="n">Vnitřní klimatizace</div>
+        <div class="n">ISOFIX</div>
+      </div>
     </div>
   </details>
 
@@ -180,6 +218,36 @@
       <table>
         <tr><td class="k">Zelená karta</td><td class="v" style="color:#c0392b">ⓘ ověřit platnost s majitelem!</td></tr>
         <tr><td class="k">Technický průkaz</td><td class="v">ve voze</td></tr>
+        <tr><td class="k">Dálniční známka ČR</td><td class="v"><span class="yes">ano</span> — ve výbavě</td></tr>
+      </table>
+    </div>
+  </details>
+
+  <details class="acc">
+    <summary>💰 Ceny &amp; podmínky pronájmu <span class="chev">▸</span></summary>
+    <div class="inner">
+      <table>
+        <tr><td class="k">Cena</td><td class="v">od 3 968 Kč / den (dle sezóny)</td></tr>
+        <tr><td class="k">Vratná kauce</td><td class="v">30 000 Kč (při převzetí)</td></tr>
+        <tr><td class="k">Servisní poplatek</td><td class="v">jednorázově 2 000 Kč</td></tr>
+        <tr><td class="k">Parkování vlastního auta</td><td class="v">možné v půjčovně</td></tr>
+      </table>
+      <p class="listnote">Servisní poplatek zahrnuje: domytí a finální čištění, doplnění vody, výměnu plynových lahví, doplnění chemie do WC, doplnění kapslí do kávovaru, vyprání utěrek/ručníků/chráničů matrací a kontrolu vozidla.</p>
+    </div>
+  </details>
+
+  <details class="acc">
+    <summary>📜 Pravidla &amp; předání <span class="chev">▸</span></summary>
+    <div class="inner">
+      <table>
+        <tr><td class="k">Minimální věk nájemce</td><td class="v">25 let</td></tr>
+        <tr><td class="k">Řidičský průkaz</td><td class="v">min. 5 let</td></tr>
+        <tr><td class="k">Domácí mazlíčci (pes)</td><td class="v"><span class="yes">ano</span> — po domluvě s majitelem</td></tr>
+        <tr><td class="k">Kouření</td><td class="v"><span class="no">ne</span></td></tr>
+        <tr><td class="k">Festivaly / hromadné akce / off-road</td><td class="v"><span class="no">ne</span></td></tr>
+        <tr><td class="k">Vyzvednutí</td><td class="v">v den půjčení nejdříve 09:00</td></tr>
+        <tr><td class="k">Vrácení</td><td class="v">poslední den nejpozději do 13:00</td></tr>
+        <tr><td class="k">Pozdní vrácení</td><td class="v">jednorázový poplatek 1 000 Kč</td></tr>
       </table>
     </div>
   </details>
