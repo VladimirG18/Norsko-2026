@@ -75,6 +75,18 @@
   .badge.p-yellow{background:#fdf6e3;color:var(--yellow);border-color:#e8cf8a}
   .badge.p-green{background:#eafaf1;color:var(--green);border-color:#9bd9b5}
   .tag{font-size:.72rem;color:var(--slabe);background:#eef3f7;border-radius:20px;padding:2px 8px}
+  .who-badge{font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:20px;cursor:pointer;border:1px solid #cdd9e3;background:#eef3f7;color:var(--slabe)}
+  .who-badge.w-none{font-weight:600;color:var(--slabe)}
+  .who-badge.w-lucka{background:#fde7f1;color:#b0306a;border-color:#f3bcd6}
+  .who-badge.w-vladimir{background:#e7f0fb;color:#1d5fa8;border-color:#bcd6f3}
+  .who-badge.w-jirka{background:#e6f7ee;color:#1f8f57;border-color:#bce6cf}
+  .who-badge.w-jarka{background:#f3ebfb;color:#7a3fb0;border-color:#dcc7f0}
+  .group-head{display:flex;align-items:center;gap:8px;margin:16px 2px 4px;font-size:.9rem;font-weight:700;color:var(--modra)}
+  .group-head:first-child{margin-top:2px}
+  .group-head .cnt{font-weight:400;color:var(--slabe);font-size:.8rem}
+  .group-head .dot{width:10px;height:10px;border-radius:50%;background:#cdd9e3;flex:none}
+  .group-head .dot.w-lucka{background:#e0539c}.group-head .dot.w-vladimir{background:#2f74cc}
+  .group-head .dot.w-jirka{background:#2aa468}.group-head .dot.w-jarka{background:#9159c4}
   .answer{margin-top:7px;background:#eef3f7;border:1px solid #cdd9e3;border-radius:8px;
           padding:7px 10px;font-size:.9rem;cursor:pointer}
   .answer b{color:var(--modra)}
@@ -91,7 +103,7 @@
   @media print{
     .topbar,.addform,.filters,.filternote,.statusbar,.grip,.acts,.progress .bar,.note{display:none}
     body{background:#fff}.item{box-shadow:none;break-inside:avoid}
-    .badge{cursor:default}
+    .badge,.who-badge{cursor:default}
   }
 </style>
 </head>
@@ -103,7 +115,8 @@
 <div class="wrap">
   <h1>Co zařídit</h1>
   <p class="sub">Společný odškrtávací seznam příprav před cestou. Odškrtni hotové, klikni na <b>💬</b> a připiš poznámku (rezervační číslo, odkaz…).
-     Můžeš taky přidávat, mazat a upravovat úkoly, klikem na štítek měnit prioritu, přetažením za <b>⠿</b> řadit a nahoře filtrovat. Vše sdílené pro celou posádku.</p>
+     Klikem na <b>👤</b> přiřadíš úkol někomu z posádky (Lucka, Vladimír, Jirka, Jarka) a nahoře pak můžeš podle řešitele filtrovat nebo seskupit.
+     Můžeš taky přidávat, mazat a upravovat úkoly, klikem na štítek měnit prioritu a přetažením za <b>⠿</b> řadit. Vše sdílené pro celou posádku v reálném čase.</p>
 
   <div id="status" class="statusbar"></div>
 
@@ -121,6 +134,7 @@
         <option value="green">🟢 dobré mít</option>
       </select>
       <select id="newCat"></select>
+      <select id="newWho"></select>
       <button class="btn" id="addBtn">Přidat</button>
     </div>
   </div>
@@ -138,6 +152,11 @@
       <option value="">Vše</option>
       <option value="open">Jen nehotové</option>
       <option value="done">Jen hotové</option>
+    </select>
+    <select id="fWho"><option value="">Všichni řešitelé</option></select>
+    <select id="fGroup">
+      <option value="">Bez seskupení</option>
+      <option value="who">👥 Seskupit podle řešitele</option>
     </select>
     <button class="btn ghost" id="clearF">Zrušit filtry</button>
     <button class="btn ghost" id="printBtn">🖨️ Tisk</button>
@@ -203,20 +222,33 @@ const PRIO_RANK = {red:0, yellow:1, green:2};
 const PRIO_LABEL = {red:'🔴 nutné', yellow:'🟡 důležité', green:'🟢 dobré mít'};
 const PRIO_CYCLE = {red:'yellow', yellow:'green', green:'red'};
 
+// posádka, na kterou jdou úkoly přiřadit ('' = nepřiřazeno)
+const PEOPLE = ['Lucka','Vladimír','Jirka','Jarka'];
+const whoSlug = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+const whoClass = s => 'w-' + (s ? whoSlug(s) : 'none');
+const ASSIGN_CYCLE = w => { const i = PEOPLE.indexOf(w); return i < 0 ? PEOPLE[0] : (i+1 < PEOPLE.length ? PEOPLE[i+1] : ''); };
+
 const $ = id => document.getElementById(id);
 const listEl=$('list'), statusEl=$('status'), footEl=$('footnote'), filterNote=$('filterNote');
-const fSearch=$('fSearch'), fCat=$('fCat'), fPrio=$('fPrio'), fStatus=$('fStatus');
+const fSearch=$('fSearch'), fCat=$('fCat'), fPrio=$('fPrio'), fStatus=$('fStatus'), fWho=$('fWho'), fGroup=$('fGroup');
 
 // naplnění selectů kategorií
 for(const c of CATS){
   fCat.insertAdjacentHTML('beforeend', `<option value="${c}">${c}</option>`);
   $('newCat').insertAdjacentHTML('beforeend', `<option value="${c}">${c}</option>`);
 }
+// naplnění selectů řešitelů
+$('newWho').insertAdjacentHTML('beforeend', `<option value="">👤 nepřiřazeno</option>`);
+fWho.insertAdjacentHTML('beforeend', `<option value="__none">👤 Nepřiřazené</option>`);
+for(const p of PEOPLE){
+  $('newWho').insertAdjacentHTML('beforeend', `<option value="${p}">👤 ${p}</option>`);
+  fWho.insertAdjacentHTML('beforeend', `<option value="${p}">👤 ${p}</option>`);
+}
 
 let items = [];               // aktuální data z backendu
 const esc = s => (s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const fmtDate = ts => ts ? new Date(ts).toLocaleDateString('cs-CZ') : '';
-const filtersActive = () => !!(fSearch.value.trim() || fCat.value || fPrio.value || fStatus.value);
+const filtersActive = () => !!(fSearch.value.trim() || fCat.value || fPrio.value || fStatus.value || fWho.value);
 
 function visibleItems(){
   const q = fSearch.value.trim().toLowerCase();
@@ -225,6 +257,8 @@ function visibleItems(){
     if(fPrio.value && it.prio !== fPrio.value) return false;
     if(fStatus.value === 'open' && it.done) return false;
     if(fStatus.value === 'done' && !it.done) return false;
+    if(fWho.value === '__none' && it.who) return false;
+    if(fWho.value && fWho.value !== '__none' && it.who !== fWho.value) return false;
     if(q && !(it.text||'').toLowerCase().includes(q)) return false;
     return true;
   });
@@ -238,12 +272,62 @@ function renderProgress(){
   $('progBar').style.width = pct + '%';
 }
 
+function makeRow(it, dndOff){
+  const row = document.createElement('div');
+  row.className = `item p-${it.prio}${it.done?' done':''}`;
+  row.dataset.id = it.id;
+  row.draggable = !dndOff;
+  row.innerHTML = `
+    <span class="grip${dndOff?' off':''}" title="${dndOff?'Řazení vypnuto při filtru/seskupení':'Přetáhni pro změnu pořadí'}">⠿</span>
+    <input type="checkbox" ${it.done?'checked':''} title="Hotovo">
+    <div class="body">
+      <div class="txt">${esc(it.text)}</div>
+      <div class="meta">
+        <span class="badge p-${it.prio}" title="Klikni pro změnu priority">${PRIO_LABEL[it.prio]}</span>
+        <span class="tag">${esc(it.cat||'')}</span>
+        <span class="who-badge ${whoClass(it.who)}" title="Klikni pro přiřazení člověku">${it.who ? '👤 '+esc(it.who) : '👤 přiřadit'}</span>
+      </div>
+      ${it.answer ? `<div class="answer" title="Klikni pro úpravu poznámky"><b>📝 Poznámka:</b>
+        <span class="atext">${esc(it.answer)}</span>
+        ${it.answeredAt ? `<span class="who"> — ${fmtDate(it.answeredAt)}</span>` : ''}</div>` : ''}
+    </div>
+    <div class="acts">
+      <button class="iconbtn ans" title="${it.answer?'Upravit poznámku':'Přidat poznámku'}">💬</button>
+      <button class="iconbtn edit" title="Upravit text úkolu">✏️</button>
+      <button class="iconbtn del" title="Smazat">🗑</button>
+    </div>`;
+
+  row.querySelector('input').addEventListener('change', e=> backend.update(it.id, {done: e.target.checked}));
+  row.querySelector('.badge').addEventListener('click', ()=> backend.update(it.id, {prio: PRIO_CYCLE[it.prio]}));
+  row.querySelector('.who-badge').addEventListener('click', ()=> backend.update(it.id, {who: ASSIGN_CYCLE(it.who||'')}));
+  const respond = ()=>{
+    const a = prompt('Poznámka k úkolu (rezervační číslo, odkaz, kdo to řeší…).\nPrázdné pole poznámku smaže:', it.answer||'');
+    if(a===null) return;
+    const t = a.trim();
+    if(t) backend.update(it.id, {answer:t, answeredAt:Date.now()});
+    else backend.update(it.id, {answer:'', answeredAt:null});
+  };
+  row.querySelector('.ans').addEventListener('click', respond);
+  const ansBox = row.querySelector('.answer');
+  if(ansBox) ansBox.addEventListener('click', respond);
+  row.querySelector('.edit').addEventListener('click', ()=>{
+    const t = prompt('Upravit úkol:', it.text);
+    if(t!=null && t.trim()) backend.update(it.id, {text: t.trim()});
+  });
+  row.querySelector('.del').addEventListener('click', ()=>{
+    if(confirm('Smazat tento úkol?')) backend.remove(it.id);
+  });
+  if(!dndOff) attachDnD(row);
+  return row;
+}
+
 function render(){
   renderProgress();
   const vis = visibleItems();
-  const dndOff = filtersActive();
-  filterNote.textContent = filtersActive()
-    ? `Zobrazeno ${vis.length} z ${items.length}. Ruční řazení přetažením je vypnuté — zruš filtry pro změnu pořadí.`
+  const grouping = fGroup.value;            // '' nebo 'who'
+  const blocked = filtersActive() || !!grouping;
+  filterNote.textContent = blocked
+    ? `Zobrazeno ${vis.length} z ${items.length}. Ruční řazení přetažením je vypnuté — zruš filtry i seskupení pro změnu pořadí.`
     : (items.length ? 'Pořadí změníš přetažením za ⠿.' : '');
 
   listEl.innerHTML = '';
@@ -251,52 +335,22 @@ function render(){
     listEl.innerHTML = `<div class="empty">${items.length ? 'Nic neodpovídá filtru.' : 'Zatím tu nejsou žádné úkoly.'}</div>`;
     return;
   }
-  for(const it of vis){
-    const row = document.createElement('div');
-    row.className = `item p-${it.prio}${it.done?' done':''}`;
-    row.dataset.id = it.id;
-    row.draggable = !dndOff;
-    row.innerHTML = `
-      <span class="grip${dndOff?' off':''}" title="${dndOff?'Řazení vypnuto při filtru':'Přetáhni pro změnu pořadí'}">⠿</span>
-      <input type="checkbox" ${it.done?'checked':''} title="Hotovo">
-      <div class="body">
-        <div class="txt">${esc(it.text)}</div>
-        <div class="meta">
-          <span class="badge p-${it.prio}" title="Klikni pro změnu priority">${PRIO_LABEL[it.prio]}</span>
-          <span class="tag">${esc(it.cat||'')}</span>
-        </div>
-        ${it.answer ? `<div class="answer" title="Klikni pro úpravu poznámky"><b>📝 Poznámka:</b>
-          <span class="atext">${esc(it.answer)}</span>
-          ${it.answeredAt ? `<span class="who"> — ${fmtDate(it.answeredAt)}</span>` : ''}</div>` : ''}
-      </div>
-      <div class="acts">
-        <button class="iconbtn ans" title="${it.answer?'Upravit poznámku':'Přidat poznámku'}">💬</button>
-        <button class="iconbtn edit" title="Upravit text úkolu">✏️</button>
-        <button class="iconbtn del" title="Smazat">🗑</button>
-      </div>`;
-
-    row.querySelector('input').addEventListener('change', e=> backend.update(it.id, {done: e.target.checked}));
-    row.querySelector('.badge').addEventListener('click', ()=> backend.update(it.id, {prio: PRIO_CYCLE[it.prio]}));
-    const respond = ()=>{
-      const a = prompt('Poznámka k úkolu (rezervační číslo, odkaz, kdo to řeší…).\nPrázdné pole poznámku smaže:', it.answer||'');
-      if(a===null) return;
-      const t = a.trim();
-      if(t) backend.update(it.id, {answer:t, answeredAt:Date.now()});
-      else backend.update(it.id, {answer:'', answeredAt:null});
-    };
-    row.querySelector('.ans').addEventListener('click', respond);
-    const ansBox = row.querySelector('.answer');
-    if(ansBox) ansBox.addEventListener('click', respond);
-    row.querySelector('.edit').addEventListener('click', ()=>{
-      const t = prompt('Upravit úkol:', it.text);
-      if(t!=null && t.trim()) backend.update(it.id, {text: t.trim()});
-    });
-    row.querySelector('.del').addEventListener('click', ()=>{
-      if(confirm('Smazat tento úkol?')) backend.remove(it.id);
-    });
-    if(!dndOff) attachDnD(row);
-    listEl.appendChild(row);
+  if(grouping === 'who'){
+    const order = [...PEOPLE, ''];           // lidé v pořadí, nepřiřazené na konci
+    for(const person of order){
+      const grp = vis.filter(it => (it.who||'') === person);
+      if(!grp.length) continue;
+      const head = document.createElement('div');
+      head.className = 'group-head';
+      head.innerHTML = `<span class="dot ${whoClass(person)}"></span>`
+        + (person ? '👤 '+esc(person) : '👤 Nepřiřazené')
+        + ` <span class="cnt">(${grp.filter(i=>!i.done).length} nehotových / ${grp.length})</span>`;
+      listEl.appendChild(head);
+      for(const it of grp) listEl.appendChild(makeRow(it, blocked));
+    }
+    return;
   }
+  for(const it of vis) listEl.appendChild(makeRow(it, blocked));
 }
 
 // ---- drag & drop řazení (jen když nejsou aktivní filtry) ----
@@ -325,14 +379,14 @@ $('addBtn').addEventListener('click', ()=>{
   const text = $('newText').value.trim();
   if(!text){ $('newText').focus(); return; }
   const maxOrder = items.reduce((m,i)=>Math.max(m, i.order||0), -1);
-  backend.add({text, prio:$('newPrio').value, cat:$('newCat').value, done:false, order:maxOrder+1});
+  backend.add({text, prio:$('newPrio').value, cat:$('newCat').value, who:$('newWho').value, done:false, order:maxOrder+1});
   $('newText').value=''; $('newText').focus();
 });
 $('newText').addEventListener('keydown', e=>{ if(e.key==='Enter') $('addBtn').click(); });
 
 // ---- filtry ----
-[fSearch,fCat,fPrio,fStatus].forEach(el=> el.addEventListener('input', render));
-$('clearF').addEventListener('click', ()=>{ fSearch.value=''; fCat.value=''; fPrio.value=''; fStatus.value=''; render(); });
+[fSearch,fCat,fPrio,fStatus,fWho,fGroup].forEach(el=> el.addEventListener('input', render));
+$('clearF').addEventListener('click', ()=>{ fSearch.value=''; fCat.value=''; fPrio.value=''; fStatus.value=''; fWho.value=''; fGroup.value=''; render(); });
 $('printBtn').addEventListener('click', ()=> window.print());
 
 // ---- lokální záloha ----
