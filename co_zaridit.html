@@ -77,7 +77,7 @@
   .tag{font-size:.72rem;color:var(--slabe);background:#eef3f7;border-radius:20px;padding:2px 8px}
   .who-badge{font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:20px;cursor:pointer;border:1px solid #cdd9e3;background:#eef3f7;color:var(--slabe)}
   .who-badge.w-none{font-weight:600;color:var(--slabe)}
-  .who-badge.w-lucka{background:#fde7f1;color:#b0306a;border-color:#f3bcd6}
+  .who-badge.w-lucie,.who-badge.w-lucka{background:#fde7f1;color:#b0306a;border-color:#f3bcd6}
   .who-badge.w-vladimir{background:#e7f0fb;color:#1d5fa8;border-color:#bcd6f3}
   .who-badge.w-jirka{background:#e6f7ee;color:#1f8f57;border-color:#bce6cf}
   .who-badge.w-jarka{background:#f3ebfb;color:#7a3fb0;border-color:#dcc7f0}
@@ -95,7 +95,7 @@
   .group-head:first-child{margin-top:2px}
   .group-head .cnt{font-weight:400;color:var(--slabe);font-size:.8rem}
   .group-head .dot{width:10px;height:10px;border-radius:50%;background:#cdd9e3;flex:none}
-  .group-head .dot.w-lucka{background:#e0539c}.group-head .dot.w-vladimir{background:#2f74cc}
+  .group-head .dot.w-lucie,.group-head .dot.w-lucka{background:#e0539c}.group-head .dot.w-vladimir{background:#2f74cc}
   .group-head .dot.w-jirka{background:#2aa468}.group-head .dot.w-jarka{background:#9159c4}
   .answer{margin-top:7px;background:#eef3f7;border:1px solid #cdd9e3;border-radius:8px;
           padding:7px 10px;font-size:.9rem;cursor:pointer}
@@ -125,7 +125,7 @@
 <div class="wrap">
   <h1>Co zařídit</h1>
   <p class="sub">Společný odškrtávací seznam příprav před cestou. Odškrtni hotové, klikni na <b>💬</b> a připiš poznámku (rezervační číslo, odkaz…).
-     Klikem na <b>👤</b> vybereš z nabídky, komu úkol patří — můžeš zaškrtnout i víc lidí nebo <b>Všichni</b> (Lucka, Vladimír, Jirka, Jarka). Nahoře pak jde podle řešitele filtrovat nebo seskupit.
+     Klikem na <b>👤</b> vybereš z nabídky, komu úkol patří — můžeš zaškrtnout i víc lidí nebo <b>Všichni</b> (Lucie, Vladimír, Jirka, Jarka). Nahoře pak jde podle řešitele filtrovat nebo seskupit.
      Můžeš taky přidávat, mazat a upravovat úkoly, klikem na štítek měnit prioritu a přetažením za <b>⠿</b> řadit. Vše sdílené pro celou posádku v reálném čase.</p>
 
   <div id="status" class="statusbar"></div>
@@ -233,7 +233,7 @@ const PRIO_LABEL = {red:'🔴 nutné', yellow:'🟡 důležité', green:'🟢 do
 const PRIO_CYCLE = {red:'yellow', yellow:'green', green:'red'};
 
 // posádka, na kterou jdou úkoly přiřadit (úkol může mít víc lidí; všichni = celá posádka)
-const PEOPLE = ['Lucka','Vladimír','Jirka','Jarka'];
+const PEOPLE = ['Lucie','Vladimír','Jirka','Jarka'];
 const whoSlug = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
 const whoClass = s => 'w-' + (s ? whoSlug(s) : 'none');
 // kompatibilita se starým formátem (who jako řetězec) i prázdnem → vždy pole jmen
