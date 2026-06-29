@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Norsko 2026 — průvodce &amp; checklist</title>
+<title>Norsko 2026 — průvodce cestou</title>
 <style>
   :root{--modra:#0b3d66;--modra2:#16689c;--led:#e8f1f7;--akcent:#c0392b;
         --zelena:#27ae60;--text:#1c2733;--slabe:#5b6b7a}
@@ -62,7 +62,7 @@
 </head>
 <body>
 <div class="topbar">
-  <b>📋 Norsko 2026 — průvodce &amp; checklist</b>
+  <b>📋 Norsko 2026 — průvodce cestou</b>
   <a href="index.html">← rozcestník</a>
 </div>
 <div class="wrap">
@@ -71,36 +71,15 @@
 
   <div class="tabs">
     <button class="on" data-t="itin">🗓️ Itinerář</button>
-    <button data-t="check">✅ Co zařídit</button>
     <button data-t="info">ℹ️ Klíčové info</button>
   </div>
+  <p class="sub" style="margin-top:-8px">Odškrtávací seznam příprav se přesunul do samostatné dlaždice
+     <a href="co_zaridit.html" style="color:var(--modra2)">✅ Co zařídit</a> — je sdílený online a aktualizuje se všem v reálném čase.</p>
 
   <!-- ITINERÁŘ -->
   <div class="panel on" id="itin">
     <p class="sub" style="margin-top:-6px">Klikni na den — rozbalí se fotky míst, zajímavosti, vzdálenost &amp; čas jízdy a průměrná teplota (červenec).</p>
     <div id="dny"></div>
-  </div>
-
-  <!-- CHECKLIST -->
-  <div class="panel" id="check">
-    <div class="prog"><div class="f" id="progfill"></div></div>
-    <div class="card">
-      <h2>Rezervace</h2>
-      <div data-list></div>
-    </div>
-    <div class="card">
-      <h2>Pojištění &amp; doklady</h2>
-      <div data-list></div>
-    </div>
-    <div class="card">
-      <h2>Příprava &amp; výbava</h2>
-      <div data-list></div>
-    </div>
-    <div class="card">
-      <h2>Otázky na majitele vozu</h2>
-      <div data-list></div>
-    </div>
-    <button class="reset" onclick="resetAll()">vynulovat všechna zaškrtnutí</button>
   </div>
 
   <!-- INFO -->
@@ -253,73 +232,6 @@ function fetchFoto(img){
     cont.appendChild(el);
   });
 })();
-
-const checklist={
- 'Rezervace':[
-   'Trajekt Hirtshals–Kristiansand',
-   'Parkování u Trolltunga (P2/P3) — hodně dopředu',
-   'Případné zpáteční přejezdy přes fjordy',
- ],
- 'Pojištění & doklady':[
-   'Ověřit platnost pojištění / zelené karty (byla jen do 03/2026!)',
-   'Mezinárodní pojistná karta (CZ/0002)',
-   'Osvědčení o registraci vozidla ve voze',
- ],
- 'Příprava & výbava':[
-   'Vyřešit mýtné (krabička + objednat dopředu)',
-   'Nainstalovat eSIM aplikaci Saily',
-   'Navigace s filtrem výšky 3,20 m',
-   'Ověřit otevření Trollstigenu (sezónní)',
-   'Ověřit průjezdnost 7,45 m u Lovatnet a Stegastein',
-   'Nepromokavé ponožky DexShell + kotníkové boty',
-   'Zvážit vůz na nákladní váze (limit 485 kg)',
-   'Namrazit PET lahve před trajektem',
- ],
- 'Otázky na majitele vozu':[
-   'Bude pojištění platit celou cestu (18.7.–2.8.)?',
-   'Kapacita servisní baterie (Ah) + invertor 230V',
-   'Počet a umístění 12V / USB zásuvek',
-   'Objem nádrží (čistá / odpadní voda) + bojler',
-   'Kapacita kazetové toalety + kde se vylévá',
-   'Rozměr pneumatik',
-   'Umístění výfuku Trumy',
-   'GPS model — filtruje výšku 3,20 m?',
-   'Pioneer rádio — CarPlay / Android Auto?',
-   'Kvalita zpětné kamery za šera',
-   'Povolení převozu na trajektu',
-   'Limit kilometrů',
-   'Kontakt na zahraniční asistenci',
- ],
-};
-const KEY='norsko2026_checklist';
-let state=JSON.parse(localStorage.getItem(KEY)||'{}');
-const sekce=document.querySelectorAll('#check [data-list]');
-let idx=0, total=0;
-Object.keys(checklist).forEach((nazev,si)=>{
-  const cont=sekce[si];
-  checklist[nazev].forEach(text=>{
-    const id='c'+(idx++); total++;
-    const done=state[id];
-    const div=document.createElement('div');
-    div.className='item'+(done?' done':'');
-    div.innerHTML=`<input type="checkbox" id="${id}" ${done?'checked':''}>
-                   <label for="${id}">${text}</label>`;
-    const cb=div.querySelector('input');
-    cb.addEventListener('change',()=>{
-      state[id]=cb.checked; div.classList.toggle('done',cb.checked);
-      localStorage.setItem(KEY,JSON.stringify(state)); prog();
-    });
-    cont.appendChild(div);
-  });
-});
-function prog(){
-  const done=Object.values(state).filter(Boolean).length;
-  document.getElementById('progfill').style.width=(total?done/total*100:0)+'%';
-}
-function resetAll(){state={};localStorage.removeItem(KEY);
-  document.querySelectorAll('#check input').forEach(c=>{c.checked=false;
-    c.closest('.item').classList.remove('done')}); prog();}
-prog();
 
 // taby
 document.querySelectorAll('.tabs button').forEach(b=>{
