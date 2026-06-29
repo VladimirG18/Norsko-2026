@@ -81,6 +81,16 @@
   .who-badge.w-vladimir{background:#e7f0fb;color:#1d5fa8;border-color:#bcd6f3}
   .who-badge.w-jirka{background:#e6f7ee;color:#1f8f57;border-color:#bce6cf}
   .who-badge.w-jarka{background:#f3ebfb;color:#7a3fb0;border-color:#dcc7f0}
+  .who-badge.w-multi{background:#e7f0fb;color:#1d5fa8;border-color:#bcd6f3}
+  .who-badge.w-all{background:#fff1e0;color:#b06a00;border-color:#f0d9b0}
+  .assignpop{position:absolute;z-index:60;background:#fff;border:1px solid #cdd9e3;border-radius:10px;
+       box-shadow:0 10px 28px rgba(11,61,102,.20);padding:8px;min-width:180px;display:none;flex-direction:column;gap:1px}
+  .assignpop label{display:flex;align-items:center;gap:9px;font-size:.92rem;padding:6px 8px;border-radius:7px;cursor:pointer}
+  .assignpop label:hover{background:var(--led)}
+  .assignpop label.apall{font-weight:700;color:var(--modra)}
+  .assignpop input{width:17px;height:17px;accent-color:var(--modra2);cursor:pointer}
+  .assignpop .apsep{height:1px;background:#eef3f7;margin:3px 1px}
+  .assignpop .apDone{margin-top:5px;text-align:center}
   .group-head{display:flex;align-items:center;gap:8px;margin:16px 2px 4px;font-size:.9rem;font-weight:700;color:var(--modra)}
   .group-head:first-child{margin-top:2px}
   .group-head .cnt{font-weight:400;color:var(--slabe);font-size:.8rem}
@@ -115,7 +125,7 @@
 <div class="wrap">
   <h1>Co zařídit</h1>
   <p class="sub">Společný odškrtávací seznam příprav před cestou. Odškrtni hotové, klikni na <b>💬</b> a připiš poznámku (rezervační číslo, odkaz…).
-     Klikem na <b>👤</b> přiřadíš úkol někomu z posádky (Lucka, Vladimír, Jirka, Jarka) a nahoře pak můžeš podle řešitele filtrovat nebo seskupit.
+     Klikem na <b>👤</b> vybereš z nabídky, komu úkol patří — můžeš zaškrtnout i víc lidí nebo <b>Všichni</b> (Lucka, Vladimír, Jirka, Jarka). Nahoře pak jde podle řešitele filtrovat nebo seskupit.
      Můžeš taky přidávat, mazat a upravovat úkoly, klikem na štítek měnit prioritu a přetažením za <b>⠿</b> řadit. Vše sdílené pro celou posádku v reálném čase.</p>
 
   <div id="status" class="statusbar"></div>
@@ -134,7 +144,7 @@
         <option value="green">🟢 dobré mít</option>
       </select>
       <select id="newCat"></select>
-      <select id="newWho"></select>
+      <button type="button" class="btn ghost" id="newWhoBtn">👤 Přiřadit…</button>
       <button class="btn" id="addBtn">Přidat</button>
     </div>
   </div>
@@ -222,11 +232,16 @@ const PRIO_RANK = {red:0, yellow:1, green:2};
 const PRIO_LABEL = {red:'🔴 nutné', yellow:'🟡 důležité', green:'🟢 dobré mít'};
 const PRIO_CYCLE = {red:'yellow', yellow:'green', green:'red'};
 
-// posádka, na kterou jdou úkoly přiřadit ('' = nepřiřazeno)
+// posádka, na kterou jdou úkoly přiřadit (úkol může mít víc lidí; všichni = celá posádka)
 const PEOPLE = ['Lucka','Vladimír','Jirka','Jarka'];
 const whoSlug = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
 const whoClass = s => 'w-' + (s ? whoSlug(s) : 'none');
-const ASSIGN_CYCLE = w => { const i = PEOPLE.indexOf(w); return i < 0 ? PEOPLE[0] : (i+1 < PEOPLE.length ? PEOPLE[i+1] : ''); };
+// kompatibilita se starým formátem (who jako řetězec) i prázdnem → vždy pole jmen
+const whoArr = it => Array.isArray(it.who) ? it.who.filter(Boolean) : (it.who ? [it.who] : []);
+const isAll = arr => arr.length>0 && PEOPLE.every(p=>arr.includes(p));
+const whoLabel = arr => !arr.length ? '👤 přiřadit' : (isAll(arr) ? '👥 Všichni' : '👤 '+arr.join(', '));
+const whoBadgeClass = arr => !arr.length ? 'w-none' : (isAll(arr) ? 'w-all' : (arr.length===1 ? whoClass(arr[0]) : 'w-multi'));
+let newWhoSel = [];           // staging výběr řešitelů pro nový úkol
 
 const $ = id => document.getElementById(id);
 const listEl=$('list'), statusEl=$('status'), footEl=$('footnote'), filterNote=$('filterNote');
@@ -237,11 +252,9 @@ for(const c of CATS){
   fCat.insertAdjacentHTML('beforeend', `<option value="${c}">${c}</option>`);
   $('newCat').insertAdjacentHTML('beforeend', `<option value="${c}">${c}</option>`);
 }
-// naplnění selectů řešitelů
-$('newWho').insertAdjacentHTML('beforeend', `<option value="">👤 nepřiřazeno</option>`);
+// naplnění filtru řešitelů
 fWho.insertAdjacentHTML('beforeend', `<option value="__none">👤 Nepřiřazené</option>`);
 for(const p of PEOPLE){
-  $('newWho').insertAdjacentHTML('beforeend', `<option value="${p}">👤 ${p}</option>`);
   fWho.insertAdjacentHTML('beforeend', `<option value="${p}">👤 ${p}</option>`);
 }
 
@@ -257,8 +270,8 @@ function visibleItems(){
     if(fPrio.value && it.prio !== fPrio.value) return false;
     if(fStatus.value === 'open' && it.done) return false;
     if(fStatus.value === 'done' && !it.done) return false;
-    if(fWho.value === '__none' && it.who) return false;
-    if(fWho.value && fWho.value !== '__none' && it.who !== fWho.value) return false;
+    if(fWho.value === '__none' && whoArr(it).length) return false;
+    if(fWho.value && fWho.value !== '__none' && !whoArr(it).includes(fWho.value)) return false;
     if(q && !(it.text||'').toLowerCase().includes(q)) return false;
     return true;
   });
@@ -285,7 +298,7 @@ function makeRow(it, dndOff){
       <div class="meta">
         <span class="badge p-${it.prio}" title="Klikni pro změnu priority">${PRIO_LABEL[it.prio]}</span>
         <span class="tag">${esc(it.cat||'')}</span>
-        <span class="who-badge ${whoClass(it.who)}" title="Klikni pro přiřazení člověku">${it.who ? '👤 '+esc(it.who) : '👤 přiřadit'}</span>
+        <span class="who-badge ${whoBadgeClass(whoArr(it))}" title="Klikni pro přiřazení (lze i víc lidem)">${esc(whoLabel(whoArr(it)))}</span>
       </div>
       ${it.answer ? `<div class="answer" title="Klikni pro úpravu poznámky"><b>📝 Poznámka:</b>
         <span class="atext">${esc(it.answer)}</span>
@@ -299,7 +312,7 @@ function makeRow(it, dndOff){
 
   row.querySelector('input').addEventListener('change', e=> backend.update(it.id, {done: e.target.checked}));
   row.querySelector('.badge').addEventListener('click', ()=> backend.update(it.id, {prio: PRIO_CYCLE[it.prio]}));
-  row.querySelector('.who-badge').addEventListener('click', ()=> backend.update(it.id, {who: ASSIGN_CYCLE(it.who||'')}));
+  row.querySelector('.who-badge').addEventListener('click', (e)=> openAssign(e.currentTarget, whoArr(it), sel=> backend.update(it.id, {who: sel})));
   const respond = ()=>{
     const a = prompt('Poznámka k úkolu (rezervační číslo, odkaz, kdo to řeší…).\nPrázdné pole poznámku smaže:', it.answer||'');
     if(a===null) return;
@@ -336,18 +349,19 @@ function render(){
     return;
   }
   if(grouping === 'who'){
-    const order = [...PEOPLE, ''];           // lidé v pořadí, nepřiřazené na konci
-    for(const person of order){
-      const grp = vis.filter(it => (it.who||'') === person);
-      if(!grp.length) continue;
+    // úkol se zobrazí v sekci každého, komu je přiřazen (Všichni → ve všech); nepřiřazené na konci
+    const renderGroup = (person, grp) => {
+      if(!grp.length) return;
       const head = document.createElement('div');
       head.className = 'group-head';
-      head.innerHTML = `<span class="dot ${whoClass(person)}"></span>`
+      head.innerHTML = `<span class="dot ${person?whoClass(person):''}"></span>`
         + (person ? '👤 '+esc(person) : '👤 Nepřiřazené')
         + ` <span class="cnt">(${grp.filter(i=>!i.done).length} nehotových / ${grp.length})</span>`;
       listEl.appendChild(head);
       for(const it of grp) listEl.appendChild(makeRow(it, blocked));
-    }
+    };
+    for(const person of PEOPLE) renderGroup(person, vis.filter(it => whoArr(it).includes(person)));
+    renderGroup('', vis.filter(it => whoArr(it).length === 0));
     return;
   }
   for(const it of vis) listEl.appendChild(makeRow(it, blocked));
@@ -379,8 +393,8 @@ $('addBtn').addEventListener('click', ()=>{
   const text = $('newText').value.trim();
   if(!text){ $('newText').focus(); return; }
   const maxOrder = items.reduce((m,i)=>Math.max(m, i.order||0), -1);
-  backend.add({text, prio:$('newPrio').value, cat:$('newCat').value, who:$('newWho').value, done:false, order:maxOrder+1});
-  $('newText').value=''; $('newText').focus();
+  backend.add({text, prio:$('newPrio').value, cat:$('newCat').value, who:newWhoSel.slice(), done:false, order:maxOrder+1});
+  $('newText').value=''; newWhoSel=[]; renderNewWhoBtn(); $('newText').focus();
 });
 $('newText').addEventListener('keydown', e=>{ if(e.key==='Enter') $('addBtn').click(); });
 
@@ -388,6 +402,51 @@ $('newText').addEventListener('keydown', e=>{ if(e.key==='Enter') $('addBtn').cl
 [fSearch,fCat,fPrio,fStatus,fWho,fGroup].forEach(el=> el.addEventListener('input', render));
 $('clearF').addEventListener('click', ()=>{ fSearch.value=''; fCat.value=''; fPrio.value=''; fStatus.value=''; fWho.value=''; fGroup.value=''; render(); });
 $('printBtn').addEventListener('click', ()=> window.print());
+
+// ---- přiřazení přes nabídku (checkbox menu, lze víc lidem i „Všichni") ----
+const pop = document.createElement('div');
+pop.className = 'assignpop';
+document.body.appendChild(pop);
+let popCommit = null;
+
+function closeAssign(){ pop.style.display='none'; popCommit=null; }
+
+function openAssign(anchor, current, onDone){
+  pop.innerHTML =
+    `<label class="apall"><input type="checkbox" class="apAll"> 👥 Všichni</label>
+     <div class="apsep"></div>` +
+    PEOPLE.map(pn=>`<label><input type="checkbox" class="apOne" value="${pn}"> 👤 ${pn}</label>`).join('') +
+    `<div class="apsep"></div><button class="btn apDone">Hotovo</button>`;
+  const ones = [...pop.querySelectorAll('.apOne')];
+  const all = pop.querySelector('.apAll');
+  const cur = new Set(current);
+  ones.forEach(cb=> cb.checked = cur.has(cb.value));
+  const syncAll = ()=> all.checked = ones.every(cb=>cb.checked);
+  syncAll();
+  all.addEventListener('change', ()=>{ ones.forEach(cb=> cb.checked = all.checked); });
+  ones.forEach(cb=> cb.addEventListener('change', syncAll));
+  popCommit = ()=>{ const sel = ones.filter(cb=>cb.checked).map(cb=>cb.value); closeAssign(); onDone(sel); };
+  pop.querySelector('.apDone').addEventListener('click', popCommit);
+  // umístění pod štítek, s ohledem na okraj obrazovky
+  pop.style.display='flex';
+  const r = anchor.getBoundingClientRect();
+  pop.style.top = (window.scrollY + r.bottom + 5) + 'px';
+  pop.style.left = (window.scrollX + r.left) + 'px';
+  const pr = pop.getBoundingClientRect();
+  if(pr.right > window.innerWidth - 8) pop.style.left = (window.scrollX + window.innerWidth - 8 - pr.width) + 'px';
+}
+// klik mimo nabídku = potvrdit a zavřít
+document.addEventListener('mousedown', e=>{
+  if(pop.style.display==='none') return;
+  if(pop.contains(e.target)) return;
+  if(e.target.closest && e.target.closest('.who-badge')) return; // klik na jiný štítek řeší jeho handler
+  if(popCommit) popCommit(); else closeAssign();
+});
+
+// ---- tlačítko přiřazení v přidávacím formuláři ----
+function renderNewWhoBtn(){ $('newWhoBtn').textContent = newWhoSel.length ? whoLabel(newWhoSel) : '👤 Přiřadit…'; }
+$('newWhoBtn').addEventListener('click', e=> openAssign(e.currentTarget, newWhoSel, sel=>{ newWhoSel = sel; renderNewWhoBtn(); }));
+renderNewWhoBtn();
 
 // ---- lokální záloha ----
 function localBackend(){
