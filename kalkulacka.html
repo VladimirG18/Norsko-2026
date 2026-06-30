@@ -36,13 +36,19 @@
   .note{font-size:.82rem;color:var(--slabe);margin-top:6px}
   .alert{background:#fff4f2;border:1px solid #f3c5bd;color:var(--akcent);border-radius:10px;
          padding:12px 14px;font-size:.9rem;font-weight:600;display:none}
+  .statusbar{font-size:.82rem;color:var(--slabe);padding:9px 12px;border:1px solid #dce6ee;
+             border-radius:9px;margin:4px 0 16px;background:#fff}
+  .statusbar.ok{color:#1f8f57;border-color:#9bd9b5;background:#f1faf4}
+  .statusbar.warn{color:#9a6b00;border-color:#e8cf8a;background:#fdf8ea}
 </style>
 </head>
 <body>
 <div class="topbar"><a href="index.html">← rozcestník</a></div>
 <div class="wrap">
   <h1>⚖️ Kalkulačka nosnosti</h1>
-  <p class="sub">CI Horon 84 M Elite — užitečná nosnost (payload) <b>485 kg</b>. Sleduj, kolik ti zbývá.</p>
+  <p class="sub">CI Horon 84 M Elite — užitečná nosnost (payload) <b>485 kg</b>. Sleduj, kolik ti zbývá. Hodnoty jsou sdílené — co zadá jeden, vidí celá posádka.</p>
+
+  <div id="status" class="statusbar"></div>
 
   <div class="gauge">
     <div class="num" id="zbyva">485</div>
@@ -98,25 +104,121 @@
   </div>
 </div>
 
-<script>
+<script type="module">
+// Sdílený online backend (Firebase / Firestore) – hodnoty vidí a upravuje celá posádka v reálném čase.
+// Stejný projekt jako poznámky, dotazy a co zařídit, ale vlastní kolekce, ať se data nemíchají.
+const firebaseConfig = {
+  apiKey: "AIzaSyCLU7cH1tXPqnaxVV_-BsSNssl-NU9Pz1I",
+  authDomain: "rd-modrice-e9477.firebaseapp.com",
+  projectId: "rd-modrice-e9477",
+  storageBucket: "rd-modrice-e9477.firebasestorage.app",
+  messagingSenderId: "941681195558",
+  appId: "1:941681195558:web:3aac10f182e784cdb3c4e7"
+};
+const COLLECTION = 'kalkulacka-norsko';
+const DOC_ID = 'state';
+const KEY = 'norsko2026-kalkulacka-v1';
+
 const LIMIT=485;
 const ids=['dosp','deti','pes','obleceni','jidlo','voda','outdoor','kola','ostatni'];
-function num(id){return Math.max(0,parseFloat(document.getElementById(id).value)||0)}
+// výchozí hodnoty (naplní se jen při prvním načtení do prázdné databáze)
+const DEFAULTS={dosp:4,deti:1,pes:20,obleceni:40,jidlo:35,voda:40,outdoor:25,kola:0,ostatni:20};
+
+const $ = id => document.getElementById(id);
+const statusEl = $('status');
+function num(id){return Math.max(0,parseFloat($(id).value)||0)}
 function prepocet(){
   const naloz = num('dosp')*75 + num('deti')*35 + num('pes')
      + num('obleceni')+num('jidlo')+num('voda')+num('outdoor')+num('kola')+num('ostatni');
   const zbyva = LIMIT - naloz;
-  document.getElementById('naloz').textContent = Math.round(naloz)+' kg';
-  const z=document.getElementById('zbyva');
+  $('naloz').textContent = Math.round(naloz)+' kg';
+  const z=$('zbyva');
   z.textContent = Math.round(zbyva);
   const pct = Math.min(100, naloz/LIMIT*100);
-  const fill=document.getElementById('fill');
+  const fill=$('fill');
   fill.style.width = pct+'%';
   let col = zbyva<0 ? '#c0392b' : zbyva<50 ? '#e0a800' : '#27ae60';
   fill.style.background = col; z.style.color = col;
-  document.getElementById('alert').style.display = zbyva<0 ? 'block' : 'none';
+  $('alert').style.display = zbyva<0 ? 'block' : 'none';
 }
-ids.forEach(id=>document.getElementById(id).addEventListener('input',prepocet));
+
+// promítnutí sdíleného stavu do polí (nepřepisuj pole, které právě upravuju)
+function applyState(state){
+  for(const id of ids){
+    if(state[id]==null) continue;
+    const el=$(id);
+    if(document.activeElement===el) continue;
+    const v=String(state[id]);
+    if(el.value!==v) el.value=v;
+  }
+  prepocet();
+}
+
+let backend;
+// zápis se zdržením, ať se při psaní neposílá každý úhoz
+const timers={};
+function pushChange(id){
+  clearTimeout(timers[id]);
+  timers[id]=setTimeout(()=> backend.set(id, num(id)), 350);
+}
+ids.forEach(id=> $(id).addEventListener('input', ()=>{ prepocet(); pushChange(id); }));
+
+// ---- lokální záloha ----
+function localBackend(){
+  let data={};
+  try{ data = JSON.parse(localStorage.getItem(KEY)) || {}; }catch(e){ data={}; }
+  if(!Object.keys(data).length) data={...DEFAULTS};
+  const save=()=> localStorage.setItem(KEY, JSON.stringify(data));
+  return {
+    start(){ applyState(data); },
+    set(id,v){ data[id]=v; save(); }
+  };
+}
+
+// ---- sdílený Firebase backend ----
+async function firebaseBackend(){
+  const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
+  const { getFirestore, collection, doc, setDoc, updateDoc, onSnapshot, getDoc }
+    = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const ref = doc(collection(db, COLLECTION), DOC_ID);
+
+  // prvotní naplnění výchozími hodnotami, pokud dokument ještě neexistuje
+  const snap0 = await getDoc(ref);
+  if(!snap0.exists()){ await setDoc(ref, {...DEFAULTS}); }
+
+  return {
+    start(){
+      onSnapshot(ref, snap=>{
+        applyState(snap.exists() ? snap.data() : {});
+      }, err=>{
+        console.error(err);
+        statusEl.textContent='⚠️ Chyba připojení k databázi – zkontroluj pravidla Firestore.';
+        statusEl.className='statusbar warn';
+      });
+    },
+    set(id,v){ return updateDoc(ref, {[id]: v}); }
+  };
+}
+
+const useFirebase = firebaseConfig && firebaseConfig.apiKey && firebaseConfig.apiKey.length > 10;
+if(useFirebase){
+  try{
+    backend = await firebaseBackend();
+    statusEl.textContent='🟢 Sdílené online – hodnoty vidí a upravuje celá posádka v reálném čase.';
+    statusEl.className='statusbar ok';
+  }catch(e){
+    console.error(e);
+    backend = localBackend();
+    statusEl.textContent='⚠️ Online databázi se nepodařilo načíst – používá se lokální ukládání na tomto zařízení.';
+    statusEl.className='statusbar warn';
+  }
+}else{
+  backend = localBackend();
+  statusEl.textContent='🔒 Jen na tomto zařízení.';
+}
+backend.start();
 prepocet();
 </script>
 </body>
