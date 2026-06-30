@@ -40,6 +40,15 @@
              border-radius:9px;margin:4px 0 16px;background:#fff}
   .statusbar.ok{color:#1f8f57;border-color:#9bd9b5;background:#f1faf4}
   .statusbar.warn{color:#9a6b00;border-color:#e8cf8a;background:#fdf8ea}
+  .modesrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 16px}
+  .modesrow .lbl{font-size:.85rem;color:var(--slabe);font-weight:600}
+  .modes{display:inline-flex;background:#fff;border:1px solid #cdd9e3;border-radius:10px;padding:3px;gap:3px}
+  .modes button{border:0;background:none;color:var(--modra);font:inherit;font-weight:600;
+       padding:8px 16px;border-radius:8px;cursor:pointer;font-size:.9rem}
+  .modes button.on{background:var(--modra);color:#fff}
+  .row.hidden{display:none}
+  .subhead{font-size:.78rem;font-weight:700;color:var(--slabe);text-transform:uppercase;
+           letter-spacing:.04em;margin:14px 0 2px;padding-top:8px;border-top:1px dashed #e1ecf4}
 </style>
 </head>
 <body>
@@ -49,6 +58,14 @@
   <p class="sub">CI Horon 84 M Elite — užitečná nosnost (payload) <b>485 kg</b>. Sleduj, kolik ti zbývá. Hodnoty jsou sdílené — co zadá jeden, vidí celá posádka.</p>
 
   <div id="status" class="statusbar"></div>
+
+  <div class="modesrow">
+    <span class="lbl">Režim:</span>
+    <div class="modes" id="modes">
+      <button type="button" class="mode" data-mode="zakladni">Základní</button>
+      <button type="button" class="mode" data-mode="podrobna">Podrobná</button>
+    </div>
+  </div>
 
   <div class="gauge">
     <div class="num" id="zbyva">485</div>
@@ -76,31 +93,60 @@
 
   <div class="card">
     <h2>🎒 Vybavení &amp; zásoby</h2>
-    <div class="row">
+
+    <div class="row" data-mode="both">
       <label>Oblečení &amp; osobní věci <span class="hint">~8 kg/os.</span></label>
       <input type="number" id="obleceni" value="40" min="0"><span class="unit">kg</span>
     </div>
-    <div class="row">
+    <div class="row" data-mode="podrobna">
+      <label>Drogerie &amp; hygiena</label>
+      <input type="number" id="hygiena" value="6" min="0"><span class="unit">kg</span>
+    </div>
+
+    <!-- jídlo & pití -->
+    <div class="subhead" data-mode="podrobna">Jídlo &amp; pití</div>
+    <div class="row" data-mode="zakladni">
       <label>Jídlo &amp; nápoje na cestu</label>
       <input type="number" id="jidlo" value="35" min="0"><span class="unit">kg</span>
     </div>
-    <div class="row">
+    <div class="row" data-mode="podrobna">
+      <label>Trvanlivé potraviny <span class="hint">konzervy, těstoviny, pečivo…</span></label>
+      <input type="number" id="jidlo_trvanlive" value="18" min="0"><span class="unit">kg</span>
+    </div>
+    <div class="row" data-mode="podrobna">
+      <label>Čerstvé &amp; chlazené jídlo</label>
+      <input type="number" id="jidlo_cerstve" value="12" min="0"><span class="unit">kg</span>
+    </div>
+    <div class="row" data-mode="podrobna">
+      <label>Pití – nealko <span class="hint">balená voda, limo, džusy</span></label>
+      <input type="number" id="piti_nealko" value="10" min="0"><span class="unit">kg</span>
+    </div>
+    <div class="row" data-mode="podrobna">
+      <label>Pití – pivo, víno, ostatní</label>
+      <input type="number" id="piti_alko" value="6" min="0"><span class="unit">kg</span>
+    </div>
+
+    <div class="row" data-mode="both">
       <label>Voda v nádrži <span class="hint">1 l = 1 kg</span></label>
       <input type="number" id="voda" value="40" min="0"><span class="unit">kg</span>
     </div>
-    <div class="row">
+    <div class="row" data-mode="podrobna">
+      <label>Nádobí &amp; vybavení kuchyně</label>
+      <input type="number" id="kuchyne" value="10" min="0"><span class="unit">kg</span>
+    </div>
+    <div class="row" data-mode="both">
       <label>Outdoor (boty, batohy, treky)</label>
       <input type="number" id="outdoor" value="25" min="0"><span class="unit">kg</span>
     </div>
-    <div class="row">
+    <div class="row" data-mode="both">
       <label>Kola na nosiči <span class="hint">~14 kg/kolo</span></label>
       <input type="number" id="kola" value="0" min="0"><span class="unit">kg</span>
     </div>
-    <div class="row">
+    <div class="row" data-mode="both">
       <label>Ostatní (AdBlue, plyn, klíny…)</label>
       <input type="number" id="ostatni" value="20" min="0"><span class="unit">kg</span>
     </div>
-    <p class="note">Hodnoty jsou orientační — uprav podle reality. Doporučení z podkladů: vůz před odjezdem zvážit na nákladní váze.</p>
+    <p class="note">Hodnoty jsou orientační — uprav podle reality. Přepínač <b>Základní/Podrobná</b> nahoře určuje, které položky se počítají. Doporučení z podkladů: vůz před odjezdem zvážit na nákladní váze.</p>
   </div>
 </div>
 
@@ -120,16 +166,29 @@ const DOC_ID = 'state';
 const KEY = 'norsko2026-kalkulacka-v1';
 
 const LIMIT=485;
-const ids=['dosp','deti','pes','obleceni','jidlo','voda','outdoor','kola','ostatni'];
-// výchozí hodnoty (naplní se jen při prvním načtení do prázdné databáze)
-const DEFAULTS={dosp:4,deti:1,pes:20,obleceni:40,jidlo:35,voda:40,outdoor:25,kola:0,ostatni:20};
+// všechna vstupní pole (sjednocení obou režimů)
+const ids=['dosp','deti','pes','obleceni','hygiena','jidlo',
+  'jidlo_trvanlive','jidlo_cerstve','piti_nealko','piti_alko',
+  'voda','kuchyne','outdoor','kola','ostatni'];
+// které položky vybavení se počítají v daném režimu
+const EQUIP={
+  zakladni:['obleceni','jidlo','voda','outdoor','kola','ostatni'],
+  podrobna:['obleceni','hygiena','jidlo_trvanlive','jidlo_cerstve','piti_nealko','piti_alko',
+            'voda','kuchyne','outdoor','kola','ostatni']
+};
+const MODES=['zakladni','podrobna'];
+// výchozí hodnoty + režim (naplní se jen při prvním načtení do prázdné databáze)
+const DEFAULTS={mode:'zakladni',dosp:4,deti:1,pes:20,obleceni:40,hygiena:6,jidlo:35,
+  jidlo_trvanlive:18,jidlo_cerstve:12,piti_nealko:10,piti_alko:6,
+  voda:40,kuchyne:10,outdoor:25,kola:0,ostatni:20};
 
 const $ = id => document.getElementById(id);
 const statusEl = $('status');
+let mode='zakladni';
 function num(id){return Math.max(0,parseFloat($(id).value)||0)}
 function prepocet(){
-  const naloz = num('dosp')*75 + num('deti')*35 + num('pes')
-     + num('obleceni')+num('jidlo')+num('voda')+num('outdoor')+num('kola')+num('ostatni');
+  const crew = num('dosp')*75 + num('deti')*35 + num('pes');
+  const naloz = crew + EQUIP[mode].reduce((s,id)=>s+num(id),0);
   const zbyva = LIMIT - naloz;
   $('naloz').textContent = Math.round(naloz)+' kg';
   const z=$('zbyva');
@@ -142,6 +201,18 @@ function prepocet(){
   $('alert').style.display = zbyva<0 ? 'block' : 'none';
 }
 
+// zobrazení řádků (a aktivního tlačítka) podle režimu
+function applyMode(m){
+  if(!MODES.includes(m)) m='zakladni';
+  mode=m;
+  document.querySelectorAll('[data-mode]:not(.mode)').forEach(el=>{
+    const dm=el.dataset.mode;
+    el.classList.toggle('hidden', !(dm==='both' || dm===mode));
+  });
+  document.querySelectorAll('#modes .mode').forEach(b=> b.classList.toggle('on', b.dataset.mode===mode));
+  prepocet();
+}
+
 // promítnutí sdíleného stavu do polí (nepřepisuj pole, které právě upravuju)
 function applyState(state){
   for(const id of ids){
@@ -151,7 +222,7 @@ function applyState(state){
     const v=String(state[id]);
     if(el.value!==v) el.value=v;
   }
-  prepocet();
+  applyMode(state.mode||mode);
 }
 
 let backend;
@@ -162,6 +233,9 @@ function pushChange(id){
   timers[id]=setTimeout(()=> backend.set(id, num(id)), 350);
 }
 ids.forEach(id=> $(id).addEventListener('input', ()=>{ prepocet(); pushChange(id); }));
+// přepínač režimu – sdílený pro celou posádku
+document.querySelectorAll('#modes .mode').forEach(b=>
+  b.addEventListener('click', ()=>{ applyMode(b.dataset.mode); backend.set('mode', b.dataset.mode); }));
 
 // ---- lokální záloha ----
 function localBackend(){
