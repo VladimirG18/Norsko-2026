@@ -49,6 +49,8 @@
   .row.hidden{display:none}
   .subhead{font-size:.78rem;font-weight:700;color:var(--slabe);text-transform:uppercase;
            letter-spacing:.04em;margin:14px 0 2px;padding-top:8px;border-top:1px dashed #e1ecf4}
+  .subhead2{font-size:.82rem;font-weight:700;color:var(--modra);margin:2px 0 4px}
+  .subhead2 .hint{font-weight:400}
 </style>
 </head>
 <body>
@@ -77,9 +79,22 @@
 
   <div class="card">
     <h2>👥 Posádka</h2>
+    <div class="subhead2">Dospělí <span class="hint">hmotnost každého zvlášť</span></div>
     <div class="row">
-      <label>Dospělí <span class="hint">průměr 75 kg/os.</span></label>
-      <input type="number" id="dosp" value="4" min="0"><span class="unit">os</span>
+      <label>Lucie</label>
+      <input type="number" id="dosp_lucie" value="75" min="0"><span class="unit">kg</span>
+    </div>
+    <div class="row">
+      <label>Vladimír</label>
+      <input type="number" id="dosp_vladimir" value="75" min="0"><span class="unit">kg</span>
+    </div>
+    <div class="row">
+      <label>Jirka</label>
+      <input type="number" id="dosp_jirka" value="75" min="0"><span class="unit">kg</span>
+    </div>
+    <div class="row">
+      <label>Jarka</label>
+      <input type="number" id="dosp_jarka" value="75" min="0"><span class="unit">kg</span>
     </div>
     <div class="row">
       <label>Děti <span class="hint">průměr 35 kg/dítě</span></label>
@@ -199,8 +214,10 @@ const DOC_ID = 'state';
 const KEY = 'norsko2026-kalkulacka-v1';
 
 const LIMIT=485;
+// dospělí – každý se zadává samostatně (skutečná hmotnost v kg)
+const ADULTS=['dosp_lucie','dosp_vladimir','dosp_jirka','dosp_jarka'];
 // všechna vstupní pole (sjednocení obou režimů)
-const ids=['dosp','deti','pes','obleceni','hygiena','dite','pes_vyb','jidlo',
+const ids=[...ADULTS,'deti','pes','obleceni','hygiena','dite','pes_vyb','jidlo',
   'jidlo_trvanlive','jidlo_cerstve','piti_nealko','piti_alko','kuchyne',
   'voda','outdoor','outdoor_obuv','batohy','ostatni','elektro','naradi','provoz'];
 // které položky vybavení se počítají v daném režimu
@@ -212,7 +229,8 @@ const EQUIP={
 };
 const MODES=['zakladni','podrobna'];
 // výchozí hodnoty + režim (naplní se jen při prvním načtení do prázdné databáze)
-const DEFAULTS={mode:'zakladni',dosp:4,deti:1,pes:20,obleceni:40,voda:40,
+const DEFAULTS={mode:'zakladni',
+  dosp_lucie:75,dosp_vladimir:75,dosp_jirka:75,dosp_jarka:75,deti:1,pes:20,obleceni:40,voda:40,
   jidlo:35,outdoor:25,ostatni:20,
   hygiena:6,dite:12,pes_vyb:10,jidlo_trvanlive:18,jidlo_cerstve:12,
   piti_nealko:10,piti_alko:6,kuchyne:10,outdoor_obuv:15,batohy:8,
@@ -223,7 +241,7 @@ const statusEl = $('status');
 let mode='zakladni';
 function num(id){return Math.max(0,parseFloat($(id).value)||0)}
 function prepocet(){
-  const crew = num('dosp')*75 + num('deti')*35 + num('pes');
+  const crew = ADULTS.reduce((s,id)=>s+num(id),0) + num('deti')*35 + num('pes');
   const naloz = crew + EQUIP[mode].reduce((s,id)=>s+num(id),0);
   const zbyva = LIMIT - naloz;
   $('naloz').textContent = Math.round(naloz)+' kg';
