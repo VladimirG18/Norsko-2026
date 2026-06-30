@@ -53,8 +53,8 @@
   /* barvy autorů */
   .who-lucie{color:#c0398f}    .border-lucie{border-left-color:#e879c9}
   .who-vladimir{color:#16689c} .border-vladimir{border-left-color:#4f9eff}
-  .who-jirka{color:#1f8f57}    .border-jirka{border-left-color:#2ec27e}
-  .who-jarka{color:#9a6b00}    .border-jarka{border-left-color:#e3b341}
+  .who-jiri{color:#1f8f57}    .border-jiri{border-left-color:#2ec27e}
+  .who-jaroslava{color:#9a6b00}    .border-jaroslava{border-left-color:#e3b341}
 
   .note{margin-top:22px;font-size:.8rem;color:var(--slabe);font-style:italic}
 </style>
@@ -76,8 +76,8 @@
       <select id="author">
         <option value="Lucie">Lucie</option>
         <option value="Vladimír">Vladimír</option>
-        <option value="Jirka">Jirka</option>
-        <option value="Jarka">Jarka</option>
+        <option value="Jiří">Jiří</option>
+        <option value="Jaroslava">Jaroslava</option>
       </select>
     </div>
     <textarea id="text" placeholder="Sem napiš poznámku…"></textarea>
@@ -106,6 +106,7 @@ const COLLECTION = 'poznamky-norsko';   // oddělená kolekce pro Norsko
 
 const KEY = 'norsko2026-poznamky-v1';
 const slug = s => s.toLowerCase().replace('á','a').replace('í','i').replace('ř','r');
+const NAME_FIX = {Jirka:'Jiří', Jarka:'Jaroslava'};   // sjednocení i starších poznámek
 
 const authorEl = document.getElementById('author');
 const textEl = document.getElementById('text');
@@ -116,7 +117,7 @@ const addBtn = document.getElementById('add');
 
 // zapamatuj si naposledy zvoleného autora
 const lastAuthor = localStorage.getItem(KEY + '-author');
-if(lastAuthor) authorEl.value = lastAuthor;
+if(lastAuthor) authorEl.value = NAME_FIX[lastAuthor] || lastAuthor;
 
 function fmt(ts){
   if(!ts) return '';
@@ -131,12 +132,13 @@ function render(notes){
     return;
   }
   notes.slice().sort((a,b)=> (b.ts||0) - (a.ts||0)).forEach(n => {
-    const s = slug(n.author || '');
+    const author = NAME_FIX[n.author] || n.author || '';
+    const s = slug(author);
     const div = document.createElement('div');
     div.className = 'noteitem border-' + s;
     const head = document.createElement('div');
     head.className = 'head';
-    head.innerHTML = `<span class="who who-${s}">${n.author||''}</span>
+    head.innerHTML = `<span class="who who-${s}">${author}</span>
       <span style="display:flex;align-items:center;gap:8px">
         <span class="when">${fmt(n.ts)}</span>
         <button class="del" title="Smazat">🗑</button></span>`;
