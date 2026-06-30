@@ -89,6 +89,18 @@
       Fjord Line (FSTR katamarán ~2:25 / trajekty ~3:15) nebo Color Line SuperSpeed. V sezóně až 4 odjezdy denně. <b>Rezervovat dopředu — vyprodává se.</b> Na trajektu vypnout plyn.
     </div>
     <div class="card">
+      <h2>🎟️ Rezervovat dopředu</h2>
+      V sezóně se vyprodává — zamluvit včas: <b>trajekt</b> Hirtshals–Kristiansand · <b>shuttle Trolltunga</b> P2→P3 (trolltunganorway.com) · <b>plavba Geirangerfjordem</b> (visitgeiranger.com) · <b>loď a parkoviště na Besseggen</b> — parking Reinsvangen <b>na SPZ!</b> (gjende.no, visitgjende.onepark.no).
+    </div>
+    <div class="card">
+      <h2>🅿️ Parkovné &amp; platby</h2>
+      Většina norských parkovišť přes appku <b>EasyPark</b>. Orientační ceny: Stavanger Sandviga 30 NOK/h · Preikestolen 1 — 275 NOK/den · Bondhusdalen 125 NOK · Trolltunga P2 500 NOK (s mýtem) · Ålesund ~375 NOK/24 h. Kempy u jezer ~320–500 NOK (často s pračkou).
+    </div>
+    <div class="card">
+      <h2>💧 Voda v přírodě</h2>
+      Hodně nocí spíme v přírodě bez zázemí — <b>vodu načerpat den předem</b> (denní parkoviště, kempy). Hlavně před nocemi u Aurlandu, po Trolltunze a v Jotunheimen.
+    </div>
+    <div class="card">
       <h2>💰 Mýta &amp; měna</h2>
       Dánské mosty Øresund i Storebælt jsou placené a drahé. Dánsko platí dánskou korunou (ne euro). Norská mýta řešit krabičkou / předem.
     </div>
@@ -127,34 +139,34 @@ const dny=[
   body:'Příjezd trajektem do <b>Kristiansandu</b> cca <b>23:30–00:00</b>. Krátký přesun mimo město, nocleh v okolí.',
   mista:[{n:'Kristiansand',w:'Kristiansand'}],
   km:30,h:0.5,teplota:'~17 °C (noc)',pozn:'Pozor: Kristiansand (jih), ne KristiansUnd!'},
- {den:'Den 3 · Po',datum:'20. 7.',nadpis:'Preikestolen',
-  body:'Ráno dle času a nálady případně Kristiansand. Dopoledne klidný přesun k <b>Preikestolen</b> (cesta ~4 h). Odpoledne (start ~14:00–15:30) výstup — túra ~5 h (8 km). Večer návrat, noc v okolí Preikestolenu.',
-  mista:[{n:'Preikestolen',w:'Preikestolen'}],
-  km:190,h:4,teplota:'~16 °C',pozn:'Při škaredém počasí v pondělí prohodit: Po Kristiansand+Stavanger, Út ráno Preikestolen a přesun do Oddy.'},
- {den:'Den 4 · Út',datum:'21. 7.',nadpis:'Stavanger → Odda + Låtefossen',
-  body:'Ráno/dopoledne <b>Stavanger</b> — centrum a barevná ulička Øvre Holmegate (dle času a nálady). Odpoledne přejezd do <b>Oddy</b> (~4 h), zastávka u vodopádu <b>Låtefossen</b>. 🛒 Nákup jídla v Odda. Večer ubytování/kemp Odda (u parkoviště pro Trolltunga).',
-  mista:[{n:'Stavanger',w:'Stavanger'},{n:'Låtefossen',w:'Låtefossen'},{n:'Odda',w:'Odda'}],
-  km:210,h:5,teplota:'~17 °C'},
+ {den:'Den 3 · Po',datum:'20. 7.',nadpis:'Stavanger → Preikestolen',
+  body:'Dopoledne klidný přesun směrem <b>Preikestolen</b> (~4 h). Dle času a nálady zastávka ve <b>Stavangeru</b> — Gamle Stavanger (bílé domky) a barevná ulička Øvre Holmegate, přístav (parkoviště Sandviga Motorhome 30 NOK/h, platba přes EasyPark, 10 min do centra), odjezd nejpozději 13–14 h. Odpoledne (start ~14:00–15:30) výstup na <b>Preikestolen</b> — 8 km, max ~5 h, parking Preikestolen 1 — 275 NOK/den. Večer návrat, noc v okolí.',
+  mista:[{n:'Stavanger',w:'Stavanger'},{n:'Preikestolen',w:'Preikestolen'}],
+  km:270,h:4.5,teplota:'~16 °C',pozn:'Noc: kousek je area zdarma (rychle plná, lze napustit vodu / vypustit WC), poblíž placené hezčí místo (voda ano, vypouštění WC ne). Při škaredém počasí prohodit: Po Kristiansand+Stavanger, Út ráno Preikestolen a přesun do Oddy.'},
+ {den:'Den 4 · Út',datum:'21. 7.',nadpis:'Odda + Låtefossen + Bondhusvatnet',
+  body:'Přejezd směr <b>Bondhusvatnet</b> (>4 h), po cestě nákup jídla a zásob. Zastávka u vodopádu <b>Låtefossen</b> (hned u silnice). Výlet k <b>Bondhusvatnet</b> — ledovcové jezero pod Folgefonnou, snadná procházka ~2 km tam a zpět (parking Bondhusdalen 125 NOK). 🛒 Nákup v supermarketu v Oddě. Večer kemp Odda u startu na Trolltungu.',
+  mista:[{n:'Låtefossen',w:'Låtefossen'},{n:'Bondhusvatnet',w:'Bondhusvatnet'},{n:'Odda',w:'Odda'}],
+  km:200,h:5,teplota:'~16 °C',pozn:'Spaní lze i blíž jezeru — Mauranger nebo Sundal Camping (~320 NOK, ~40 min na Trolltunga parking), kde se dá přespat i po Trolltunze.'},
  {den:'Den 5 · St',datum:'22. 7.',nadpis:'Trolltunga',
-  body:'Velmi brzký start. Celodenní túra <b>Trolltunga</b> 10–14 h. Návrat večer, odpočinek.',
+  body:'Z kempu na parkoviště Skjeggedal <b>P2</b> ~40 min — vyrazit <b>nejpozději v 6:00!</b> Parking P2 500 NOK (mýtné + parkování). Celodenní túra <b>Trolltunga</b>. Návrat večer, spaní po cestě k Tvindefossen.',
   mista:[{n:'Trolltunga',w:'Trolltunga'}],
-  km:0,h:0,teplota:'~13 °C',pozn:'Parkovat na P2 — předem zamluvit shuttle bus na P3 (ušetří ~3 h a 7 km, polovina do prudkého kopce).'},
+  km:0,h:0,teplota:'~13 °C',pozn:'Předem zamluvit shuttle P2→P3 (150 NOK tam, 100 NOK zpět na místě) — ušetří ~1,5 h a 3,5 km prudkého kopce. Sledovat počasí! Cestou doplnit vodu na „denním" parkovišti — další noc nejspíš v přírodě bez vody.'},
  {den:'Den 6 · Čt',datum:'23. 7.',nadpis:'Fjordy + Aurland (rybaření)',
-  body:'Dopoledne přesun (~3,5 h v autě). Zastávka <b>Tvindefossen</b> a vyhlídka <b>Stegastein</b>. Příjezd do <b>Aurlandu</b> — celé odpoledne 🎣 rybaření + relax. Noc Aurland.',
-  mista:[{n:'Tvindefossen',w:'Tvindefossen'},{n:'Stegastein',w:'Stegastein'},{n:'Aurland',w:'Aurland'}],
+  body:'Dopoledne přesun (~3,5 h v autě). Zastávka <b>Tvindefossen</b> a vyhlídka <b>Stegastein</b>. Příjezd do <b>Aurlandu</b> — celé odpoledne 🎣 rybaření + relax. Spaní po cestě v přírodě (vodu načerpat předem!) nebo až ve <b>Fjærlandu</b> (kemp zdarma, sprchy a praní za poplatek).',
+  mista:[{n:'Tvindefossen',w:'Tvindefossen'},{n:'Stegastein',w:'Stegastein'},{n:'Aurland',w:'Aurland'},{n:'Fjærland',w:'Fjærland'}],
   km:160,h:3.5,teplota:'~17 °C',pozn:'Cesta na Stegastein je úzká a klikatá — s obytkou opatrně.'},
  {den:'Den 7 · Pá',datum:'24. 7.',nadpis:'Ledovce + jezera',
-  body:'Přejezd (~3 h). Krátká zastávka u ledovce <b>Bøyabreen</b>. <b>Lovatnet</b> — jezero, procházka a klid u vody. Noc Loen / Stryn.',
-  mista:[{n:'Bøyabreen',w:'Bøyabreen'},{n:'Lovatnet',w:'Lovatnet'}],
-  km:150,h:3,teplota:'~17 °C'},
+  body:'Přejezd (~3 h, z Fjærlandu jen ~10 min k ledovci). Krátká zastávka u ledovce <b>Bøyabreen</b>. <b>Lovatnet</b> — tyrkysové jezero, procházka a klid u vody. <b>Kjenndalsbreen</b> — ledovec kousek od jezera, snadno přístupný. Noc v kempu přímo u jezera.',
+  mista:[{n:'Bøyabreen',w:'Bøyabreen'},{n:'Lovatnet',w:'Lovatnet'},{n:'Kjenndalsbreen',w:'Kjenndalsbreen'}],
+  km:150,h:3,teplota:'~17 °C',pozn:'Kempy u jezera mají pračku (~400–500 NOK) — ideální den na vyprání prádla.'},
  {den:'Den 8 · So',datum:'25. 7.',nadpis:'Geirangerfjord',
-  body:'Přejezd ~1,5 h. Plavba <b>Geirangerfjordem</b> (2–3 h). Vyhlídky <b>Flydalsjuvet</b> a <b>Dalsnibba</b> (dle času a nálady). Noc po cestě do Ålesundu.',
-  mista:[{n:'Geirangerfjord',w:'Geirangerfjorden'},{n:'Dalsnibba',w:'Dalsnibba'}],
-  km:120,h:3,teplota:'~17 °C'},
+  body:'Cesta Lovatnet → <b>Dalsnibba</b> → <b>Flydalsjuvet</b> → Geiranger (vyhlídky jsou po cestě, zajížďka ~15 min). Plavba <b>Geirangerfjordem</b> — ideálně hybridní loď 12:30 (2 h, 630 NOK) nebo klasická (75 min, 610 NOK), psi na palubě OK. Noc po cestě do Ålesundu.',
+  mista:[{n:'Dalsnibba',w:'Dalsnibba'},{n:'Geirangerfjord',w:'Geirangerfjorden'}],
+  km:120,h:3,teplota:'~17 °C',pozn:'Plavbu rezervovat předem (visitgeiranger.com). V Geirangeru parkovat dle park4night; pozor — vedlejší kemp obytňáky nebere.'},
  {den:'Den 9 · Ne',datum:'26. 7.',nadpis:'Ålesund',
-  body:'<b>Ålesund</b> — secesní město, vyhlídka <b>Aksla</b>. Lehký městský den. Noc po cestě do Snillfjordu.',
-  mista:[{n:'Ålesund',w:'Ålesund'}],
-  km:200,h:4,teplota:'~16 °C'},
+  body:'<b>Ålesund</b> — secesní město. Vyhlídka <b>Aksla</b> (schody z města), barevné domy z náměstí Dronning Sonjas plass, příp. <b>Sukkertoppen</b>. Lehký městský den. Parkování pro obytňák ~375 NOK/24 h. Noc po cestě do Snillfjordu (~5 h).',
+  mista:[{n:'Ålesund',w:'Ålesund'},{n:'Atlantic Ocean Road',w:'Atlantic Ocean Road'}],
+  km:300,h:5,teplota:'~16 °C',pozn:'Cestou dle času a počasí volitelná zajížďka na <b>Atlantic Ocean Road</b> (~45 min navíc).'},
  {den:'Den 10 · Po',datum:'27. 7.',nadpis:'Snillfjord — klidný den',
   body:'Dopoledne příjezd do <b>Snillfjordu</b>. Rybaření, procházky, klidný nostalgický den. 🧺 Vyprat prádlo! Nákup jídla.',
   mista:[{n:'Snillfjord',w:'Snillfjord'}],
@@ -164,13 +176,13 @@ const dny=[
   mista:[{n:'Jotunheimen',w:'Jotunheimen'},{n:'Lom',w:'Lom, Norway'}],
   km:300,h:5,teplota:'~14 °C'},
  {den:'Den 12 · St',datum:'29. 7.',nadpis:'Besseggen (lehká varianta)',
-  body:'Loď <b>Gjendesheim → Memurubu</b>, výšlap 1–2 h + otočka (baby-friendly část hřebene <b>Besseggen</b>). Návrat. Noc Gjende / Lom.',
+  body:'Parkovat v Gjendesheim (Reinsvangen — <b>rezervovat předem na SPZ!</b>), přijet brzy. Lehká varianta: z Gjendesheim na <b>Veslfjellet</b> a zpět (~6,8 km, 700–800 m) — nejhezčí panoramata na obě jezera jsou ještě před exponovaným hřebenem, vyhneme se frontám a lezení po rukou. Nebo loď do Memurubu → Bandet a zpět (hezčí, ale nutno stihnout lodě). Noc u Bygdin.',
   mista:[{n:'Besseggen',w:'Besseggen'}],
-  km:60,h:1.2,teplota:'~12 °C'},
- {den:'Den 13 · Čt',datum:'30. 7.',nadpis:'Knutshøe / lehký den',
-  body:'Lehčí túra <b>Knutshøe</b> (5–7 h) nebo odpočinek. Poslední horský den. Noc Lom / Vågå.',
-  mista:[{n:'Knutshøe',w:'Knutshøe'}],
-  km:0,h:0,teplota:'~13 °C',pozn:'Jotunheimen dle počasí — kdyby bylo škaredě, vymyslet alternativu.'},
+  km:60,h:1.2,teplota:'~12 °C',pozn:'Loď i parking koupit dopředu (gjende.no, visitgjende.onepark.no). Plán B za špatného počasí: jen plavba Gjendesheim ↔ Memurubu nebo procházka podél jezera Gjende.'},
+ {den:'Den 13 · Čt',datum:'30. 7.',nadpis:'Bygdin — poslední horský den',
+  body:'Záložní den u jezera Bygdin. Volby: <b>Synshorn → Heimre Fagerdalshøe</b> (10–13 km, ~600 m, 3–5 h — klidná a hezká alternativa k přelidněnému Besseggenu) nebo <b>Bitihorn</b> (9,5 km, 553 m, 3–4 h). Lehčí túra 5–7 h nebo odpočinek. Noc u Bygdin nebo kousek na jih.',
+  mista:[{n:'Bitihorn',w:'Bitihorn'},{n:'Bygdin',w:'Bygdin'}],
+  km:0,h:0,teplota:'~13 °C',pozn:'Jotunheimen dle počasí — kdyby bylo škaredě, vymyslet alternativu. Den 12 a 13 lze prohodit.'},
  {den:'Den 14 · Pá',datum:'31. 7.',nadpis:'Přesun na jih → Oslo → Malmö',
   body:'Přesun směr <b>Oslo</b> — krátká zastávka na pár hodin (nebo žádná, dle času). Pokračování do Švédska. Noc Malmö.',
   mista:[{n:'Oslo',w:'Oslo'},{n:'Malmö',w:'Malmö'}],
