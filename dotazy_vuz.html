@@ -45,6 +45,12 @@
   .btn.ghost{background:#fff;color:var(--modra)}
   .btn.ghost:hover{background:var(--led)}
 
+  /* migrace nových dotazů */
+  .migrate{display:none;gap:10px;align-items:center;flex-wrap:wrap;background:#eef6ff;
+           border:1px solid #bcd6f3;border-radius:12px;padding:10px 14px;margin:0 0 14px}
+  .migrate .btn.done{background:var(--green);border-color:var(--green);cursor:default;opacity:1}
+  .mignote{font-size:.8rem;color:var(--slabe);flex:1;min-width:140px}
+
   /* filtry */
   .filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 6px}
   .filters input[type=text]{flex:1;min-width:160px;background:#fff;color:var(--text);
@@ -123,6 +129,11 @@
       <select id="newCat"></select>
       <button class="btn" id="addBtn">Přidat</button>
     </div>
+  </div>
+
+  <div class="migrate" id="migrateBar">
+    <button class="btn" id="migBtn">➕ Doplnit nové dotazy z itineráře</button>
+    <span class="mignote">Jednorázově přidá nové dotazy z upřesněného itineráře všem ve sdíleném seznamu. Stačí kliknout jednou (neduplikuje).</span>
   </div>
 
   <div class="filters">
@@ -251,6 +262,7 @@ const PRIO_CYCLE = {red:'yellow', yellow:'green', green:'red'};
 const $ = id => document.getElementById(id);
 const listEl=$('list'), statusEl=$('status'), footEl=$('footnote'), filterNote=$('filterNote');
 const fSearch=$('fSearch'), fCat=$('fCat'), fPrio=$('fPrio'), fStatus=$('fStatus');
+const migBar=$('migrateBar'), migBtn=$('migBtn');
 
 // naplnění selectů kategorií
 for(const c of CATS){
@@ -287,6 +299,7 @@ function renderProgress(){
 
 function render(){
   renderProgress();
+  refreshMig();
   const vis = visibleItems();
   const dndOff = filtersActive();
   filterNote.textContent = filtersActive()
@@ -382,6 +395,40 @@ $('newText').addEventListener('keydown', e=>{ if(e.key==='Enter') $('addBtn').cl
 $('clearF').addEventListener('click', ()=>{ fSearch.value=''; fCat.value=''; fPrio.value=''; fStatus.value=''; render(); });
 $('printBtn').addEventListener('click', ()=> window.print());
 
+// ---- jednorázová migrace: doplní nové dotazy z upřesněného itineráře do sdílené DB ----
+// Porovnává podle textu, takže neduplikuje (ani na čerstvě naseedované databázi).
+const MIGRATE = [
+  ['migr-dv-01','yellow','Mýto a trajekty','Platby na SPZ (EasyPark, rezervace parkování Reinsvangen u Besseggenu) — můžeme zadat SPZ vozu? Komu přijde účet a jak ho vyrovnáme?'],
+  ['migr-dv-02','green','Mýto a trajekty','Drobné fjordové trajekty (např. k Mauranger/Bondhusvatnet, Fjærland) — je přeprava vozu povolena a jak se platí (AutoPASS / SPZ)?'],
+];
+let migClicked = false;
+const normTxt = s => (s||'').trim().toLowerCase();
+const czPlural = (n,a,b,c) => n===1?a:((n>=2&&n<=4)?b:c);
+const missingMigrate = () => { const have=new Set(items.map(i=>normTxt(i.text))); return MIGRATE.filter(m=>!have.has(normTxt(m[3]))); };
+function refreshMig(){
+  if(!migBar) return;
+  const miss = missingMigrate().length;
+  if(miss){
+    migBar.style.display='flex';
+    migBtn.disabled=false; migBtn.classList.remove('done');
+    migBtn.textContent=`➕ Doplnit ${miss} ${czPlural(miss,'nový dotaz','nové dotazy','nových dotazů')} z itineráře`;
+  } else if(migClicked){
+    migBar.style.display='flex';
+    migBtn.disabled=true; migBtn.classList.add('done');
+    migBtn.textContent='✅ Už doplněno';
+  } else {
+    migBar.style.display='none';
+  }
+}
+migBtn.addEventListener('click', ()=>{
+  const miss = missingMigrate();
+  if(!miss.length) return;
+  migClicked = true;
+  let base = items.reduce((m,i)=>Math.max(m, i.order||0), -1);
+  miss.forEach((m,idx)=> backend.addWithId(m[0], {prio:m[1], cat:m[2], text:m[3], done:false, order:base+1+idx}));
+  migBtn.disabled=true; migBtn.classList.add('done'); migBtn.textContent='✅ Už doplněno';
+});
+
 // Export odpovědí jako markdown – zkopíruje do schránky, ať se dají vložit Claudovi do chatu.
 $('exportBtn').addEventListener('click', async ()=>{
   const answered = items.filter(i=>i.answer).sort((a,b)=>(a.order||0)-(b.order||0));
@@ -408,6 +455,7 @@ function localBackend(){
   return {
     start(){ emit(); },
     add(it){ data.push({id:id(), ...it}); save(); emit(); },
+    addWithId(id_, it){ if(!data.some(d=>d.id===id_)){ data.push({id:id_, ...it}); save(); emit(); } },
     update(id_, f){ const x=data.find(d=>d.id===id_); if(x){ Object.assign(x,f); save(); emit(); } },
     remove(id_){ data=data.filter(d=>d.id!==id_); save(); emit(); }
   };
@@ -442,6 +490,7 @@ async function firebaseBackend(){
       });
     },
     add(it){ return addDoc(col, it); },
+    addWithId(id_, it){ return setDoc(doc(col, id_), it); },
     update(id_, f){ return updateDoc(doc(col, id_), f); },
     remove(id_){ return deleteDoc(doc(col, id_)); }
   };

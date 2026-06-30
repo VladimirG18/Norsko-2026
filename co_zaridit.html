@@ -45,6 +45,12 @@
   .btn.ghost{background:#fff;color:var(--modra)}
   .btn.ghost:hover{background:var(--led)}
 
+  /* migrace nových položek */
+  .migrate{display:none;gap:10px;align-items:center;flex-wrap:wrap;background:#eef6ff;
+           border:1px solid #bcd6f3;border-radius:12px;padding:10px 14px;margin:0 0 14px}
+  .migrate .btn.done{background:var(--green);border-color:var(--green);cursor:default;opacity:1}
+  .mignote{font-size:.8rem;color:var(--slabe);flex:1;min-width:140px}
+
   /* filtry */
   .filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 6px}
   .filters input[type=text]{flex:1;min-width:160px;background:#fff;color:var(--text);
@@ -149,6 +155,11 @@
     </div>
   </div>
 
+  <div class="migrate" id="migrateBar">
+    <button class="btn" id="migBtn">➕ Doplnit nové položky z itineráře</button>
+    <span class="mignote">Jednorázově přidá nové úkoly z upřesněného itineráře všem ve sdíleném seznamu. Stačí kliknout jednou (neduplikuje).</span>
+  </div>
+
   <div class="filters">
     <input type="text" id="fSearch" placeholder="🔎 hledat v textu…">
     <select id="fCat"><option value="">Všechny kategorie</option></select>
@@ -243,6 +254,7 @@ let newWhoSel = [];           // staging výběr řešitelů pro nový úkol
 const $ = id => document.getElementById(id);
 const listEl=$('list'), statusEl=$('status'), footEl=$('footnote'), filterNote=$('filterNote');
 const fSearch=$('fSearch'), fCat=$('fCat'), fPrio=$('fPrio'), fStatus=$('fStatus'), fWho=$('fWho'), fGroup=$('fGroup');
+const migBar=$('migrateBar'), migBtn=$('migBtn');
 
 // naplnění selectů kategorií
 for(const c of CATS){
@@ -333,6 +345,7 @@ function makeRow(it, dndOff){
 
 function render(){
   renderProgress();
+  refreshMig();
   const vis = visibleItems();
   const grouping = fGroup.value;            // '' nebo 'who'
   const blocked = filtersActive() || !!grouping;
@@ -400,6 +413,46 @@ $('newText').addEventListener('keydown', e=>{ if(e.key==='Enter') $('addBtn').cl
 $('clearF').addEventListener('click', ()=>{ fSearch.value=''; fCat.value=''; fPrio.value=''; fStatus.value=''; fWho.value=''; fGroup.value=''; render(); });
 $('printBtn').addEventListener('click', ()=> window.print());
 
+// ---- jednorázová migrace: doplní nové úkoly z upřesněného itineráře do sdílené DB ----
+// Porovnává podle textu, takže neduplikuje (ani na čerstvě naseedované databázi).
+const MIGRATE = [
+  ['migr-cz-01','red','Rezervace','Shuttle bus Trolltunga P2→P3 — koupit dopředu (trolltunganorway.com)'],
+  ['migr-cz-02','red','Rezervace','Plavba Geirangerfjordem — rezervovat (visitgeiranger.com, ideálně hybridní loď 12:30)'],
+  ['migr-cz-03','red','Rezervace','Parkování Reinsvangen u Gjendesheim (Besseggen) — rezervovat na SPZ! (visitgjende.onepark.no)'],
+  ['migr-cz-04','red','Rezervace','Loď Gjendesheim ↔ Memurubu (Besseggen) — koupit dopředu (gjende.no)'],
+  ['migr-cz-05','yellow','Příprava a výbava','Nainstalovat appku EasyPark na placení parkovného'],
+  ['migr-cz-06','yellow','Příprava a výbava','Stáhnout offline mapy / park4night (noclehy a voda v přírodě)'],
+  ['migr-cz-07','green','Příprava a výbava','Připravit kartu/hotovost na norská parkoviště (Preikestolen 275, Bondhusdalen 125, Trolltunga P2 500 NOK…)'],
+  ['migr-cz-08','green','Příprava a výbava','Plánovat doplnění vody den předem (hodně nocí v přírodě bez zázemí)'],
+];
+let migClicked = false;
+const normTxt = s => (s||'').trim().toLowerCase();
+const czPlural = (n,a,b,c) => n===1?a:((n>=2&&n<=4)?b:c);
+const missingMigrate = () => { const have=new Set(items.map(i=>normTxt(i.text))); return MIGRATE.filter(m=>!have.has(normTxt(m[3]))); };
+function refreshMig(){
+  if(!migBar) return;
+  const miss = missingMigrate().length;
+  if(miss){
+    migBar.style.display='flex';
+    migBtn.disabled=false; migBtn.classList.remove('done');
+    migBtn.textContent=`➕ Doplnit ${miss} ${czPlural(miss,'novou položku','nové položky','nových položek')} z itineráře`;
+  } else if(migClicked){
+    migBar.style.display='flex';
+    migBtn.disabled=true; migBtn.classList.add('done');
+    migBtn.textContent='✅ Už doplněno';
+  } else {
+    migBar.style.display='none';
+  }
+}
+migBtn.addEventListener('click', ()=>{
+  const miss = missingMigrate();
+  if(!miss.length) return;
+  migClicked = true;
+  let base = items.reduce((m,i)=>Math.max(m, i.order||0), -1);
+  miss.forEach((m,idx)=> backend.addWithId(m[0], {prio:m[1], cat:m[2], text:m[3], who:[], done:false, order:base+1+idx}));
+  migBtn.disabled=true; migBtn.classList.add('done'); migBtn.textContent='✅ Už doplněno';
+});
+
 // ---- přiřazení přes nabídku (checkbox menu, lze víc lidem i „Všichni") ----
 const pop = document.createElement('div');
 pop.className = 'assignpop';
@@ -456,6 +509,7 @@ function localBackend(){
   return {
     start(){ emit(); },
     add(it){ data.push({id:id(), ...it}); save(); emit(); },
+    addWithId(id_, it){ if(!data.some(d=>d.id===id_)){ data.push({id:id_, ...it}); save(); emit(); } },
     update(id_, f){ const x=data.find(d=>d.id===id_); if(x){ Object.assign(x,f); save(); emit(); } },
     remove(id_){ data=data.filter(d=>d.id!==id_); save(); emit(); }
   };
@@ -490,6 +544,7 @@ async function firebaseBackend(){
       });
     },
     add(it){ return addDoc(col, it); },
+    addWithId(id_, it){ return setDoc(doc(col, id_), it); },
     update(id_, f){ return updateDoc(doc(col, id_), f); },
     remove(id_){ return deleteDoc(doc(col, id_)); }
   };
