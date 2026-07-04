@@ -45,6 +45,14 @@
        background:linear-gradient(140deg,var(--modra),var(--modra2));border-radius:12px;
        padding:8px 10px;text-align:center}
   .den .dt small{display:block;color:#cfe6f7;font-weight:600;font-size:.72rem;margin-top:2px}
+  .den .hthumb{flex:0 0 68px;width:68px;height:50px;border-radius:10px;overflow:hidden;
+       background:linear-gradient(150deg,#d5e5f1,#e9f2f8);position:relative}
+  .den .hthumb::before{content:"🏔️";position:absolute;inset:0;display:flex;align-items:center;
+       justify-content:center;font-size:1.1rem;opacity:.45}
+  .den .hthumb img{position:relative;width:100%;height:100%;object-fit:cover;display:block;
+       opacity:0;transition:opacity .6s ease}
+  .den .hthumb img.on{opacity:1}
+  @media(max-width:520px){.den .hthumb{display:none}}
   .den .tt{flex:1}
   .den .tt>b{font-size:.98rem}
   .den .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
@@ -236,9 +244,12 @@ function fetchFoto(img){
     const fotky = d.mista.map(m=>
       `<figure><img class="wimg" data-w="${m.w}" data-lang="${m.lang||'en'}" alt="${m.n}" referrerpolicy="no-referrer"><figcaption>${m.n}</figcaption></figure>`).join('');
     const el=document.createElement('div'); el.className='den';
+    const m0=d.mista[0];
     el.innerHTML=`
       <div class="hd">
         <div class="dt">${d.den}<small>${d.datum}</small></div>
+        <span class="hthumb"><img class="wimg" data-w="${m0.w}" data-lang="${m0.lang||'en'}"
+             alt="" referrerpolicy="no-referrer"></span>
         <div class="tt"><b>${d.nadpis}</b>
           <div class="chips">
             <span class="chip">🚗 ${kmTxt}${hChip}</span>
@@ -262,6 +273,9 @@ function fetchFoto(img){
       if(open) el.querySelectorAll('.fotky img').forEach(img=>{ if(!img.getAttribute('src')) fetchFoto(img); });
     };
     cont.appendChild(el);
+    // malá fotka místa přímo v hlavičce dne
+    const ht=el.querySelector('.hthumb img');
+    if(ht){ ht.addEventListener('load',()=>ht.classList.add('on')); fetchFoto(ht); }
   });
 })();
 

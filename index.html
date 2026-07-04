@@ -45,20 +45,29 @@
   /* ---------- OBSAH ---------- */
   main{max-width:960px;margin:-38px auto 48px;padding:0 16px;position:relative}
   .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
-  a.card{display:block;background:#fff;border-radius:18px;padding:22px;text-decoration:none;
-         color:inherit;box-shadow:var(--shadow);border:1px solid var(--line);
+  a.card{display:flex;flex-direction:column;background:#fff;border-radius:18px;padding:0;
+         text-decoration:none;color:inherit;box-shadow:var(--shadow);border:1px solid var(--line);
          transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;
          position:relative;overflow:hidden}
-  a.card::after{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;
-         background:linear-gradient(180deg,var(--aurora),var(--modra2));opacity:0;transition:opacity .18s}
   a.card:hover{transform:translateY(-4px);box-shadow:var(--shadow-h);border-color:#cfe0ee}
-  a.card:hover::after{opacity:1}
-  .card .ico{width:52px;height:52px;display:flex;align-items:center;justify-content:center;
-       font-size:1.7rem;border-radius:14px;
-       background:linear-gradient(135deg,#e6f2fb,#f2f9f5);border:1px solid var(--line)}
-  .card h2{margin:14px 0 6px;font-size:1.16rem;font-weight:800;color:var(--modra);letter-spacing:-.01em}
-  .card p{margin:0;color:var(--slabe);font-size:.9rem;line-height:1.55}
-  .card .go{display:inline-flex;align-items:center;gap:5px;margin-top:12px;font-size:.84rem;
+  .cimg{position:relative;height:132px;flex:none;overflow:hidden;
+       background:linear-gradient(150deg,#c9dded,#e8f1f7)}
+  .cimg .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+       font-size:2.1rem;opacity:.45}
+  .cimg img{position:relative;width:100%;height:100%;object-fit:cover;display:block;
+       opacity:0;transition:opacity .8s ease,transform .4s ease}
+  .cimg img.loaded{opacity:1}
+  a.card:hover .cimg img{transform:scale(1.06)}
+  .cimg .misto{position:absolute;right:10px;bottom:10px;z-index:2;
+       background:rgba(10,44,73,.72);color:#fff;font-size:.7rem;font-weight:700;
+       padding:3px 10px;border-radius:999px;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+  .card .ico{position:absolute;left:18px;top:106px;z-index:3;width:52px;height:52px;
+       display:flex;align-items:center;justify-content:center;font-size:1.6rem;border-radius:14px;
+       background:#fff;border:1px solid var(--line);box-shadow:0 4px 14px rgba(12,58,95,.20)}
+  .cbody{padding:36px 20px 20px;display:flex;flex-direction:column;flex:1}
+  .card h2{margin:0 0 6px;font-size:1.16rem;font-weight:800;color:var(--modra);letter-spacing:-.01em}
+  .card p{margin:0;color:var(--slabe);font-size:.9rem;line-height:1.55;flex:1}
+  .card .go{display:inline-flex;align-items:center;gap:5px;margin-top:14px;font-size:.84rem;
        font-weight:700;color:var(--modra2)}
   .card .go i{font-style:normal;transition:transform .18s}
   a.card:hover .go i{transform:translateX(4px)}
@@ -124,47 +133,75 @@
 </header>
 <main>
   <div class="grid">
-    <a class="card" href="mapa.html">
+    <a class="card" href="mapa.html" data-foto="Atlantic Ocean Road" data-misto="Atlanterhavsveien">
+      <div class="cimg"><span class="ph">🏔️</span><span class="misto">Atlanterhavsveien</span>
+        <img alt="" loading="lazy" referrerpolicy="no-referrer"></div>
       <div class="ico">🗺️</div>
-      <h2>Interaktivní mapa</h2>
-      <p>Všechny zastávky, trasa tam přes trajekt i zpět přes mosty, denní program v popiscích.</p>
-      <span class="go">Otevřít mapu <i>→</i></span>
+      <div class="cbody">
+        <h2>Interaktivní mapa</h2>
+        <p>Všechny zastávky, trasa tam přes trajekt i zpět přes mosty, denní program v popiscích.</p>
+        <span class="go">Otevřít mapu <i>→</i></span>
+      </div>
     </a>
-    <a class="card" href="pruvodce.html">
+    <a class="card" href="pruvodce.html" data-foto="Stegastein" data-misto="Stegastein">
+      <div class="cimg"><span class="ph">🏔️</span><span class="misto">Stegastein</span>
+        <img alt="" loading="lazy" referrerpolicy="no-referrer"></div>
       <div class="ico">📋</div>
-      <h2>Průvodce</h2>
-      <p>Itinerář po dnech s fotkami, vzdálenostmi a teplotami, plus klíčové info k trajektu, mýtu a výbavě.</p>
-      <span class="go">Otevřít průvodce <i>→</i></span>
+      <div class="cbody">
+        <h2>Průvodce</h2>
+        <p>Itinerář po dnech s fotkami, vzdálenostmi a teplotami, plus klíčové info k trajektu, mýtu a výbavě.</p>
+        <span class="go">Otevřít průvodce <i>→</i></span>
+      </div>
     </a>
-    <a class="card" href="co_zaridit.html">
+    <a class="card" href="co_zaridit.html" data-foto="Kristiansand" data-misto="Kristiansand">
+      <div class="cimg"><span class="ph">🏔️</span><span class="misto">Kristiansand</span>
+        <img alt="" loading="lazy" referrerpolicy="no-referrer"></div>
       <div class="ico">✅</div>
-      <h2>Co zařídit</h2>
-      <p>Sdílený checklist příprav — rezervace, doklady a výbava. Odškrtávej, přiřazuj komu úkol patří, přidávej, řaď a filtruj. Vše online v reálném čase.</p>
-      <span class="go">Otevřít checklist <i>→</i></span>
+      <div class="cbody">
+        <h2>Co zařídit</h2>
+        <p>Sdílený checklist příprav — rezervace, doklady a výbava. Odškrtávej, přiřazuj komu úkol patří, přidávej, řaď a filtruj. Vše online v reálném čase.</p>
+        <span class="go">Otevřít checklist <i>→</i></span>
+      </div>
     </a>
-    <a class="card" href="vuz.html">
+    <a class="card" href="vuz.html" data-foto="Låtefossen" data-misto="Låtefossen">
+      <div class="cimg"><span class="ph">🏔️</span><span class="misto">Låtefossen</span>
+        <img alt="" loading="lazy" referrerpolicy="no-referrer"></div>
       <div class="ico">🚐</div>
-      <h2>Karta vozu</h2>
-      <p>Rychlá reference do kabiny — limity, tankování, trajekt, paliva. Vhodné k tisku.</p>
-      <span class="go">Otevřít kartu <i>→</i></span>
+      <div class="cbody">
+        <h2>Karta vozu</h2>
+        <p>Rychlá reference do kabiny — limity, tankování, trajekt, paliva. Vhodné k tisku.</p>
+        <span class="go">Otevřít kartu <i>→</i></span>
+      </div>
     </a>
-    <a class="card" href="dotazy_vuz.html">
+    <a class="card" href="dotazy_vuz.html" data-foto="Aurland" data-misto="Aurland">
+      <div class="cimg"><span class="ph">🏔️</span><span class="misto">Aurland</span>
+        <img alt="" loading="lazy" referrerpolicy="no-referrer"></div>
       <div class="ico">❓</div>
-      <h2>Dotazy k obytnému vozu</h2>
-      <p>Co ověřit u majitele před cestou — odškrtávej, přidávej, maž, řaď přetažením a filtruj. Sdílené pro celou posádku.</p>
-      <span class="go">Otevřít dotazy <i>→</i></span>
+      <div class="cbody">
+        <h2>Dotazy k obytnému vozu</h2>
+        <p>Co ověřit u majitele před cestou — odškrtávej, přidávej, maž, řaď přetažením a filtruj. Sdílené pro celou posádku.</p>
+        <span class="go">Otevřít dotazy <i>→</i></span>
+      </div>
     </a>
-    <a class="card" href="kalkulacka.html">
+    <a class="card" href="kalkulacka.html" data-foto="Bondhusvatnet" data-misto="Bondhusvatnet">
+      <div class="cimg"><span class="ph">🏔️</span><span class="misto">Bondhusvatnet</span>
+        <img alt="" loading="lazy" referrerpolicy="no-referrer"></div>
       <div class="ico">⚖️</div>
-      <h2>Kalkulačka nosnosti</h2>
-      <p>Hlídej kritických 485 kg — zadej posádku a vybavení, uvidíš zbývající rezervu. Hodnoty sdílené online pro celou posádku.</p>
-      <span class="go">Otevřít kalkulačku <i>→</i></span>
+      <div class="cbody">
+        <h2>Kalkulačka nosnosti</h2>
+        <p>Hlídej kritických 485 kg — zadej posádku a vybavení, uvidíš zbývající rezervu. Hodnoty sdílené online pro celou posádku.</p>
+        <span class="go">Otevřít kalkulačku <i>→</i></span>
+      </div>
     </a>
-    <a class="card" href="poznamky.html">
+    <a class="card" href="poznamky.html" data-foto="Bøyabreen" data-misto="Bøyabreen">
+      <div class="cimg"><span class="ph">🏔️</span><span class="misto">Bøyabreen</span>
+        <img alt="" loading="lazy" referrerpolicy="no-referrer"></div>
       <div class="ico">📝</div>
-      <h2>Poznámky</h2>
-      <p>Sdílené poznámky k cestě — každý zapíše pod svým jménem (Jiří, Jaroslava, Vladimír, Lucie) a všichni je vidí v reálném čase.</p>
-      <span class="go">Otevřít poznámky <i>→</i></span>
+      <div class="cbody">
+        <h2>Poznámky</h2>
+        <p>Sdílené poznámky k cestě — každý zapíše pod svým jménem (Jiří, Jaroslava, Vladimír, Lucie) a všichni je vidí v reálném čase.</p>
+        <span class="go">Otevřít poznámky <i>→</i></span>
+      </div>
     </a>
   </div>
 
@@ -218,12 +255,15 @@ wikiThumb('Geirangerfjorden', 1400).then(res=>{
 
 // galerie highlightů
 const highlights=[
+  {t:'Stavanger',           n:'Stavanger',      d:'Den 3 · 20. 7.',  s:'Gamle Stavanger — bílé domky'},
   {t:'Preikestolen',        n:'Preikestolen',   d:'Den 3 · 20. 7.',  s:'Kazatelna nad Lysefjordem'},
   {t:'Trolltunga',          n:'Trolltunga',     d:'Den 5 · 22. 7.',  s:'Trollí jazyk — celodenní túra'},
+  {t:'Lovatnet',            n:'Lovatnet',       d:'Den 7 · 24. 7.',  s:'Tyrkysové ledovcové jezero'},
+  {t:'Dalsnibba',           n:'Dalsnibba',      d:'Den 8 · 25. 7.',  s:'Vyhlídka 1 500 m nad fjordem'},
   {t:'Geirangerfjorden',    n:'Geirangerfjord', d:'Den 8 · 25. 7.',  s:'Plavba fjordem (UNESCO)'},
   {t:'Ålesund',             n:'Ålesund',        d:'Den 9 · 26. 7.',  s:'Secesní město mezi fjordy'},
-  {t:'Lovatnet',            n:'Lovatnet',       d:'Den 7 · 24. 7.',  s:'Tyrkysové ledovcové jezero'},
-  {t:'Besseggen',           n:'Besseggen',      d:'Den 12 · 29. 7.', s:'Hřeben v Jotunheimen'},
+  {t:'Jotunheimen',         n:'Jotunheimen',    d:'Den 11–13',       s:'Domov obrů — národní park'},
+  {t:'Besseggen',           n:'Besseggen',      d:'Den 12 · 29. 7.', s:'Hřeben mezi dvěma jezery'},
 ];
 const hg=document.getElementById('hgrid');
 highlights.forEach(h=>{
@@ -235,6 +275,18 @@ highlights.forEach(h=>{
   hg.appendChild(fig);
   const img=fig.querySelector('img');
   wikiThumb(h.t, 640).then(res=>{
+    if(!res) return;
+    img.onload=()=>img.classList.add('loaded');
+    img.onerror=()=>{ img.onerror=null; img.src=res.small; };
+    img.src=res.big;
+  });
+});
+
+// fotky v dlaždicích rozcestníku
+document.querySelectorAll('a.card[data-foto]').forEach(card=>{
+  const img=card.querySelector('.cimg img');
+  if(!img) return;
+  wikiThumb(card.dataset.foto, 640).then(res=>{
     if(!res) return;
     img.onload=()=>img.classList.add('loaded');
     img.onerror=()=>{ img.onerror=null; img.src=res.small; };
