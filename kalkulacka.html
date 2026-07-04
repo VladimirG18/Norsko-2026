@@ -3,58 +3,77 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a2c49">
 <title>Norsko 2026 — kalkulačka nosnosti</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root{--modra:#0b3d66;--led:#e8f1f7;--akcent:#c0392b;--zelena:#27ae60;
-        --text:#1c2733;--slabe:#5b6b7a}
+  :root{--modra:#0c3a5f;--modra2:#1a6ea8;--led:#eef4f9;--akcent:#c0392b;--zelena:#27ae60;
+        --text:#182634;--slabe:#5d6e7d;--aurora:#2fbf8f;--line:#dfe9f2;
+        --shadow:0 1px 2px rgba(12,58,95,.05),0 8px 24px rgba(12,58,95,.09)}
   *{box-sizing:border-box}
-  body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-       color:var(--text);background:var(--led)}
-  .topbar{background:var(--modra);color:#fff;padding:10px 16px}
-  .topbar a{color:#cfe6f5;text-decoration:none;font-size:.9rem}
-  .wrap{max-width:680px;margin:18px auto;padding:0 14px}
-  h1{color:var(--modra);font-size:1.4rem;margin:6px 0}
+  body{margin:0;font-family:'Manrope',-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+       color:var(--text);background:linear-gradient(180deg,#f6fafd 0%,var(--led) 260px);line-height:1.5}
+  .topbar{background:linear-gradient(120deg,#0a2c49 0%,#155a8c 100%);color:#fff;padding:12px 18px;
+          border-bottom:3px solid;border-image:linear-gradient(90deg,var(--aurora),#3a9bd5,#8b7bd8) 1;
+          box-shadow:0 2px 14px rgba(10,44,73,.22)}
+  .topbar a{color:#bfe0f5;text-decoration:none;font-size:.9rem;font-weight:600}
+  .topbar a:hover{color:#fff}
+  .wrap{max-width:680px;margin:22px auto;padding:0 14px}
+  h1{color:var(--modra);font-size:1.6rem;font-weight:800;letter-spacing:-.02em;margin:6px 0}
   .sub{color:var(--slabe);font-size:.92rem;margin:0 0 18px}
-  .gauge{background:#fff;border-radius:14px;padding:20px;box-shadow:0 4px 16px rgba(11,61,102,.1);
-         margin-bottom:18px;text-align:center}
-  .gauge .num{font-size:2.6rem;font-weight:800;line-height:1}
-  .gauge .cap{color:var(--slabe);font-size:.9rem;margin-top:4px}
-  .bar{height:22px;background:#e3eaf0;border-radius:11px;overflow:hidden;margin:16px 0 6px}
-  .bar .fill{height:100%;width:0;background:var(--zelena);transition:.25s}
-  .scale{display:flex;justify-content:space-between;font-size:.78rem;color:var(--slabe)}
-  .card{background:#fff;border-radius:14px;padding:18px 20px;box-shadow:0 4px 16px rgba(11,61,102,.1);
-        margin-bottom:16px}
-  .card h2{margin:0 0 12px;color:var(--modra);font-size:1.05rem}
+  .gauge{background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px 20px 20px;
+         box-shadow:var(--shadow);margin-bottom:18px;text-align:center;position:relative;overflow:hidden}
+  .gauge::before{content:"";position:absolute;left:0;right:0;top:0;height:5px;
+         background:linear-gradient(90deg,var(--aurora),var(--modra2))}
+  .gauge .num{font-size:3rem;font-weight:800;line-height:1;letter-spacing:-.03em;transition:color .25s}
+  .gauge .cap{color:var(--slabe);font-size:.9rem;font-weight:600;margin-top:6px}
+  .bar{height:22px;background:#e6eef5;border-radius:999px;overflow:hidden;margin:18px 0 7px;
+       box-shadow:inset 0 1px 3px rgba(12,58,95,.10)}
+  .bar .fill{height:100%;width:0;background:var(--zelena);border-radius:999px;
+       transition:width .3s ease,background .3s ease}
+  .scale{display:flex;justify-content:space-between;font-size:.78rem;font-weight:600;color:var(--slabe)}
+  .card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px 22px;
+        box-shadow:var(--shadow);margin-bottom:16px}
+  .card h2{margin:0 0 12px;color:var(--modra);font-size:1.05rem;font-weight:800}
   .row{display:flex;align-items:center;justify-content:space-between;gap:10px;
        padding:8px 0;border-bottom:1px solid #eef3f7}
   .row:last-child{border-bottom:0}
   .row label{flex:1;font-size:.92rem}
   .row .hint{color:var(--slabe);font-size:.78rem;display:block}
-  input[type=number]{width:80px;padding:7px 8px;border:1px solid #cdd9e3;border-radius:8px;
-       font-size:.95rem;text-align:right}
+  input[type=number]{width:84px;padding:8px 10px;border:1px solid #c8d7e4;border-radius:10px;
+       font:inherit;font-size:.95rem;font-weight:600;text-align:right;color:var(--text);
+       transition:border-color .15s,box-shadow .15s}
+  input[type=number]:focus{outline:none;border-color:var(--modra2);
+       box-shadow:0 0 0 3px rgba(26,110,168,.15)}
   .unit{color:var(--slabe);font-size:.82rem;width:28px}
   .note{font-size:.82rem;color:var(--slabe);margin-top:6px}
-  .alert{background:#fff4f2;border:1px solid #f3c5bd;color:var(--akcent);border-radius:10px;
-         padding:12px 14px;font-size:.9rem;font-weight:600;display:none}
-  .statusbar{font-size:.82rem;color:var(--slabe);padding:9px 12px;border:1px solid #dce6ee;
-             border-radius:9px;margin:4px 0 16px;background:#fff}
+  .alert{background:#fff4f2;border:1px solid #f3c5bd;color:var(--akcent);border-radius:12px;
+         padding:12px 14px;font-size:.9rem;font-weight:700;display:none;margin-top:12px}
+  .statusbar{font-size:.82rem;color:var(--slabe);padding:10px 14px;border:1px solid var(--line);
+             border-radius:12px;margin:4px 0 16px;background:#fff;box-shadow:var(--shadow)}
   .statusbar.ok{color:#1f8f57;border-color:#9bd9b5;background:#f1faf4}
   .statusbar.warn{color:#9a6b00;border-color:#e8cf8a;background:#fdf8ea}
   .modesrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 16px}
-  .modesrow .lbl{font-size:.85rem;color:var(--slabe);font-weight:600}
-  .modes{display:inline-flex;background:#fff;border:1px solid #cdd9e3;border-radius:10px;padding:3px;gap:3px}
-  .modes button{border:0;background:none;color:var(--modra);font:inherit;font-weight:600;
-       padding:8px 16px;border-radius:8px;cursor:pointer;font-size:.9rem}
-  .modes button.on{background:var(--modra);color:#fff}
-  .row.hidden{display:none}
-  .subhead{font-size:.78rem;font-weight:700;color:var(--slabe);text-transform:uppercase;
-           letter-spacing:.04em;margin:14px 0 2px;padding-top:8px;border-top:1px dashed #e1ecf4}
-  .subhead2{font-size:.82rem;font-weight:700;color:var(--modra);margin:2px 0 4px}
+  .modesrow .lbl{font-size:.85rem;color:var(--slabe);font-weight:700}
+  .modes{display:inline-flex;background:#fff;border:1px solid var(--line);border-radius:999px;
+       padding:4px;gap:3px;box-shadow:var(--shadow)}
+  .modes button{border:0;background:none;color:var(--modra);font:inherit;font-weight:700;
+       padding:8px 18px;border-radius:999px;cursor:pointer;font-size:.9rem;transition:background .15s,color .15s}
+  .modes button.on{background:linear-gradient(120deg,var(--modra),var(--modra2));color:#fff}
+  .row.hidden,.subhead.hidden{display:none}
+  .subhead{font-size:.76rem;font-weight:800;color:var(--slabe);text-transform:uppercase;
+           letter-spacing:.06em;margin:14px 0 2px;padding-top:10px;border-top:1px dashed #dbe7f0}
+  .subhead2{font-size:.82rem;font-weight:800;color:var(--modra);margin:2px 0 4px}
   .subhead2 .hint{font-weight:400}
 </style>
 </head>
 <body>
-<div class="topbar"><a href="index.html">← rozcestník</a></div>
+<div class="topbar" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+  <b>⚖️ Norsko 2026 — kalkulačka nosnosti</b>
+  <a href="index.html">← rozcestník</a>
+</div>
 <div class="wrap">
   <h1>⚖️ Kalkulačka nosnosti</h1>
   <p class="sub">CI Horon 84 M Elite — užitečná nosnost (payload) <b>485 kg</b>. Sleduj, kolik ti zbývá. Hodnoty jsou sdílené — co zadá jeden, vidí celá posádka.</p>

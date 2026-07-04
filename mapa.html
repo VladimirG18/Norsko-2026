@@ -4,53 +4,64 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Norsko 2026 — interaktivní mapa</title>
+<meta name="theme-color" content="#0a2c49">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root{--modra:#0b3d66}
+  :root{--modra:#0c3a5f;--modra2:#1a6ea8;--aurora:#2fbf8f;--line:#dfe9f2}
   *{box-sizing:border-box}
-  html,body{margin:0;height:100%;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
-  #bar{background:var(--modra);color:#fff;padding:10px 16px;display:flex;align-items:center;
-       justify-content:space-between;flex-wrap:wrap;gap:8px}
-  #bar a{color:#cfe6f5;text-decoration:none;font-size:.9rem}
-  #bar b{font-size:1.05rem}
+  html,body{margin:0;height:100%;font-family:'Manrope',-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif}
+  #bar{background:linear-gradient(120deg,#0a2c49 0%,#155a8c 100%);color:#fff;padding:11px 16px;
+       display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;
+       border-bottom:3px solid;border-image:linear-gradient(90deg,var(--aurora),#3a9bd5,#8b7bd8) 1}
+  #bar a{color:#bfe0f5;text-decoration:none;font-size:.9rem;font-weight:600}
+  #bar a:hover{color:#fff}
+  #bar b{font-size:1.05rem;letter-spacing:-.01em}
   #bar .right{display:flex;gap:12px;align-items:center}
-  #ptoggle{background:#fff;color:var(--modra);border:0;padding:6px 12px;border-radius:8px;
-           font-weight:600;cursor:pointer;font-size:.85rem}
-  #legend{font-size:.8rem;display:flex;gap:12px;flex-wrap:wrap;background:#fff;color:#333;
-          padding:8px 16px;border-bottom:1px solid #dce6ee}
+  #ptoggle{background:#fff;color:var(--modra);border:0;padding:7px 14px;border-radius:999px;
+           font-weight:700;cursor:pointer;font-size:.85rem;font-family:inherit;
+           box-shadow:0 2px 8px rgba(0,0,0,.18);transition:transform .15s}
+  #ptoggle:hover{transform:translateY(-1px)}
+  #legend{font-size:.78rem;font-weight:600;display:flex;gap:12px;flex-wrap:wrap;background:#fff;color:#3c4c5a;
+          padding:9px 16px;border-bottom:1px solid var(--line)}
   #legend span{display:inline-flex;align-items:center;gap:5px}
-  .dot{width:12px;height:12px;border-radius:50%;display:inline-block}
+  .dot{width:12px;height:12px;border-radius:50%;display:inline-block;box-shadow:0 1px 3px rgba(0,0,0,.25)}
   #map{position:absolute;top:0;bottom:0;left:0;right:0}
   #wrap{position:absolute;top:0;bottom:0;left:0;right:0;display:flex;flex-direction:column}
   #mapwrap{flex:1;position:relative;overflow:hidden}
-  .leaflet-popup-content{font-size:.9rem;line-height:1.45}
-  .leaflet-popup-content h3{margin:0 0 4px;color:var(--modra);font-size:1rem}
-  .leaflet-popup-content .den{display:inline-block;background:#e8f1f7;color:var(--modra);
-       font-weight:600;font-size:.75rem;padding:1px 8px;border-radius:10px;margin-bottom:6px}
-  .leaflet-popup-content .warn{color:#c0392b;font-weight:600}
-  .leaflet-popup-content .wimg{display:none;width:100%;border-radius:6px;margin-top:8px}
-  .leaflet-popup-content .tp{margin-top:6px;background:#fff1e0;color:#b06a00;
-       padding:3px 8px;border-radius:8px;display:inline-block;font-size:.85rem}
-  .leaflet-popup-content .tp span{color:#5b6b7a;font-size:.78rem}
+  .leaflet-popup-content-wrapper{border-radius:14px;box-shadow:0 10px 32px rgba(10,44,73,.28)}
+  .leaflet-popup-content{font-size:.9rem;line-height:1.5;font-family:inherit}
+  .leaflet-popup-content h3{margin:0 0 4px;color:var(--modra);font-size:1rem;font-weight:800}
+  .leaflet-popup-content .den{display:inline-block;background:#e6f2fb;color:var(--modra);
+       font-weight:700;font-size:.75rem;padding:2px 10px;border-radius:999px;margin-bottom:6px}
+  .leaflet-popup-content .warn{color:#c0392b;font-weight:700}
+  .leaflet-popup-content .wimg{display:none;width:100%;border-radius:10px;margin-top:8px}
+  .leaflet-popup-content .tp{margin-top:6px;background:#fff3e2;color:#a96a00;
+       padding:3px 10px;border-radius:999px;display:inline-block;font-size:.85rem;font-weight:600}
+  .leaflet-popup-content .tp span{color:#5d6e7d;font-size:.78rem;font-weight:400}
   /* boční panel s úseky */
-  #panel{position:absolute;top:0;right:0;bottom:0;width:330px;max-width:85%;background:#fff;
-         box-shadow:-3px 0 14px rgba(0,0,0,.15);transform:translateX(100%);transition:.25s;
-         z-index:1000;display:flex;flex-direction:column}
+  #panel{position:absolute;top:0;right:0;bottom:0;width:340px;max-width:85%;background:#fff;
+         box-shadow:-6px 0 28px rgba(10,44,73,.22);transform:translateX(100%);
+         transition:transform .28s cubic-bezier(.4,0,.2,1);
+         z-index:1000;display:flex;flex-direction:column;border-radius:16px 0 0 16px;overflow:hidden}
   #panel.open{transform:none}
-  .phead{background:var(--modra);color:#fff;padding:12px 14px;font-weight:600;
+  .phead{background:linear-gradient(120deg,#0a2c49,#155a8c);color:#fff;padding:13px 16px;font-weight:700;
          display:flex;justify-content:space-between;align-items:center}
-  .phead #pclose{cursor:pointer;font-size:1.1rem}
+  .phead #pclose{cursor:pointer;font-size:1.1rem;opacity:.85}
+  .phead #pclose:hover{opacity:1}
   #prows{overflow:auto;flex:1;padding:4px 0}
-  .prow{display:flex;justify-content:space-between;gap:10px;padding:8px 14px;
-        border-bottom:1px solid #eef3f7;font-size:.85rem;cursor:pointer}
-  .prow:hover{background:#f3f8fc}
-  .prow.active{background:#fff1e0;box-shadow:inset 3px 0 0 #ff7a00}
-  .prow .pn{color:#1c2733}
-  .prow .pv{color:var(--modra);font-weight:600;white-space:nowrap;text-align:right}
+  .prow{display:flex;justify-content:space-between;gap:10px;padding:9px 16px;
+        border-bottom:1px solid #eef3f7;font-size:.85rem;cursor:pointer;transition:background .12s}
+  .prow:hover{background:#f4f9fd}
+  .prow.active{background:#fff3e2;box-shadow:inset 3px 0 0 #ff7a00}
+  .prow .pn{color:#182634}
+  .prow .pv{color:var(--modra);font-weight:700;white-space:nowrap;text-align:right}
   .prow .pv.est{color:#b07a00}
-  #ptot{padding:12px 14px;border-top:2px solid #e8f1f7;font-size:.88rem;background:#f7fafc}
+  #ptot{padding:13px 16px;border-top:2px solid #e6f2fb;font-size:.88rem;background:#f7fafc}
   #ptot .grand{margin-top:5px;color:var(--modra);font-size:1.02rem}
-  .pnote{padding:10px 14px;font-size:.72rem;color:#5b6b7a}
+  .pnote{padding:10px 16px;font-size:.72rem;color:#5d6e7d}
 </style>
 </head>
 <body>

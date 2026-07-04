@@ -3,51 +3,62 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a2c49">
 <title>Norsko 2026 — poznámky</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root{--modra:#0b3d66;--modra2:#16689c;--led:#e8f1f7;--akcent:#c0392b;
-        --text:#1c2733;--slabe:#5b6b7a}
+  :root{--modra:#0c3a5f;--modra2:#1a6ea8;--led:#eef4f9;--akcent:#c0392b;
+        --text:#182634;--slabe:#5d6e7d;--aurora:#2fbf8f;--line:#dfe9f2;
+        --shadow:0 1px 2px rgba(12,58,95,.05),0 8px 24px rgba(12,58,95,.09)}
   *{box-sizing:border-box}
-  body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-       color:var(--text);background:var(--led);line-height:1.5}
-  .topbar{background:var(--modra);color:#fff;padding:10px 16px;display:flex;
-          justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
-  .topbar a{color:#cfe6f5;text-decoration:none;font-size:.9rem}
-  .wrap{max-width:820px;margin:18px auto;padding:0 14px}
-  h1{color:var(--modra);font-size:1.5rem;margin:6px 0 2px}
+  body{margin:0;font-family:'Manrope',-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+       color:var(--text);background:linear-gradient(180deg,#f6fafd 0%,var(--led) 260px);line-height:1.55}
+  .topbar{background:linear-gradient(120deg,#0a2c49 0%,#155a8c 100%);color:#fff;padding:12px 18px;display:flex;
+          justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;
+          border-bottom:3px solid;border-image:linear-gradient(90deg,var(--aurora),#3a9bd5,#8b7bd8) 1;
+          box-shadow:0 2px 14px rgba(10,44,73,.22)}
+  .topbar a{color:#bfe0f5;text-decoration:none;font-size:.9rem;font-weight:600}
+  .topbar a:hover{color:#fff}
+  .wrap{max-width:820px;margin:22px auto;padding:0 14px}
+  h1{color:var(--modra);font-size:1.7rem;font-weight:800;letter-spacing:-.02em;margin:6px 0 2px}
   .sub{color:var(--slabe);font-size:.92rem;margin:0 0 16px}
 
   /* stavový proužek připojení */
-  .statusbar{font-size:.82rem;color:var(--slabe);padding:9px 12px;border:1px solid #dce6ee;
-             border-radius:9px;margin:4px 0 16px;background:#fff}
+  .statusbar{font-size:.82rem;color:var(--slabe);padding:10px 14px;border:1px solid var(--line);
+             border-radius:12px;margin:4px 0 16px;background:#fff;box-shadow:var(--shadow)}
   .statusbar.ok{color:#1f8f57;border-color:#9bd9b5;background:#f1faf4}
   .statusbar.warn{color:#9a6b00;border-color:#e8cf8a;background:#fdf8ea}
 
   /* formulář poznámky */
-  .noteform{background:#fff;border:1px solid #dce6ee;border-radius:12px;padding:16px;
-            margin:6px 0 22px;box-shadow:0 3px 12px rgba(11,61,102,.09)}
+  .noteform{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;
+            margin:6px 0 22px;box-shadow:var(--shadow)}
   .noteform .frow{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
-  .noteform label{font-size:.85rem;color:var(--slabe)}
-  .noteform select,.noteform textarea{background:#fff;color:var(--text);border:1px solid #cdd9e3;
-       border-radius:8px;padding:9px 11px;font:inherit}
+  .noteform label{font-size:.85rem;font-weight:600;color:var(--slabe)}
+  .noteform select,.noteform textarea{background:#fff;color:var(--text);border:1px solid #c8d7e4;
+       border-radius:10px;padding:9px 12px;font:inherit;transition:border-color .15s,box-shadow .15s}
+  .noteform select:focus,.noteform textarea:focus{outline:none;border-color:var(--modra2);
+       box-shadow:0 0 0 3px rgba(26,110,168,.15)}
   .noteform select{min-width:140px}
-  .noteform textarea{width:100%;min-height:160px;resize:vertical;line-height:1.5}
-  .noteform .send{background:var(--modra);border:1px solid var(--modra);color:#fff;font-weight:600;
-       border-radius:8px;padding:9px 16px;cursor:pointer;font:inherit}
-  .noteform .send:hover{background:var(--modra2);border-color:var(--modra2)}
-  .noteform .send:disabled{opacity:.6;cursor:default}
+  .noteform textarea{width:100%;min-height:160px;resize:vertical;line-height:1.55}
+  .noteform .send{background:linear-gradient(120deg,var(--modra),var(--modra2));border:0;color:#fff;
+       font-weight:700;border-radius:10px;padding:10px 20px;cursor:pointer;font:inherit;
+       box-shadow:0 4px 12px rgba(12,58,95,.25);transition:transform .15s,box-shadow .15s}
+  .noteform .send:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(12,58,95,.32)}
+  .noteform .send:disabled{opacity:.6;cursor:default;transform:none}
 
   /* seznam poznámek */
   .notelist{display:flex;flex-direction:column;gap:12px}
-  .noteitem{background:#fff;border:1px solid #dce6ee;border-left-width:4px;border-radius:10px;
-            padding:12px 14px;box-shadow:0 3px 12px rgba(11,61,102,.07)}
+  .noteitem{background:#fff;border:1px solid var(--line);border-left-width:4px;border-radius:14px;
+            padding:13px 16px;box-shadow:var(--shadow)}
   .noteitem .head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
-  .noteitem .who{font-weight:700}
+  .noteitem .who{font-weight:800}
   .noteitem .when{color:var(--slabe);font-size:.78rem}
-  .noteitem .text{white-space:pre-wrap;line-height:1.5;font-size:.94rem}
+  .noteitem .text{white-space:pre-wrap;line-height:1.55;font-size:.94rem}
   .noteitem .del{background:none;border:none;color:var(--slabe);cursor:pointer;font-size:.95rem;
        padding:2px 6px;border-radius:6px}
-  .noteitem .del:hover{color:var(--akcent)}
+  .noteitem .del:hover{color:var(--akcent);background:#fdecea}
   .empty{color:var(--slabe);font-style:italic;padding:14px 0}
 
   /* barvy autorů */

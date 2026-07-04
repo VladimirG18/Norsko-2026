@@ -3,45 +3,60 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a2c49">
 <title>Norsko 2026 — karta vozu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root{--modra:#0b3d66;--modra2:#16689c;--led:#e8f1f7;--akcent:#c0392b;--text:#1c2733;--slabe:#5b6b7a;--zelena:#1f8f57}
+  :root{--modra:#0c3a5f;--modra2:#1a6ea8;--led:#eef4f9;--akcent:#c0392b;--text:#182634;
+        --slabe:#5d6e7d;--zelena:#1f8f57;--aurora:#2fbf8f;--line:#dfe9f2;
+        --shadow:0 1px 2px rgba(12,58,95,.05),0 8px 24px rgba(12,58,95,.09)}
   *{box-sizing:border-box}
-  body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-       color:var(--text);background:var(--led)}
-  .topbar{background:var(--modra);color:#fff;padding:10px 16px;display:flex;
-          justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
-  .topbar a{color:#cfe6f5;text-decoration:none;font-size:.9rem}
+  body{margin:0;font-family:'Manrope',-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+       color:var(--text);background:linear-gradient(180deg,#f6fafd 0%,var(--led) 260px);line-height:1.5}
+  .topbar{background:linear-gradient(120deg,#0a2c49 0%,#155a8c 100%);color:#fff;padding:12px 18px;display:flex;
+          justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;
+          border-bottom:3px solid;border-image:linear-gradient(90deg,var(--aurora),#3a9bd5,#8b7bd8) 1;
+          box-shadow:0 2px 14px rgba(10,44,73,.22)}
+  .topbar a{color:#bfe0f5;text-decoration:none;font-size:.9rem;font-weight:600}
+  .topbar a:hover{color:#fff}
   .topbar .rent{margin-left:auto;margin-right:12px;background:#fff;color:var(--modra);
-          padding:6px 12px;border-radius:8px;font-weight:600}
-  .topbar button{background:#fff;color:var(--modra);border:0;padding:6px 14px;border-radius:8px;
-          font-weight:600;cursor:pointer}
-  .sheet{max-width:780px;margin:18px auto;background:#fff;padding:26px 30px;border-radius:12px;
-         box-shadow:0 4px 16px rgba(11,61,102,.12)}
-  h1{margin:0 0 2px;color:var(--modra);font-size:1.5rem}
+          padding:7px 14px;border-radius:999px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+  .topbar .rent:hover{color:var(--modra)}
+  .topbar button{background:#fff;color:var(--modra);border:0;padding:7px 16px;border-radius:999px;
+          font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 2px 8px rgba(0,0,0,.18);
+          transition:transform .15s}
+  .topbar button:hover{transform:translateY(-1px)}
+  .sheet{max-width:780px;margin:22px auto;background:#fff;padding:28px 32px;border-radius:18px;
+         border:1px solid var(--line);box-shadow:var(--shadow)}
+  h1{margin:0 0 2px;color:var(--modra);font-size:1.6rem;font-weight:800;letter-spacing:-.02em}
   .sub{color:var(--slabe);margin:0 0 18px;font-size:.92rem}
-  .crit{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:0 0 18px}
-  .crit .box{background:#fff4f2;border:2px solid var(--akcent);border-radius:10px;
-             padding:12px;text-align:center}
-  .crit .box .big{font-size:1.6rem;font-weight:800;color:var(--akcent);line-height:1.1}
-  .crit .box .lbl{font-size:.78rem;color:var(--text);margin-top:4px}
+  .crit{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:0 0 20px}
+  .crit .box{background:linear-gradient(150deg,#fff6f4,#fff);border:1px solid #f0ccc4;
+             border-top:4px solid var(--akcent);border-radius:14px;
+             padding:14px 12px;text-align:center;box-shadow:0 3px 10px rgba(192,57,43,.08)}
+  .crit .box .big{font-size:1.7rem;font-weight:800;color:var(--akcent);line-height:1.1;letter-spacing:-.02em}
+  .crit .box .lbl{font-size:.76rem;font-weight:700;color:var(--text);margin-top:5px}
 
   /* ovládání sbalit/rozbalit */
   .accctl{display:flex;gap:8px;justify-content:flex-end;margin:0 0 10px}
-  .accctl button{background:var(--led);color:var(--modra);border:1px solid #cdd9e3;border-radius:20px;
-       padding:5px 13px;font:inherit;font-size:.82rem;font-weight:600;cursor:pointer}
-  .accctl button:hover{background:#dceaf4}
+  .accctl button{background:#fff;color:var(--modra);border:1px solid var(--line);border-radius:999px;
+       padding:6px 15px;font:inherit;font-size:.82rem;font-weight:700;cursor:pointer;
+       transition:background .15s}
+  .accctl button:hover{background:#e6f2fb}
 
   /* skládací sekce */
-  details.acc{border:1px solid #dce6ee;border-radius:10px;margin:0 0 10px;background:#fff;
-       box-shadow:0 2px 8px rgba(11,61,102,.05);overflow:hidden}
-  details.acc>summary{list-style:none;cursor:pointer;padding:12px 16px;font-weight:700;color:var(--modra);
+  details.acc{border:1px solid var(--line);border-radius:14px;margin:0 0 10px;background:#fff;
+       box-shadow:0 2px 8px rgba(12,58,95,.05);overflow:hidden;transition:border-color .15s}
+  details.acc:hover{border-color:#cfe0ee}
+  details.acc>summary{list-style:none;cursor:pointer;padding:13px 17px;font-weight:800;color:var(--modra);
        display:flex;align-items:center;gap:9px;user-select:none;font-size:1rem}
   details.acc>summary::-webkit-details-marker{display:none}
-  details.acc>summary:hover{background:#f3f8fc}
+  details.acc>summary:hover{background:#f4f9fd}
   details.acc>summary .chev{margin-left:auto;color:var(--slabe);transition:transform .2s;font-size:.95rem}
   details.acc[open]>summary .chev{transform:rotate(90deg)}
-  details.acc .inner{padding:2px 16px 14px}
+  details.acc .inner{padding:2px 17px 15px}
 
   table{width:100%;border-collapse:collapse;font-size:.9rem}
   td{padding:6px 8px;border-bottom:1px solid #eef3f7;vertical-align:top}

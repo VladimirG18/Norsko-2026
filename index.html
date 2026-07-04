@@ -3,45 +3,123 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a2c49">
 <title>Norsko 2026 — průvodce cestou</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --modra:#0b3d66; --modra2:#16689c; --led:#e8f1f7;
-    --text:#1c2733; --slabe:#5b6b7a; --akcent:#c0392b;
+    --modra:#0c3a5f; --modra2:#1a6ea8; --led:#eef4f9;
+    --text:#182634; --slabe:#5d6e7d; --akcent:#c0392b;
+    --aurora:#2fbf8f; --line:#dfe9f2;
+    --shadow:0 1px 2px rgba(12,58,95,.05),0 8px 24px rgba(12,58,95,.09);
+    --shadow-h:0 4px 10px rgba(12,58,95,.08),0 18px 40px rgba(12,58,95,.16);
   }
   *{box-sizing:border-box}
-  body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-       color:var(--text);background:var(--led);line-height:1.5}
-  header{background:linear-gradient(135deg,var(--modra),var(--modra2));color:#fff;
-         padding:48px 20px 40px;text-align:center}
-  header h1{margin:0 0 8px;font-size:2.1rem;letter-spacing:.5px}
-  header p{margin:0;opacity:.9;font-size:1.05rem}
-  .flag{font-size:2.4rem;display:block;margin-bottom:10px}
-  .meta{margin-top:18px;display:inline-flex;flex-wrap:wrap;gap:8px;justify-content:center}
-  .meta span{background:rgba(255,255,255,.15);padding:5px 12px;border-radius:20px;font-size:.85rem}
-  main{max-width:920px;margin:-24px auto 40px;padding:0 16px}
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
-  a.card{display:block;background:#fff;border-radius:14px;padding:22px;text-decoration:none;
-         color:inherit;box-shadow:0 4px 14px rgba(11,61,102,.10);transition:.15s;border:1px solid #dce6ee}
-  a.card:hover{transform:translateY(-3px);box-shadow:0 8px 22px rgba(11,61,102,.18)}
-  .card .ico{font-size:2rem}
-  .card h2{margin:10px 0 6px;font-size:1.2rem;color:var(--modra)}
-  .card p{margin:0;color:var(--slabe);font-size:.92rem}
-  .crit{background:#fff4f2;border:1px solid #f3c5bd;border-radius:14px;padding:18px 20px;margin:22px 0 0}
-  .crit h3{margin:0 0 8px;color:var(--akcent);font-size:1rem}
-  .crit ul{margin:0;padding-left:18px;color:var(--text);font-size:.92rem}
-  footer{text-align:center;color:var(--slabe);font-size:.82rem;padding:24px}
+  body{margin:0;font-family:'Manrope',-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+       color:var(--text);background:linear-gradient(180deg,#f6fafd 0%,var(--led) 420px);line-height:1.55}
+
+  /* ---------- HERO ---------- */
+  header.hero{position:relative;color:#fff;text-align:center;overflow:hidden;
+       background:linear-gradient(160deg,#0a2c49 0%,#14507e 55%,#1a6ea8 100%)}
+  .hero-bg{position:absolute;inset:0;background-size:cover;background-position:center 35%;
+       opacity:0;transition:opacity 1.2s ease}
+  .hero-bg.loaded{opacity:1}
+  .hero-shade{position:absolute;inset:0;
+       background:linear-gradient(180deg,rgba(8,32,54,.55) 0%,rgba(8,32,54,.38) 45%,rgba(10,44,73,.72) 100%)}
+  .hero-ridge{position:absolute;left:0;right:0;bottom:-1px;width:100%;height:72px;display:block}
+  .hero-in{position:relative;padding:72px 20px 96px;max-width:860px;margin:0 auto}
+  .flag{font-size:2.6rem;display:block;margin-bottom:12px;
+       filter:drop-shadow(0 3px 8px rgba(0,0,0,.35))}
+  .hero-in h1{margin:0 0 6px;font-size:clamp(2.1rem,6vw,3.1rem);font-weight:800;
+       letter-spacing:-.02em;text-shadow:0 2px 18px rgba(0,0,0,.35)}
+  .hero-in .tagline{margin:0;font-size:1.12rem;font-weight:600;opacity:.95;
+       text-shadow:0 1px 10px rgba(0,0,0,.4)}
+  .hero-in .dates{margin:6px 0 0;font-size:.98rem;opacity:.85;text-shadow:0 1px 8px rgba(0,0,0,.4)}
+  .meta{margin-top:22px;display:inline-flex;flex-wrap:wrap;gap:8px;justify-content:center}
+  .meta span{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
+       backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+       padding:6px 14px;border-radius:999px;font-size:.86rem;font-weight:600}
+
+  /* ---------- OBSAH ---------- */
+  main{max-width:960px;margin:-38px auto 48px;padding:0 16px;position:relative}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
+  a.card{display:block;background:#fff;border-radius:18px;padding:22px;text-decoration:none;
+         color:inherit;box-shadow:var(--shadow);border:1px solid var(--line);
+         transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;
+         position:relative;overflow:hidden}
+  a.card::after{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;
+         background:linear-gradient(180deg,var(--aurora),var(--modra2));opacity:0;transition:opacity .18s}
+  a.card:hover{transform:translateY(-4px);box-shadow:var(--shadow-h);border-color:#cfe0ee}
+  a.card:hover::after{opacity:1}
+  .card .ico{width:52px;height:52px;display:flex;align-items:center;justify-content:center;
+       font-size:1.7rem;border-radius:14px;
+       background:linear-gradient(135deg,#e6f2fb,#f2f9f5);border:1px solid var(--line)}
+  .card h2{margin:14px 0 6px;font-size:1.16rem;font-weight:800;color:var(--modra);letter-spacing:-.01em}
+  .card p{margin:0;color:var(--slabe);font-size:.9rem;line-height:1.55}
+  .card .go{display:inline-flex;align-items:center;gap:5px;margin-top:12px;font-size:.84rem;
+       font-weight:700;color:var(--modra2)}
+  .card .go i{font-style:normal;transition:transform .18s}
+  a.card:hover .go i{transform:translateX(4px)}
+
+  /* ---------- GALERIE ---------- */
+  .highlights{margin:40px 0 0}
+  .highlights h2{font-size:1.4rem;font-weight:800;color:var(--modra);margin:0 0 4px;letter-spacing:-.01em}
+  .highlights .hsub{color:var(--slabe);font-size:.92rem;margin:0 0 16px}
+  .hgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+  .hgrid figure{margin:0;border-radius:16px;overflow:hidden;background:#fff;
+       border:1px solid var(--line);box-shadow:var(--shadow);
+       transition:transform .18s ease,box-shadow .18s ease}
+  .hgrid figure:hover{transform:translateY(-3px);box-shadow:var(--shadow-h)}
+  .himg{position:relative;height:140px;overflow:hidden;
+       background:linear-gradient(150deg,#c9dded,#e8f1f7);display:flex;align-items:center;justify-content:center}
+  .himg .ph{font-size:2rem;opacity:.55;position:absolute}
+  .himg img{position:relative;width:100%;height:100%;object-fit:cover;display:block;
+       opacity:0;transition:opacity .8s ease,transform .4s ease}
+  .himg img.loaded{opacity:1}
+  .hgrid figure:hover .himg img{transform:scale(1.05)}
+  .himg .day{position:absolute;left:10px;top:10px;z-index:2;background:rgba(10,44,73,.78);color:#fff;
+       font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:999px;
+       backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+  .hgrid figcaption{padding:10px 13px 12px}
+  .hgrid figcaption b{display:block;font-size:.94rem;color:var(--modra)}
+  .hgrid figcaption span{font-size:.78rem;color:var(--slabe)}
+
+  /* ---------- UPOZORNĚNÍ ---------- */
+  .crit{background:linear-gradient(150deg,#fff6f4,#fff);border:1px solid #f0ccc4;
+        border-left:5px solid var(--akcent);border-radius:16px;
+        padding:18px 22px;margin:36px 0 0;box-shadow:var(--shadow)}
+  .crit h3{margin:0 0 10px;color:var(--akcent);font-size:1.02rem;font-weight:800}
+  .crit ul{margin:0;padding-left:20px;color:var(--text);font-size:.92rem}
+  .crit li{margin-bottom:6px}
+  .crit li:last-child{margin-bottom:0}
+  .crit b{color:var(--modra)}
+
+  footer{text-align:center;color:var(--slabe);font-size:.82rem;padding:28px 16px 34px}
+  footer .fjord{display:block;font-size:1.1rem;margin-bottom:6px;opacity:.7}
 </style>
 </head>
 <body>
-<header>
-  <span class="flag">🇳🇴</span>
-  <h1>Norsko 2026 — průvodce cestou</h1>
-  <p>Cesta obytným vozem · 18. 7. – 2. 8. 2026</p>
-  <div class="meta">
-    <span>📍 Modřice → Norsko → Modřice</span>
-    <span>👨‍👩‍👧 4 dospělí + dítě + pes</span>
-    <span>🚐 CI Horon 84 M Elite</span>
+<header class="hero">
+  <div class="hero-bg" id="heroBg" aria-hidden="true"></div>
+  <div class="hero-shade" aria-hidden="true"></div>
+  <svg class="hero-ridge" viewBox="0 0 1440 72" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0,52 L110,22 230,46 340,12 470,50 590,26 710,56 830,18 950,44 1080,10 1210,42 1330,28 1440,50 L1440,72 0,72 Z"
+          fill="#f6fafd" opacity=".45"/>
+    <path d="M0,60 L130,34 260,54 390,24 520,58 660,38 800,62 930,30 1060,52 1190,22 1320,50 1440,38 L1440,72 0,72 Z"
+          fill="#f6fafd"/>
+  </svg>
+  <div class="hero-in">
+    <span class="flag">🇳🇴</span>
+    <h1>Norsko 2026</h1>
+    <p class="tagline">Průvodce cestou obytným vozem — fjordy, ledovce a hory</p>
+    <p class="dates">18. 7. – 2. 8. 2026 · Modřice → Norsko → Modřice</p>
+    <div class="meta">
+      <span>👨‍👩‍👧 4 dospělí + dítě + pes</span>
+      <span>🚐 CI Horon 84 M Elite</span>
+      <span>⛴️ trajekt tam · mosty zpět</span>
+    </div>
   </div>
 </header>
 <main>
@@ -50,38 +128,51 @@
       <div class="ico">🗺️</div>
       <h2>Interaktivní mapa</h2>
       <p>Všechny zastávky, trasa tam přes trajekt i zpět přes mosty, denní program v popiscích.</p>
+      <span class="go">Otevřít mapu <i>→</i></span>
     </a>
     <a class="card" href="pruvodce.html">
       <div class="ico">📋</div>
       <h2>Průvodce</h2>
       <p>Itinerář po dnech s fotkami, vzdálenostmi a teplotami, plus klíčové info k trajektu, mýtu a výbavě.</p>
+      <span class="go">Otevřít průvodce <i>→</i></span>
     </a>
     <a class="card" href="co_zaridit.html">
       <div class="ico">✅</div>
       <h2>Co zařídit</h2>
       <p>Sdílený checklist příprav — rezervace, doklady a výbava. Odškrtávej, přiřazuj komu úkol patří, přidávej, řaď a filtruj. Vše online v reálném čase.</p>
+      <span class="go">Otevřít checklist <i>→</i></span>
     </a>
     <a class="card" href="vuz.html">
       <div class="ico">🚐</div>
       <h2>Karta vozu</h2>
       <p>Rychlá reference do kabiny — limity, tankování, trajekt, paliva. Vhodné k tisku.</p>
+      <span class="go">Otevřít kartu <i>→</i></span>
     </a>
     <a class="card" href="dotazy_vuz.html">
       <div class="ico">❓</div>
       <h2>Dotazy k obytnému vozu</h2>
       <p>Co ověřit u majitele před cestou — odškrtávej, přidávej, maž, řaď přetažením a filtruj. Sdílené pro celou posádku.</p>
+      <span class="go">Otevřít dotazy <i>→</i></span>
     </a>
     <a class="card" href="kalkulacka.html">
       <div class="ico">⚖️</div>
       <h2>Kalkulačka nosnosti</h2>
       <p>Hlídej kritických 485 kg — zadej posádku a vybavení, uvidíš zbývající rezervu. Hodnoty sdílené online pro celou posádku.</p>
+      <span class="go">Otevřít kalkulačku <i>→</i></span>
     </a>
     <a class="card" href="poznamky.html">
       <div class="ico">📝</div>
       <h2>Poznámky</h2>
       <p>Sdílené poznámky k cestě — každý zapíše pod svým jménem (Jiří, Jaroslava, Vladimír, Lucie) a všichni je vidí v reálném čase.</p>
+      <span class="go">Otevřít poznámky <i>→</i></span>
     </a>
   </div>
+
+  <section class="highlights">
+    <h2>✨ Co nás čeká</h2>
+    <p class="hsub">Vrcholy cesty — víc míst, fotek a detailů najdeš v <a href="pruvodce.html" style="color:var(--modra2)">průvodci</a> a na <a href="mapa.html" style="color:var(--modra2)">mapě</a>.</p>
+    <div class="hgrid" id="hgrid"></div>
+  </section>
 
   <div class="crit">
     <h3>⚠️ Tři věci, na které nikdy nezapomeň</h3>
@@ -93,7 +184,63 @@
   </div>
 </main>
 <footer>
+  <span class="fjord">🏔️ ⛴️ 🎣</span>
   Sestaveno z vlastních podkladů k cestě · poslední aktualizace 2026
 </footer>
+
+<script>
+// Fotky Norska z Wikipedie (stejná technika jako v průvodci a na mapě).
+// Když se fotka nenačte, zůstane hezký gradientní podklad — nic se nerozbije.
+function wikiThumb(title, px, lang){
+  return fetch(`https://${lang||'en'}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`)
+    .then(r=>r.ok?r.json():null)
+    .then(d=>{
+      const t=d&&d.thumbnail&&d.thumbnail.source;
+      if(!t) return null;
+      // z malého náhledu (~320px) uděláme větší tím, že v URL přepíšeme šířku
+      return {big:t.replace(/\/(\d+)px-/, '/'+px+'px-'), small:t};
+    }).catch(()=>null);
+}
+
+// hero fotka — Geirangerfjord
+wikiThumb('Geirangerfjorden', 1400).then(res=>{
+  if(!res) return;
+  const el=document.getElementById('heroBg');
+  const img=new Image();
+  img.onload=()=>{ el.style.backgroundImage=`url("${img.src}")`; el.classList.add('loaded'); };
+  img.onerror=()=>{ // kdyby zvětšenina neexistovala, použij původní náhled
+    const img2=new Image();
+    img2.onload=()=>{ el.style.backgroundImage=`url("${img2.src}")`; el.classList.add('loaded'); };
+    img2.src=res.small;
+  };
+  img.src=res.big;
+});
+
+// galerie highlightů
+const highlights=[
+  {t:'Preikestolen',        n:'Preikestolen',   d:'Den 3 · 20. 7.',  s:'Kazatelna nad Lysefjordem'},
+  {t:'Trolltunga',          n:'Trolltunga',     d:'Den 5 · 22. 7.',  s:'Trollí jazyk — celodenní túra'},
+  {t:'Geirangerfjorden',    n:'Geirangerfjord', d:'Den 8 · 25. 7.',  s:'Plavba fjordem (UNESCO)'},
+  {t:'Ålesund',             n:'Ålesund',        d:'Den 9 · 26. 7.',  s:'Secesní město mezi fjordy'},
+  {t:'Lovatnet',            n:'Lovatnet',       d:'Den 7 · 24. 7.',  s:'Tyrkysové ledovcové jezero'},
+  {t:'Besseggen',           n:'Besseggen',      d:'Den 12 · 29. 7.', s:'Hřeben v Jotunheimen'},
+];
+const hg=document.getElementById('hgrid');
+highlights.forEach(h=>{
+  const fig=document.createElement('figure');
+  fig.innerHTML=`
+    <div class="himg"><span class="ph">🏔️</span><span class="day">${h.d}</span>
+      <img alt="${h.n}" loading="lazy" referrerpolicy="no-referrer"></div>
+    <figcaption><b>${h.n}</b><span>${h.s}</span></figcaption>`;
+  hg.appendChild(fig);
+  const img=fig.querySelector('img');
+  wikiThumb(h.t, 640).then(res=>{
+    if(!res) return;
+    img.onload=()=>img.classList.add('loaded');
+    img.onerror=()=>{ img.onerror=null; img.src=res.small; };
+    img.src=res.big;
+  });
+});
+</script>
 </body>
 </html>
