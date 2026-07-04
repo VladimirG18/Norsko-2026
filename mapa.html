@@ -172,7 +172,13 @@ function loadPhoto(s, el){
   if(key in imgCache){ if(imgCache[key]){img.src=imgCache[key];img.style.display='block';} return; }
   fetch(`https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(s.w)}`)
     .then(r=>r.ok?r.json():null)
-    .then(d=>{ const src=d&&d.thumbnail&&d.thumbnail.source; imgCache[key]=src||'';
+    .then(d=>{
+      const o=d&&d.originalimage, t=d&&d.thumbnail;
+      let src=t&&t.source||'';
+      // známe-li originál (JPEG fotku), vyžádáme si ostřejší náhled na míru
+      if(o&&t&&/\.jpe?g$/i.test(o.source.split('?')[0]))
+        src = o.width>480 ? t.source.replace(/\/\d+px-/,'/480px-') : o.source;
+      imgCache[key]=src||'';
       if(src){img.src=src;img.style.display='block';} })
     .catch(()=>{imgCache[key]='';});
 }

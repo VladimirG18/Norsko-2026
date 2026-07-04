@@ -233,7 +233,14 @@ function fetchFoto(img){
   if(key in fotoCache){ if(fotoCache[key]) img.src=fotoCache[key]; return; }
   fetch(`https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(w)}`)
     .then(r=>r.ok?r.json():null)
-    .then(d=>{ const s=d&&d.thumbnail&&d.thumbnail.source; fotoCache[key]=s||''; if(s) img.src=s; })
+    .then(d=>{
+      const o=d&&d.originalimage, t=d&&d.thumbnail;
+      let s=t&&t.source||'';
+      // známe-li originál (JPEG fotku), vyžádáme si ostřejší náhled na míru
+      if(o&&t&&/\.jpe?g$/i.test(o.source.split('?')[0]))
+        s = o.width>640 ? t.source.replace(/\/\d+px-/,'/640px-') : o.source;
+      fotoCache[key]=s||''; if(s) img.src=s;
+    })
     .catch(()=>{fotoCache[key]='';});
 }
 (function renderDny(){

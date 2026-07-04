@@ -133,7 +133,7 @@
 </header>
 <main>
   <div class="grid">
-    <a class="card" href="mapa.html" data-foto="Atlantic Ocean Road" data-misto="Atlanterhavsveien">
+    <a class="card" href="mapa.html" data-foto="Atlantic Ocean Road|Storseisundet Bridge" data-misto="Atlanterhavsveien">
       <div class="cimg"><span class="ph">🏔️</span><span class="misto">Atlanterhavsveien</span>
         <img alt="" loading="lazy" referrerpolicy="no-referrer"></div>
       <div class="ico">🗺️</div>
@@ -143,7 +143,7 @@
         <span class="go">Otevřít mapu <i>→</i></span>
       </div>
     </a>
-    <a class="card" href="pruvodce.html" data-foto="Stegastein" data-misto="Stegastein">
+    <a class="card" href="pruvodce.html" data-foto="Stegastein|Aurlandsfjord" data-misto="Stegastein">
       <div class="cimg"><span class="ph">🏔️</span><span class="misto">Stegastein</span>
         <img alt="" loading="lazy" referrerpolicy="no-referrer"></div>
       <div class="ico">📋</div>
@@ -153,7 +153,7 @@
         <span class="go">Otevřít průvodce <i>→</i></span>
       </div>
     </a>
-    <a class="card" href="co_zaridit.html" data-foto="Kristiansand" data-misto="Kristiansand">
+    <a class="card" href="co_zaridit.html" data-foto="Kristiansand|Christiansholm Fortress|Kristiansand Cathedral" data-misto="Kristiansand">
       <div class="cimg"><span class="ph">🏔️</span><span class="misto">Kristiansand</span>
         <img alt="" loading="lazy" referrerpolicy="no-referrer"></div>
       <div class="ico">✅</div>
@@ -163,7 +163,7 @@
         <span class="go">Otevřít checklist <i>→</i></span>
       </div>
     </a>
-    <a class="card" href="vuz.html" data-foto="Låtefossen" data-misto="Låtefossen">
+    <a class="card" href="vuz.html" data-foto="Låtefossen|Odda" data-misto="Låtefossen">
       <div class="cimg"><span class="ph">🏔️</span><span class="misto">Låtefossen</span>
         <img alt="" loading="lazy" referrerpolicy="no-referrer"></div>
       <div class="ico">🚐</div>
@@ -173,7 +173,7 @@
         <span class="go">Otevřít kartu <i>→</i></span>
       </div>
     </a>
-    <a class="card" href="dotazy_vuz.html" data-foto="Aurland" data-misto="Aurland">
+    <a class="card" href="dotazy_vuz.html" data-foto="Aurlandsfjord|Aurland|Flåm" data-misto="Aurland">
       <div class="cimg"><span class="ph">🏔️</span><span class="misto">Aurland</span>
         <img alt="" loading="lazy" referrerpolicy="no-referrer"></div>
       <div class="ico">❓</div>
@@ -183,7 +183,7 @@
         <span class="go">Otevřít dotazy <i>→</i></span>
       </div>
     </a>
-    <a class="card" href="kalkulacka.html" data-foto="Bondhusvatnet" data-misto="Bondhusvatnet">
+    <a class="card" href="kalkulacka.html" data-foto="Bondhusvatnet|Folgefonna" data-misto="Bondhusvatnet">
       <div class="cimg"><span class="ph">🏔️</span><span class="misto">Bondhusvatnet</span>
         <img alt="" loading="lazy" referrerpolicy="no-referrer"></div>
       <div class="ico">⚖️</div>
@@ -193,7 +193,7 @@
         <span class="go">Otevřít kalkulačku <i>→</i></span>
       </div>
     </a>
-    <a class="card" href="poznamky.html" data-foto="Bøyabreen" data-misto="Bøyabreen">
+    <a class="card" href="poznamky.html" data-foto="Bøyabreen|Fjærland|Fjærlandsfjorden" data-misto="Bøyabreen">
       <div class="cimg"><span class="ph">🏔️</span><span class="misto">Bøyabreen</span>
         <img alt="" loading="lazy" referrerpolicy="no-referrer"></div>
       <div class="ico">📝</div>
@@ -226,44 +226,58 @@
 </footer>
 
 <script>
-// Fotky Norska z Wikipedie (stejná technika jako v průvodci a na mapě).
-// Když se fotka nenačte, zůstane hezký gradientní podklad — nic se nerozbije.
-function wikiThumb(title, px, lang){
-  return fetch(`https://${lang||'en'}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`)
-    .then(r=>r.ok?r.json():null)
-    .then(d=>{
-      const t=d&&d.thumbnail&&d.thumbnail.source;
-      if(!t) return null;
-      // z malého náhledu (~320px) uděláme větší tím, že v URL přepíšeme šířku
-      return {big:t.replace(/\/(\d+)px-/, '/'+px+'px-'), small:t};
-    }).catch(()=>null);
+// Fotky Norska z Wikipedie. Ptáme se na informace o originálu fotky, takže
+// umíme stáhnout ostrou velikost přesně na míru (žádné rozmazané zvětšeniny),
+// přeskakujeme erby a mapy (jen JPEG fotky) i příliš malé obrázky.
+// Když nic nevyjde, zůstane gradientní podklad — nic se nerozbije.
+async function wikiFoto(title, px, lang){
+  try{
+    const r=await fetch(`https://${lang||'en'}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`);
+    if(!r.ok) return null;
+    const d=await r.json();
+    const o=d.originalimage, t=d.thumbnail;
+    if(!o || !t) return null;
+    if(!/\.jpe?g$/i.test(o.source.split('?')[0])) return null;  // erb / mapa / SVG → přeskočit
+    if(o.width<600) return null;                                 // příliš malý originál → přeskočit
+    // šířka náhledu musí být menší než originál, jinak použijeme rovnou originál
+    return o.width>px ? t.source.replace(/\/\d+px-/, '/'+px+'px-') : o.source;
+  }catch(e){ return null; }
+}
+
+// zkusí postupně několik článků a vrátí první opravdu načtitelnou fotku
+async function najdiFotku(titles, px){
+  for(const t of titles){
+    const src=await wikiFoto(t, px);
+    if(!src) continue;
+    const ok=await new Promise(res=>{
+      const i=new Image();
+      i.onload=()=>res(true); i.onerror=()=>res(false);
+      i.referrerPolicy='no-referrer'; i.src=src;
+    });
+    if(ok) return src;
+  }
+  return null;
 }
 
 // hero fotka — Geirangerfjord
-wikiThumb('Geirangerfjorden', 1400).then(res=>{
-  if(!res) return;
+najdiFotku(['Geirangerfjorden','Geiranger','Seven Sisters Waterfall, Norway'], 1600).then(src=>{
+  if(!src) return;
   const el=document.getElementById('heroBg');
-  const img=new Image();
-  img.onload=()=>{ el.style.backgroundImage=`url("${img.src}")`; el.classList.add('loaded'); };
-  img.onerror=()=>{ // kdyby zvětšenina neexistovala, použij původní náhled
-    const img2=new Image();
-    img2.onload=()=>{ el.style.backgroundImage=`url("${img2.src}")`; el.classList.add('loaded'); };
-    img2.src=res.small;
-  };
-  img.src=res.big;
+  el.style.backgroundImage=`url("${src}")`;
+  el.classList.add('loaded');
 });
 
-// galerie highlightů
+// galerie highlightů — u každého místa víc kandidátů, bere se první kvalitní
 const highlights=[
-  {t:'Stavanger',           n:'Stavanger',      d:'Den 3 · 20. 7.',  s:'Gamle Stavanger — bílé domky'},
-  {t:'Preikestolen',        n:'Preikestolen',   d:'Den 3 · 20. 7.',  s:'Kazatelna nad Lysefjordem'},
-  {t:'Trolltunga',          n:'Trolltunga',     d:'Den 5 · 22. 7.',  s:'Trollí jazyk — celodenní túra'},
-  {t:'Lovatnet',            n:'Lovatnet',       d:'Den 7 · 24. 7.',  s:'Tyrkysové ledovcové jezero'},
-  {t:'Dalsnibba',           n:'Dalsnibba',      d:'Den 8 · 25. 7.',  s:'Vyhlídka 1 500 m nad fjordem'},
-  {t:'Geirangerfjorden',    n:'Geirangerfjord', d:'Den 8 · 25. 7.',  s:'Plavba fjordem (UNESCO)'},
-  {t:'Ålesund',             n:'Ålesund',        d:'Den 9 · 26. 7.',  s:'Secesní město mezi fjordy'},
-  {t:'Jotunheimen',         n:'Jotunheimen',    d:'Den 11–13',       s:'Domov obrů — národní park'},
-  {t:'Besseggen',           n:'Besseggen',      d:'Den 12 · 29. 7.', s:'Hřeben mezi dvěma jezery'},
+  {t:['Gamle Stavanger','Stavanger'],                    n:'Stavanger',      d:'Den 3 · 20. 7.',  s:'Gamle Stavanger — bílé domky'},
+  {t:['Preikestolen','Lysefjord'],                       n:'Preikestolen',   d:'Den 3 · 20. 7.',  s:'Kazatelna nad Lysefjordem'},
+  {t:['Trolltunga','Ringedalsvatnet'],                   n:'Trolltunga',     d:'Den 5 · 22. 7.',  s:'Trollí jazyk — celodenní túra'},
+  {t:['Lovatnet','Loen'],                                n:'Lovatnet',       d:'Den 7 · 24. 7.',  s:'Tyrkysové ledovcové jezero'},
+  {t:['Dalsnibba','Djupvatnet'],                         n:'Dalsnibba',      d:'Den 8 · 25. 7.',  s:'Vyhlídka 1 500 m nad fjordem'},
+  {t:['Seven Sisters Waterfall, Norway','Geirangerfjorden'], n:'Geirangerfjord', d:'Den 8 · 25. 7.', s:'Plavba fjordem (UNESCO)'},
+  {t:['Ålesund','Aksla'],                                n:'Ålesund',        d:'Den 9 · 26. 7.',  s:'Secesní město mezi fjordy'},
+  {t:['Jotunheimen','Galdhøpiggen'],                     n:'Jotunheimen',    d:'Den 11–13',       s:'Domov obrů — národní park'},
+  {t:['Besseggen','Gjende'],                             n:'Besseggen',      d:'Den 12 · 29. 7.', s:'Hřeben mezi dvěma jezery'},
 ];
 const hg=document.getElementById('hgrid');
 highlights.forEach(h=>{
@@ -274,23 +288,21 @@ highlights.forEach(h=>{
     <figcaption><b>${h.n}</b><span>${h.s}</span></figcaption>`;
   hg.appendChild(fig);
   const img=fig.querySelector('img');
-  wikiThumb(h.t, 640).then(res=>{
-    if(!res) return;
+  najdiFotku(h.t, 640).then(src=>{
+    if(!src) return;
     img.onload=()=>img.classList.add('loaded');
-    img.onerror=()=>{ img.onerror=null; img.src=res.small; };
-    img.src=res.big;
+    img.src=src;
   });
 });
 
-// fotky v dlaždicích rozcestníku
+// fotky v dlaždicích rozcestníku (kandidáti oddělení svislítkem v data-foto)
 document.querySelectorAll('a.card[data-foto]').forEach(card=>{
   const img=card.querySelector('.cimg img');
   if(!img) return;
-  wikiThumb(card.dataset.foto, 640).then(res=>{
-    if(!res) return;
+  najdiFotku(card.dataset.foto.split('|'), 640).then(src=>{
+    if(!src) return;
     img.onload=()=>img.classList.add('loaded');
-    img.onerror=()=>{ img.onerror=null; img.src=res.small; };
-    img.src=res.big;
+    img.src=src;
   });
 });
 </script>
