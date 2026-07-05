@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a2c49">
+<title>Norsko 2026 — posádka expedice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--modra:#0c3a5f;--modra2:#1a6ea8;--led:#eef4f9;--akcent:#c0392b;
+        --text:#182634;--slabe:#5d6e7d;--aurora:#2fbf8f;--line:#dfe9f2;
+        --shadow:0 1px 2px rgba(12,58,95,.05),0 8px 24px rgba(12,58,95,.09);
+        --shadow-h:0 4px 10px rgba(12,58,95,.08),0 18px 40px rgba(12,58,95,.16)}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Manrope',-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+       color:var(--text);background:linear-gradient(180deg,#f6fafd 0%,var(--led) 260px);line-height:1.55}
+  .topbar{background:linear-gradient(120deg,#0a2c49 0%,#155a8c 100%);color:#fff;padding:12px 18px;display:flex;
+          justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;
+          border-bottom:3px solid;border-image:linear-gradient(90deg,var(--aurora),#3a9bd5,#8b7bd8) 1;
+          box-shadow:0 2px 14px rgba(10,44,73,.22)}
+  .topbar b{font-size:.98rem;letter-spacing:-.01em}
+  .topbar a{color:#bfe0f5;text-decoration:none;font-size:.9rem;font-weight:600}
+  .topbar a:hover{color:#fff}
+  .wrap{max-width:880px;margin:22px auto 44px;padding:0 14px}
+  h1{color:var(--modra);font-size:1.7rem;font-weight:800;letter-spacing:-.02em;margin:6px 0 2px}
+  .sub{color:var(--slabe);font-size:.92rem;margin:0 0 20px}
+
+  .crewgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+  .clen{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px 22px;
+        box-shadow:var(--shadow);transition:transform .18s ease,box-shadow .18s ease}
+  .clen:hover{transform:translateY(-3px);box-shadow:var(--shadow-h)}
+  .chead{display:flex;gap:14px;align-items:center;margin-bottom:12px}
+  .avatar{flex:none;width:62px;height:62px;border-radius:50%;display:flex;align-items:center;
+        justify-content:center;font-size:2rem;
+        background:linear-gradient(135deg,#e6f2fb,#f0faf5);border:1px solid var(--line);
+        box-shadow:inset 0 -3px 8px rgba(12,58,95,.06)}
+  .chead h2{margin:0;font-size:1.12rem;font-weight:800;color:var(--modra);letter-spacing:-.01em}
+  .chead .prof{color:var(--slabe);font-size:.84rem;font-weight:600;margin-top:1px}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}
+  .chips span{font-size:.72rem;font-weight:700;background:#e6f2fb;color:var(--modra);
+        padding:2px 10px;border-radius:999px}
+  .role{background:linear-gradient(150deg,#f0faf5,#fff);border:1px solid #cdeadd;
+        border-left:4px solid var(--aurora);border-radius:12px;padding:10px 13px;
+        font-size:.88rem;margin:0 0 12px}
+  .role b{color:var(--modra)}
+  .fakta{margin:0;font-size:.86rem}
+  .fakta div{display:flex;gap:8px;padding:5px 0;border-top:1px dashed #e6eef5}
+  .fakta div:first-child{border-top:0}
+  .fakta .k{flex:none;width:110px;color:var(--slabe);font-weight:700;font-size:.78rem;
+        text-transform:uppercase;letter-spacing:.03em;padding-top:2px}
+  .fakta .v{flex:1}
+
+  .notecard{margin-top:22px;background:#fff;border:1px solid var(--line);border-radius:16px;
+        padding:16px 20px;box-shadow:var(--shadow);font-size:.9rem;color:var(--slabe)}
+  .notecard b{color:var(--modra)}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <b>👨‍👩‍👧‍👦 Norsko 2026 — posádka expedice</b>
+  <a href="index.html">← rozcestník</a>
+</div>
+<div class="wrap">
+  <h1>Posádka expedice</h1>
+  <p class="sub">Rodinná expedice směr Norsko — každý má svou roli: někdo řídí, někdo plánuje, někdo přežívá s batoletem a psem.</p>
+
+  <div class="crewgrid">
+    <div class="clen">
+      <div class="chead"><div class="avatar">👴</div>
+        <div><h2>Ing. Jiří Dobšák</h2><div class="prof">stavební inženýr</div></div></div>
+      <div class="chips"><span>🎂 8. 11. 1960</span><span>♏ Štír</span><span>🎣 rybář</span></div>
+      <div class="role"><b>Role ve výpravě:</b> řidič a hlavní rybář expedice. Zajišťuje občasný přísun čerstvých ryb a dohled nad klidovou zónou u vody.</div>
+      <div class="fakta">
+        <div><span class="k">Oblíbené jídlo</span><span class="v">všechno, co se dá sníst</span></div>
+        <div><span class="k">Koníčky</span><span class="v">rybaření, myslivost, vaření, chataření a vše, co zahrnuje klid, přírodu a vodu</span></div>
+      </div>
+    </div>
+
+    <div class="clen">
+      <div class="chead"><div class="avatar">👵</div>
+        <div><h2>Mgr. Jaroslava Dobšáková</h2><div class="prof">ředitelka mateřské školy</div></div></div>
+      <div class="chips"><span>🎂 11. 4. 1966</span><span>♈ Beran</span><span>🍲 zásobování</span></div>
+      <div class="role"><b>Role ve výpravě:</b> správce jídelníčku a hlavní zásobovací jednotka expedice. Zajišťuje, aby nikdo netrpěl hlady ani stravovací anarchií.</div>
+      <div class="fakta">
+        <div><span class="k">Oblíbené jídlo</span><span class="v">to, co sama nemusí vařit</span></div>
+        <div><span class="k">Koníčky</span><span class="v">lyžování, aerobik, chataření, pes Monty, rodina a dohled nad tím, aby všichni ostatní fungovali správně</span></div>
+      </div>
+    </div>
+
+    <div class="clen">
+      <div class="chead"><div class="avatar">👨</div>
+        <div><h2>Ing. Vladimír Grmela</h2><div class="prof">projektový manažer</div></div></div>
+      <div class="chips"><span>🎂 18. 5. 1991</span><span>♉ Býk</span><span>💻 technika</span></div>
+      <div class="role"><b>Role ve výpravě:</b> řidič a technický mozek expedice. Autor tohoto webu a správce všech technických záležitostí — navigace, aplikace, mapy i digitální logistika.</div>
+      <div class="fakta">
+        <div><span class="k">Oblíbené jídlo</span><span class="v">všechno, co nevaří manželka</span></div>
+        <div><span class="k">Koníčky</span><span class="v">počítače, AI, podcasty, posilovna, turistika, cestování, běh (když ho manželka namotivuje), syn a psi</span></div>
+      </div>
+    </div>
+
+    <div class="clen">
+      <div class="chead"><div class="avatar">👩</div>
+        <div><h2>MUDr. Lucie Grmelová</h2><div class="prof">lékařka</div></div></div>
+      <div class="chips"><span>🎂 3. 6. 1994</span><span>♊ Blíženci</span><span>🧠 plánování</span></div>
+      <div class="role"><b>Role ve výpravě:</b> mozek celé expedice a hlavní plánovač cesty. Zodpovídá za itinerář, rezervace, harmonogram, logistiku a celkový přežitelný průběh výpravy.</div>
+      <div class="fakta">
+        <div><span class="k">Oblíbené jídlo</span><span class="v">to, co nemusí sama vařit</span></div>
+        <div><span class="k">Koníčky</span><span class="v">běh, sport, turistika, cestování, rodina, psi a snaha udržet domácí i cestovní realitu v provozuschopném stavu</span></div>
+      </div>
+    </div>
+
+    <div class="clen">
+      <div class="chead"><div class="avatar">👶</div>
+        <div><h2>Adam Grmela</h2><div class="prof">miminko na plný úvazek</div></div></div>
+      <div class="chips"><span>🎂 15. 3. 2025</span><span>♓ Ryby</span><span>⭐ šéf harmonogramu</span></div>
+      <div class="role"><b>Role ve výpravě:</b> nejmenší člen expedice s největším vlivem na denní harmonogram celé cesty.</div>
+      <div class="fakta">
+        <div><span class="k">Oblíbené jídlo</span><span class="v">avokádo, brokolice, kuřecí maso</span></div>
+        <div><span class="k">Koníčky</span><span class="v">trápení pejsků, testování trpělivosti rodičů, koupání, pískoviště, jízda v kočárku, bazének s balónky, noční směny a nepravidelný režim</span></div>
+      </div>
+    </div>
+
+    <div class="clen">
+      <div class="chead"><div class="avatar">🐶</div>
+        <div><h2>Monty</h2><div class="prof">King Charles španěl</div></div></div>
+      <div class="chips"><span>🎂 11. 1. 2018</span><span>♑ Kozoroh</span><span>🦴 psí parťák</span></div>
+      <div class="role"><b>Role ve výpravě:</b> klidný pozorovatel a spolehlivý parťák u vody i na cestách.</div>
+      <div class="fakta">
+        <div><span class="k">Oblíbené jídlo</span><span class="v">kapsičky, pamlsky</span></div>
+        <div><span class="k">Koníčky</span><span class="v">mlsání, spaní v posteli, aportování uzlíků, kontrola kvality pelechu a dohled nad správným rytmem dne</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="notecard">
+    🐾 <b>Monty a vstup do Norska:</b> mikročip, cestovní pas EU, očkování proti vzteklině min. 21 dní před vstupem
+    a odčervení proti tasemnici u veterináře 1–5 dní (24–120 h) před vstupem do Norska se záznamem v pasu.
+    Na hranici (v přístavu) se jede <b>červeným pruhem</b> ke kontrole. Na trajektu zůstává Monty v autě
+    (při rezervaci zvolit „Domácí mazlíčci v autě"); na plavbě Geirangerfjordem smí na palubu.
+  </div>
+</div>
+</body>
+</html>

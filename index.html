@@ -69,6 +69,17 @@
   .card .go i{font-style:normal;transition:transform .18s}
   a.card:hover .go i{transform:translateX(4px)}
 
+  /* ---------- ČÍSLA ---------- */
+  .cisla{margin:40px 0 0}
+  .cisla h2{font-size:1.4rem;font-weight:800;color:var(--modra);margin:0 0 14px;letter-spacing:-.01em}
+  .cgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px}
+  .cbox{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 10px;
+        text-align:center;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .cbox::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;
+        background:linear-gradient(90deg,var(--aurora),var(--modra2))}
+  .cbox b{display:block;font-size:1.45rem;font-weight:800;color:var(--modra);letter-spacing:-.02em}
+  .cbox span{font-size:.76rem;font-weight:600;color:var(--slabe)}
+
   /* ---------- GALERIE ---------- */
   .highlights{margin:40px 0 0}
   .highlights h2{font-size:1.4rem;font-weight:800;color:var(--modra);margin:0 0 4px;letter-spacing:-.01em}
@@ -122,7 +133,7 @@
     <p class="tagline">Průvodce cestou obytným vozem — fjordy, ledovce a hory</p>
     <p class="dates">18. 7. – 2. 8. 2026 · Modřice → Norsko → Modřice</p>
     <div class="meta">
-      <span>👨‍👩‍👧 4 dospělí + dítě + pes</span>
+      <span>👨‍👩‍👧‍👦 4 dospělí · Adam (16 měs.) · pes Monty</span>
       <span>🚐 CI Horon 84 M Elite</span>
       <span>⛴️ trajekt tam · mosty zpět</span>
     </div>
@@ -184,6 +195,16 @@
         <span class="go">Otevřít kalkulačku <i>→</i></span>
       </div>
     </a>
+    <a class="card" href="posadka.html" data-foto="u:photo-1531366936337-7c912a4589a7|w:Aurora">
+      <div class="cimg"><span class="ph">🏔️</span>
+        <img alt="" loading="lazy" referrerpolicy="no-referrer"></div>
+      <div class="ico">👨‍👩‍👧‍👦</div>
+      <div class="cbody">
+        <h2>Posádka expedice</h2>
+        <p>Kdo jede a jakou má roli — Jiří, Jaroslava, Vladimír, Lucie, malý Adam a pes Monty. Profily, role a pár věcí, které se hodí vědět.</p>
+        <span class="go">Poznat posádku <i>→</i></span>
+      </div>
+    </a>
     <a class="card" href="poznamky.html" data-foto="u:photo-1519681393784-d120267933ba|w:Bøyabreen">
       <div class="cimg"><span class="ph">🏔️</span><img alt="" loading="lazy" referrerpolicy="no-referrer"></div>
       <div class="ico">📝</div>
@@ -194,6 +215,20 @@
       </div>
     </a>
   </div>
+
+  <section class="cisla">
+    <h2>📊 Expedice v číslech</h2>
+    <div class="cgrid">
+      <div class="cbox"><b>16</b><span>dní na cestě</span></div>
+      <div class="cbox"><b>5</b><span>zemí</span></div>
+      <div class="cbox"><b>~5 400</b><span>km autem</span></div>
+      <div class="cbox"><b>~90</b><span>km pěšky</span></div>
+      <div class="cbox"><b>~5 000</b><span>výškových metrů</span></div>
+      <div class="cbox"><b>6–8</b><span>plaveb a trajektů</span></div>
+      <div class="cbox"><b>4</b><span>hlavní horské túry</span></div>
+      <div class="cbox"><b>~1 700</b><span>m n. m. nejvýš</span></div>
+    </div>
+  </section>
 
   <section class="highlights">
     <h2>✨ Co nás čeká</h2>
