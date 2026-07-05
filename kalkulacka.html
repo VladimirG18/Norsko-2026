@@ -67,6 +67,9 @@
            letter-spacing:.06em;margin:14px 0 2px;padding-top:10px;border-top:1px dashed #dbe7f0}
   .subhead2{font-size:.82rem;font-weight:800;color:var(--modra);margin:2px 0 4px}
   .subhead2 .hint{font-weight:400}
+  .checkrow{display:flex;align-items:flex-start;gap:8px;font-size:.82rem;color:var(--slabe);
+       margin:4px 0;cursor:pointer}
+  .checkrow input{margin-top:3px;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -92,9 +95,17 @@
       <li>samotný vůz (karoserie, podvozek, nástavba) a jeho pevná výbava od výrobce — vestavěný nábytek, kuchyňská linka, lednice, postele, sedačky</li>
       <li>nafta v nádrži a AdBlue doplněné do referenční hladiny (obvykle ~90 % nádrže) a motorový olej, chladicí kapalina a ostatní provozní náplně</li>
       <li>prázdné nádrže samotné (na vodu i odpad) a prázdná plynová lahev v držáku — jde jen o nádobu, ne o její obsah</li>
-      <li>paušálně počítaný řidič (75 kg) — je už součástí pohotovostní hmotnosti; skutečnou váhu posádky ale i tak raději počítej celou (viz níže), ať máš rezervu</li>
       <li>u tohoto vozu bez rezervy: pouze opravná sada na defekt (rezervní kolo tu není)</li>
     </ul>
+    <div class="subhead2" style="margin-top:12px">Paušály, které výrobce už dal do pohotovostní hmotnosti <span class="hint">zaškrtni, čemu věříš — pak se to neodečítá z 485 kg navíc</span></div>
+    <label class="checkrow">
+      <input type="checkbox" id="cb_ridic">
+      <span>Řidič (paušál 75 kg) je už v pohotovostní hmotnosti — nepočítat ho podruhé do 485 kg</span>
+    </label>
+    <label class="checkrow">
+      <input type="checkbox" id="cb_voda20">
+      <span>20 l vody je už v pohotovostní hmotnosti — nepočítat těch 20 l podruhé do 485 kg</span>
+    </label>
     <p class="note" style="margin:0 0 8px">
       Naopak do 485 kg <b>se počítá</b> vše, co se do vozu navíc naloží nebo doplní: celá
       posádka (i řidič), voda nalitá do nádrže, plyn v lahvi, jídlo a nádobí, zavazadla i pes —
@@ -284,13 +295,16 @@ const EQUIP={
             'doplnky','elektro','naradi','provoz']
 };
 const MODES=['zakladni','podrobna'];
+// paušály z pohotovostní hmotnosti — checkbox rozhodne, jestli se odečtou z naloženého (výrobce už s nimi počítá)
+const CHECKS=['cb_ridic','cb_voda20'];
 // výchozí hodnoty + režim (naplní se jen při prvním načtení do prázdné databáze)
 const DEFAULTS={mode:'zakladni',
   dosp_lucie:75,dosp_vladimir:75,dosp_jirka:75,dosp_jarka:75,dite_kg:15,pes:20,obleceni:40,voda:40,
   jidlo:35,outdoor:25,ostatni:20,
   hygiena:6,dite:12,pes_vyb:10,jidlo_trvanlive:18,jidlo_cerstve:12,
   piti_nealko:10,piti_alko:6,kuchyne:10,outdoor_obuv:15,batohy:8,
-  doplnky:15,elektro:5,naradi:8,provoz:10};
+  doplnky:15,elektro:5,naradi:8,provoz:10,
+  cb_ridic:false,cb_voda20:false};
 
 const $ = id => document.getElementById(id);
 const statusEl = $('status');
@@ -298,7 +312,10 @@ let mode='zakladni';
 function num(id){return Math.max(0,parseFloat($(id).value)||0)}
 function prepocet(){
   const crew = ADULTS.reduce((s,id)=>s+num(id),0) + num('dite_kg') + num('pes');
-  const naloz = crew + EQUIP[mode].reduce((s,id)=>s+num(id),0);
+  let naloz = crew + EQUIP[mode].reduce((s,id)=>s+num(id),0);
+  if($('cb_ridic').checked) naloz -= 75;
+  if($('cb_voda20').checked) naloz -= Math.min(20, num('voda'));
+  naloz = Math.max(0, naloz);
   const zbyva = LIMIT - naloz;
   $('naloz').textContent = Math.round(naloz)+' kg';
   const z=$('zbyva');
@@ -332,6 +349,10 @@ function applyState(state){
     const v=String(state[id]);
     if(el.value!==v) el.value=v;
   }
+  for(const id of CHECKS){
+    if(state[id]==null) continue;
+    $(id).checked = !!state[id];
+  }
   applyMode(state.mode||mode);
 }
 
@@ -343,6 +364,7 @@ function pushChange(id){
   timers[id]=setTimeout(()=> backend.set(id, num(id)), 350);
 }
 ids.forEach(id=> $(id).addEventListener('input', ()=>{ prepocet(); pushChange(id); }));
+CHECKS.forEach(id=> $(id).addEventListener('change', ()=>{ prepocet(); backend.set(id, $(id).checked); }));
 // přepínač režimu – sdílený pro celou posádku
 document.querySelectorAll('#modes .mode').forEach(b=>
   b.addEventListener('click', ()=>{ applyMode(b.dataset.mode); backend.set('mode', b.dataset.mode); }));
