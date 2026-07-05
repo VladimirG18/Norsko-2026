@@ -29,8 +29,13 @@
 
   .crewgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
   .clen{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px 22px;
-        box-shadow:var(--shadow);transition:transform .18s ease,box-shadow .18s ease}
+        box-shadow:var(--shadow);transition:transform .18s ease,box-shadow .18s ease;overflow:hidden}
   .clen:hover{transform:translateY(-3px);box-shadow:var(--shadow-h)}
+  .cphoto{margin:-20px -22px 16px;height:260px;overflow:hidden;
+        background:linear-gradient(150deg,#c9dded,#e8f1f7);position:relative}
+  .cphoto img{width:100%;height:100%;object-fit:cover;object-position:center 22%;display:block;
+        transition:transform .4s ease}
+  .clen:hover .cphoto img{transform:scale(1.04)}
   .chead{display:flex;gap:14px;align-items:center;margin-bottom:12px}
   .avatar{flex:none;width:62px;height:62px;border-radius:50%;display:flex;align-items:center;
         justify-content:center;font-size:2rem;
@@ -68,6 +73,7 @@
 
   <div class="crewgrid">
     <div class="clen">
+      <div class="cphoto"><img src="foto/jiri.jpg" alt="Jiří Dobšák" loading="lazy"></div>
       <div class="chead"><div class="avatar">👴</div>
         <div><h2>Ing. Jiří Dobšák</h2><div class="prof">stavební inženýr</div></div></div>
       <div class="chips"><span>🎂 8. 11. 1960</span><span>♏ Štír</span><span>🎣 rybář</span></div>
@@ -79,6 +85,7 @@
     </div>
 
     <div class="clen">
+      <div class="cphoto"><img src="foto/jaroslava.jpg" alt="Jaroslava Dobšáková" loading="lazy"></div>
       <div class="chead"><div class="avatar">👵</div>
         <div><h2>Mgr. Jaroslava Dobšáková</h2><div class="prof">ředitelka mateřské školy</div></div></div>
       <div class="chips"><span>🎂 11. 4. 1966</span><span>♈ Beran</span><span>🍲 zásobování</span></div>
@@ -90,6 +97,7 @@
     </div>
 
     <div class="clen">
+      <div class="cphoto"><img src="foto/vladimir.jpg" alt="Vladimír Grmela" loading="lazy"></div>
       <div class="chead"><div class="avatar">👨</div>
         <div><h2>Ing. Vladimír Grmela</h2><div class="prof">projektový manažer</div></div></div>
       <div class="chips"><span>🎂 18. 5. 1991</span><span>♉ Býk</span><span>💻 technika</span></div>
@@ -101,6 +109,7 @@
     </div>
 
     <div class="clen">
+      <div class="cphoto"><img src="foto/lucie.jpg" alt="Lucie Grmelová" loading="lazy"></div>
       <div class="chead"><div class="avatar">👩</div>
         <div><h2>MUDr. Lucie Grmelová</h2><div class="prof">lékařka</div></div></div>
       <div class="chips"><span>🎂 3. 6. 1994</span><span>♊ Blíženci</span><span>🧠 plánování</span></div>
@@ -112,6 +121,7 @@
     </div>
 
     <div class="clen">
+      <div class="cphoto"><img src="foto/adam.jpg" alt="Adam Grmela" loading="lazy" style="object-position:center 45%"></div>
       <div class="chead"><div class="avatar">👶</div>
         <div><h2>Adam Grmela</h2><div class="prof">miminko na plný úvazek</div></div></div>
       <div class="chips"><span>🎂 15. 3. 2025</span><span>♓ Ryby</span><span>⭐ šéf harmonogramu</span></div>
@@ -123,6 +133,7 @@
     </div>
 
     <div class="clen">
+      <div class="cphoto"><img src="foto/monty.jpg" alt="Monty" loading="lazy" style="object-position:center 45%"></div>
       <div class="chead"><div class="avatar">🐶</div>
         <div><h2>Monty</h2><div class="prof">King Charles španěl</div></div></div>
       <div class="chips"><span>🎂 11. 1. 2018</span><span>♑ Kozoroh</span><span>🦴 psí parťák</span></div>
