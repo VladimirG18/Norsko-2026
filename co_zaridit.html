@@ -118,6 +118,8 @@
   .group-head .dot{width:10px;height:10px;border-radius:50%;background:#cdd9e3;flex:none}
   .group-head .dot.w-lucie{background:#e0539c}.group-head .dot.w-vladimir{background:#2f74cc}
   .group-head .dot.w-jiri{background:#2aa468}.group-head .dot.w-jaroslava{background:#9159c4}
+  .group-head .dot.p-red{background:var(--red)}.group-head .dot.p-yellow{background:var(--yellow)}
+  .group-head .dot.p-green{background:var(--green)}
   .answer{margin-top:7px;background:#eef3f7;border:1px solid #cdd9e3;border-radius:8px;
           padding:7px 10px;font-size:.9rem;cursor:pointer}
   .answer b{color:var(--modra)}
@@ -193,6 +195,8 @@
     <select id="fGroup">
       <option value="">Bez seskupení</option>
       <option value="who">👥 Seskupit podle řešitele</option>
+      <option value="cat">🏷️ Seskupit podle kategorie</option>
+      <option value="prio">🚦 Seskupit podle priority</option>
     </select>
     <button class="btn ghost" id="clearF">Zrušit filtry</button>
     <button class="btn ghost" id="printBtn">🖨️ Tisk</button>
@@ -389,6 +393,33 @@ function render(){
     };
     for(const person of PEOPLE) renderGroup(person, vis.filter(it => whoArr(it).includes(person)));
     renderGroup('', vis.filter(it => whoArr(it).length === 0));
+    return;
+  }
+  if(grouping === 'cat'){
+    const renderCatGroup = (cat, grp) => {
+      if(!grp.length) return;
+      const head = document.createElement('div');
+      head.className = 'group-head';
+      head.innerHTML = `<span class="dot"></span>🏷️ ${esc(cat||'Bez kategorie')}`
+        + ` <span class="cnt">(${grp.filter(i=>!i.done).length} nehotových / ${grp.length})</span>`;
+      listEl.appendChild(head);
+      for(const it of grp) listEl.appendChild(makeRow(it, blocked));
+    };
+    for(const cat of CATS) renderCatGroup(cat, vis.filter(it => it.cat === cat));
+    renderCatGroup('', vis.filter(it => !CATS.includes(it.cat)));
+    return;
+  }
+  if(grouping === 'prio'){
+    const renderPrioGroup = (p, grp) => {
+      if(!grp.length) return;
+      const head = document.createElement('div');
+      head.className = 'group-head';
+      head.innerHTML = `<span class="dot p-${p}"></span>${PRIO_LABEL[p]}`
+        + ` <span class="cnt">(${grp.filter(i=>!i.done).length} nehotových / ${grp.length})</span>`;
+      listEl.appendChild(head);
+      for(const it of grp) listEl.appendChild(makeRow(it, blocked));
+    };
+    for(const p of ['red','yellow','green']) renderPrioGroup(p, vis.filter(it => it.prio === p));
     return;
   }
   for(const it of vis) listEl.appendChild(makeRow(it, blocked));
