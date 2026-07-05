@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a2c49">
+<title>Norsko 2026 — výdaje</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--modra:#0c3a5f;--modra2:#1a6ea8;--led:#eef4f9;--akcent:#c0392b;
+        --text:#182634;--slabe:#5d6e7d;--aurora:#2fbf8f;--line:#dfe9f2;
+        --green:#1f8f57;
+        --shadow:0 1px 2px rgba(12,58,95,.05),0 8px 24px rgba(12,58,95,.09)}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Manrope',-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+       color:var(--text);background:linear-gradient(180deg,#f6fafd 0%,var(--led) 260px);line-height:1.55}
+  .topbar{background:linear-gradient(120deg,#0a2c49 0%,#155a8c 100%);color:#fff;padding:12px 18px;display:flex;
+          justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;
+          border-bottom:3px solid;border-image:linear-gradient(90deg,var(--aurora),#3a9bd5,#8b7bd8) 1;
+          box-shadow:0 2px 14px rgba(10,44,73,.22)}
+  .topbar b{font-size:.98rem;letter-spacing:-.01em}
+  .topbar a{color:#bfe0f5;text-decoration:none;font-size:.9rem;font-weight:600}
+  .topbar a:hover{color:#fff}
+  .wrap{max-width:880px;margin:22px auto 44px;padding:0 14px}
+  h1{color:var(--modra);font-size:1.7rem;font-weight:800;letter-spacing:-.02em;margin:6px 0 2px}
+  .sub{color:var(--slabe);font-size:.92rem;margin:0 0 14px}
+
+  .statusbar{font-size:.82rem;color:var(--slabe);padding:10px 14px;border:1px solid var(--line);
+             border-radius:12px;margin:4px 0 14px;background:#fff;box-shadow:var(--shadow)}
+  .statusbar.ok{color:#1f8f57;border-color:#9bd9b5;background:#f1faf4}
+  .statusbar.warn{color:#9a6b00;border-color:#e8cf8a;background:#fdf8ea}
+
+  /* nastavení kurzu a měny souhrnu */
+  .settings{background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px 16px;
+            margin:0 0 14px;box-shadow:var(--shadow);display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+  .settings .lbl{font-size:.85rem;font-weight:700;color:var(--slabe)}
+  .settings input[type=number]{width:90px;background:#fff;color:var(--text);border:1px solid #c8d7e4;
+       border-radius:10px;padding:8px 10px;font:inherit;font-weight:700}
+  .settings input[type=number]:focus{outline:none;border-color:var(--modra2);
+       box-shadow:0 0 0 3px rgba(26,110,168,.15)}
+  .pills{display:inline-flex;gap:4px;background:#eef3f7;border-radius:999px;padding:3px}
+  .pills button{border:0;background:none;color:var(--slabe);font:inherit;font-size:.84rem;font-weight:700;
+       padding:6px 14px;border-radius:999px;cursor:pointer;transition:background .15s,color .15s}
+  .pills button.on{background:linear-gradient(120deg,var(--modra),var(--modra2));color:#fff;
+       box-shadow:0 2px 8px rgba(12,58,95,.25)}
+  .kurznote{font-size:.76rem;color:var(--slabe);flex-basis:100%}
+
+  /* souhrn */
+  .sumgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:0 0 14px}
+  .sumbox{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px;
+          box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .sumbox::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;
+          background:linear-gradient(90deg,var(--aurora),var(--modra2))}
+  .sumbox .k{font-size:.74rem;font-weight:700;color:var(--slabe);text-transform:uppercase;letter-spacing:.03em}
+  .sumbox .v{font-size:1.22rem;font-weight:800;color:var(--modra);letter-spacing:-.01em;margin-top:2px}
+  .sumbox .v small{display:block;font-size:.8rem;font-weight:700;color:var(--slabe)}
+  .catsum{background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px 16px;
+          margin:0 0 16px;box-shadow:var(--shadow)}
+  .catsum h2{margin:0 0 8px;font-size:.95rem;font-weight:800;color:var(--modra)}
+  .catrow{display:flex;justify-content:space-between;gap:10px;padding:5px 0;font-size:.88rem;
+          border-top:1px dashed #e6eef5}
+  .catrow:first-of-type{border-top:0}
+  .catrow b{color:var(--modra);white-space:nowrap}
+
+  /* formulář */
+  .addform{background:#fff;border:1px solid var(--line);border-radius:14px;padding:15px;
+           margin:0 0 14px;box-shadow:var(--shadow)}
+  .addform .frow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .addform input[type=text]{flex:1;min-width:170px;background:#fff;color:var(--text);
+       border:1px solid #c8d7e4;border-radius:10px;padding:9px 12px;font:inherit;
+       transition:border-color .15s,box-shadow .15s}
+  .addform input[type=number]{width:110px;background:#fff;color:var(--text);
+       border:1px solid #c8d7e4;border-radius:10px;padding:9px 12px;font:inherit}
+  .addform input:focus{outline:none;border-color:var(--modra2);box-shadow:0 0 0 3px rgba(26,110,168,.15)}
+  select{background:#fff;color:var(--text);border:1px solid #c8d7e4;
+       border-radius:10px;padding:8px 10px;font:inherit}
+  .btn{background:linear-gradient(120deg,var(--modra),var(--modra2));border:0;color:#fff;font-weight:700;
+       border-radius:10px;padding:10px 17px;cursor:pointer;font:inherit;
+       box-shadow:0 4px 12px rgba(12,58,95,.22);transition:transform .15s,box-shadow .15s}
+  .btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(12,58,95,.30)}
+  .btn.ghost{background:#fff;color:var(--modra);border:1px solid var(--line);box-shadow:none}
+  .btn.ghost:hover{background:#e6f2fb;transform:none}
+
+  /* filtry */
+  .filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 12px}
+  .filters input[type=text]{flex:1;min-width:150px;background:#fff;color:var(--text);
+       border:1px solid #cdd9e3;border-radius:8px;padding:8px 10px;font:inherit}
+
+  /* seznam */
+  .list{display:flex;flex-direction:column;gap:8px;margin-bottom:24px}
+  .item{display:flex;align-items:flex-start;gap:10px;background:#fff;border:1px solid var(--line);
+        border-radius:12px;padding:11px 13px;
+        box-shadow:0 2px 8px rgba(12,58,95,.06);transition:box-shadow .15s,border-color .15s}
+  .item:hover{border-color:#cfe0ee;box-shadow:0 4px 14px rgba(12,58,95,.10)}
+  .item .body{flex:1;min-width:0}
+  .item .txt{font-size:.94rem;word-wrap:break-word;cursor:pointer}
+  .item .meta{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:5px}
+  .tag{font-size:.72rem;color:var(--slabe);background:#eef3f7;border-radius:20px;padding:2px 8px;cursor:pointer}
+  .who-badge{font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:20px;cursor:pointer;
+       border:1px solid #cdd9e3;background:#eef3f7;color:var(--slabe)}
+  .who-badge.w-lucie{background:#fde7f1;color:#b0306a;border-color:#f3bcd6}
+  .who-badge.w-vladimir{background:#e7f0fb;color:#1d5fa8;border-color:#bcd6f3}
+  .who-badge.w-jiri{background:#e6f7ee;color:#1f8f57;border-color:#bce6cf}
+  .who-badge.w-jaroslava{background:#f3ebfb;color:#7a3fb0;border-color:#dcc7f0}
+  .who-badge.w-spolecne{background:#fff1e0;color:#b06a00;border-color:#f0d9b0}
+  .when{font-size:.72rem;color:var(--slabe)}
+  .note-badge{font-size:.78rem;color:var(--slabe);margin-top:4px;font-style:italic}
+  .amount{flex:none;text-align:right;cursor:pointer;min-width:96px}
+  .amount b{display:block;font-size:1rem;font-weight:800;color:var(--modra);white-space:nowrap}
+  .amount .conv{font-size:.74rem;color:var(--slabe);white-space:nowrap}
+  .amount .missing{color:var(--akcent);font-size:.78rem;font-weight:700}
+  .curbadge{font-size:.7rem;font-weight:800;padding:1px 7px;border-radius:20px;cursor:pointer;
+       border:1px solid #bcd6f3;background:#e7f0fb;color:#1d5fa8;display:inline-block;margin-top:3px}
+  .curbadge.nok{background:#fdecea;color:#b03a2e;border-color:#f3c5bd}
+  .acts{display:flex;flex-direction:column;gap:2px;flex:none}
+  .iconbtn{background:none;border:none;color:var(--slabe);cursor:pointer;font-size:.95rem;
+           padding:3px 6px;border-radius:6px;line-height:1}
+  .iconbtn:hover{background:var(--led);color:var(--modra)}
+  .iconbtn.del:hover{color:var(--akcent);background:#fdecea}
+  .empty{color:var(--slabe);font-style:italic;padding:18px 4px;text-align:center}
+  .note{margin-top:6px;font-size:.8rem;color:var(--slabe);font-style:italic}
+
+  @media print{
+    .topbar,.addform,.filters,.statusbar,.acts,.note{display:none}
+    body{background:#fff}.item{box-shadow:none;break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <b>💰 Norsko 2026 — výdaje</b>
+  <span><a href="index.html">← rozcestník</a> &nbsp; <a href="pruvodce.html">průvodce →</a></span>
+</div>
+<div class="wrap">
+  <h1>Výdaje</h1>
+  <p class="sub">Sdílená evidence výdajů celé expedice. Ceny zapisuj v <b>Kč</b> nebo <b>NOK</b> — souhrn se přepočítá
+     podle nastaveného kurzu a zobrazí v měně, kterou si zvolíš (nebo v obou najednou).
+     Klikem na text výdaj přejmenuješ, klikem na částku ji upravíš, klikem na štítek měny/kategorie/osoby je přepneš.</p>
+
+  <div id="status" class="statusbar"></div>
+
+  <div class="settings">
+    <span class="lbl">💱 Kurz:</span>
+    <span>1 NOK = <input type="number" id="kurz" step="0.01" min="0.5" max="10" value="2.10"> Kč</span>
+    <span class="lbl">Souhrn v:</span>
+    <span class="pills" id="modePills">
+      <button data-m="CZK">Kč</button>
+      <button data-m="NOK">NOK</button>
+      <button data-m="BOTH" class="on">Kč + NOK</button>
+    </span>
+    <span class="kurznote">Kurz je sdílený pro celou posádku (změna se propíše všem). Volba měny souhrnu je jen tvoje — každý si může zobrazit, co mu vyhovuje.</span>
+  </div>
+
+  <div class="sumgrid" id="sumGrid"></div>
+
+  <div class="catsum" id="catSum"></div>
+
+  <div class="addform">
+    <div class="frow">
+      <input type="text" id="newText" placeholder="Nový výdaj (např. nafta, kemp, nákup KIWI…)">
+      <input type="number" id="newAmount" placeholder="Částka" min="0" step="1">
+      <select id="newCur">
+        <option value="NOK">NOK</option>
+        <option value="CZK">Kč</option>
+      </select>
+      <select id="newCat"></select>
+      <select id="newWho">
+        <option value="">👤 platil…</option>
+        <option value="Společné">Společné</option>
+        <option value="Lucie">Lucie</option>
+        <option value="Vladimír">Vladimír</option>
+        <option value="Jiří">Jiří</option>
+        <option value="Jaroslava">Jaroslava</option>
+      </select>
+      <button class="btn" id="addBtn">Přidat</button>
+    </div>
+  </div>
+
+  <div class="filters">
+    <input type="text" id="fSearch" placeholder="🔎 hledat…">
+    <select id="fCat"><option value="">Všechny kategorie</option></select>
+    <select id="fWho">
+      <option value="">Všichni</option>
+      <option value="Společné">Společné</option>
+      <option value="Lucie">Lucie</option>
+      <option value="Vladimír">Vladimír</option>
+      <option value="Jiří">Jiří</option>
+      <option value="Jaroslava">Jaroslava</option>
+    </select>
+    <button class="btn ghost" id="clearF">Zrušit filtry</button>
+    <button class="btn ghost" id="printBtn">🖨️ Tisk</button>
+  </div>
+
+  <div class="list" id="list"></div>
+
+  <p class="note" id="footnote"></p>
+</div>
+
+<script type="module">
+// Sdílený online backend (Firebase / Firestore) – výdaje vidí celá posádka v reálném čase.
+// Stejný projekt jako poznámky a checklisty, ale vlastní kolekce, ať se data nemíchají.
+const firebaseConfig = {
+  apiKey: "AIzaSyCLU7cH1tXPqnaxVV_-BsSNssl-NU9Pz1I",
+  authDomain: "rd-modrice-e9477.firebaseapp.com",
+  projectId: "rd-modrice-e9477",
+  storageBucket: "rd-modrice-e9477.firebasestorage.app",
+  messagingSenderId: "941681195558",
+  appId: "1:941681195558:web:3aac10f182e784cdb3c4e7"
+};
+const COLLECTION = 'vydaje-norsko';
+const CONFIG_ID = '__nastaveni';          // dokument s kurzem, není to výdaj
+const KEY = 'norsko2026-vydaje-v1';
+
+const CATS = ['Doprava a trajekty','Parkování','Kempy a nocleh','Aktivity a plavby','Jídlo a nákupy','Nafta','Ostatní'];
+const PEOPLE = ['Společné','Lucie','Vladimír','Jiří','Jaroslava'];
+const DEFAULT_KURZ = 2.10;
+
+// Výchozí výdaje ze známých cen v itineráři (naplní se jen do prázdné databáze).
+// [kategorie, text, částka, měna, kdo, poznámka]  — částka 0 = cenu doplníme.
+const SEED = [
+  ['Doprava a trajekty','Trajekt Hirtshals → Kristiansand', 0,'NOK','','cenu doplnit z rezervace (Fjord Line / Color Line)'],
+  ['Doprava a trajekty','Most Storebælt (koupit online)', 2190,'CZK','','645 DKK — motorhome do 10 m, storebaelt.dk'],
+  ['Doprava a trajekty','Program Øresundgo', 1260,'CZK','','370 DKK — zákaznický program, zlevní průjezd mostu'],
+  ['Doprava a trajekty','Most Øresund s Øresundgo', 1240,'CZK','','364 DKK — motorhome 6–10 m, oresundsbron.com'],
+  ['Doprava a trajekty','Mýto Norsko (AutoPASS)', 0,'NOK','','vyúčtuje se automaticky po cestě — doplnit po příjezdu'],
+  ['Doprava a trajekty','Shuttle Trolltunga P2 → P3 (4 × 150)', 600,'NOK','','rezervovat dopředu — trolltunganorway.com'],
+  ['Doprava a trajekty','Shuttle Trolltunga zpět (4 × 100)', 400,'NOK','','kupuje se na místě'],
+  ['Parkování','Parkování Stavanger — Sandviga (~2 h)', 60,'NOK','','30 NOK/h, platba přes EasyPark'],
+  ['Parkování','Parkování Preikestolen P1', 275,'NOK','','~600 Kč / den'],
+  ['Parkování','Parkování Bondhusdalen', 125,'NOK','','odpadá, pokud necháme auto v kempu'],
+  ['Parkování','Parkování + mýto Trolltunga P2 (Skjeggedal)', 500,'NOK',''],
+  ['Parkování','Parkování Ålesund (24 h)', 375,'NOK',''],
+  ['Parkování','Parkování Reinsvangen — Gjendesheim', 0,'NOK','','rezervace na SPZ! visitgjende.onepark.no — cenu doplnit'],
+  ['Kempy a nocleh','Sundal Camping (noc 21. 7.)', 320,'NOK','','sprchy, zázemí, blízko Bondhusvatnet'],
+  ['Kempy a nocleh','Kemp Lovatnet (noc 24. 7.)', 450,'NOK','','400–500 NOK, sprchy + pračka'],
+  ['Kempy a nocleh','Snillfjord camping (noc 27. 7.)', 0,'NOK','','cenu doplnit'],
+  ['Aktivity a plavby','Plavba Geirangerfjord — hybridní loď (4 × 630)', 2520,'NOK','','rezervovat — visitgeiranger.com, ideálně 12:30'],
+  ['Aktivity a plavby','Loď Gjendesheim ↔ Memurubu (Besseggen)', 0,'NOK','','koupit dopředu — gjende.no, cenu doplnit'],
+];
+
+const $ = id => document.getElementById(id);
+const listEl=$('list'), statusEl=$('status'), footEl=$('footnote');
+const fSearch=$('fSearch'), fCat=$('fCat'), fWho=$('fWho');
+const kurzEl=$('kurz');
+
+for(const c of CATS){
+  fCat.insertAdjacentHTML('beforeend', `<option value="${c}">${c}</option>`);
+  $('newCat').insertAdjacentHTML('beforeend', `<option value="${c}">${c}</option>`);
+}
+
+let items = [];
+let kurz = DEFAULT_KURZ;
+let mode = localStorage.getItem(KEY+'-mode') || 'BOTH';
+
+const esc = s => (s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const whoSlug = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+const fmtDate = ts => ts ? new Date(ts).toLocaleDateString('cs-CZ') : '';
+const fmtNum = v => Math.round(v).toLocaleString('cs-CZ');
+const fmtMoney = (v,cur) => fmtNum(v) + (cur==='CZK' ? ' Kč' : ' NOK');
+
+function toCZK(it){ return it.cur==='CZK' ? it.amount : it.amount*kurz; }
+function toNOK(it){ return it.cur==='NOK' ? it.amount : (kurz>0 ? it.amount/kurz : 0); }
+
+// ---------- souhrn ----------
+function sumLabel(czk, nok){
+  if(mode==='CZK') return `<b>${fmtMoney(czk,'CZK')}</b>`;
+  if(mode==='NOK') return `<b>${fmtMoney(nok,'NOK')}</b>`;
+  return `<b>${fmtMoney(czk,'CZK')}</b> · ${fmtMoney(nok,'NOK')}`;
+}
+function renderSummary(){
+  const czk = items.reduce((s,i)=>s+toCZK(i),0);
+  const nok = items.reduce((s,i)=>s+toNOK(i),0);
+  const missing = items.filter(i=>!i.amount).length;
+  const sg=$('sumGrid');
+  const totalV = mode==='CZK' ? fmtMoney(czk,'CZK')
+              : mode==='NOK' ? fmtMoney(nok,'NOK')
+              : `${fmtMoney(czk,'CZK')}<small>≈ ${fmtMoney(nok,'NOK')}</small>`;
+  sg.innerHTML = `
+    <div class="sumbox"><div class="k">Celkem</div><div class="v">${totalV}</div></div>
+    <div class="sumbox"><div class="k">Počet výdajů</div><div class="v">${items.length}${missing?`<small>${missing}× bez ceny</small>`:''}</div></div>
+    <div class="sumbox"><div class="k">Zapsáno v Kč</div><div class="v">${fmtMoney(items.filter(i=>i.cur==='CZK').reduce((s,i)=>s+i.amount,0),'CZK')}</div></div>
+    <div class="sumbox"><div class="k">Zapsáno v NOK</div><div class="v">${fmtMoney(items.filter(i=>i.cur==='NOK').reduce((s,i)=>s+i.amount,0),'NOK')}</div></div>`;
+
+  const cs=$('catSum');
+  let rows='';
+  for(const c of CATS){
+    const grp = items.filter(i=>i.cat===c);
+    if(!grp.length) continue;
+    rows += `<div class="catrow"><span>${esc(c)} <span style="color:var(--slabe)">(${grp.length})</span></span>
+             <span>${sumLabel(grp.reduce((s,i)=>s+toCZK(i),0), grp.reduce((s,i)=>s+toNOK(i),0))}</span></div>`;
+  }
+  const other = items.filter(i=>!CATS.includes(i.cat));
+  if(other.length)
+    rows += `<div class="catrow"><span>Bez kategorie (${other.length})</span>
+             <span>${sumLabel(other.reduce((s,i)=>s+toCZK(i),0), other.reduce((s,i)=>s+toNOK(i),0))}</span></div>`;
+  cs.innerHTML = `<h2>📊 Podle kategorií</h2>` + (rows || '<div class="empty">Zatím žádné výdaje.</div>');
+}
+
+// ---------- seznam ----------
+function visibleItems(){
+  const q = fSearch.value.trim().toLowerCase();
+  return items.filter(it=>{
+    if(fCat.value && it.cat !== fCat.value) return false;
+    if(fWho.value && it.who !== fWho.value) return false;
+    if(q && !(it.text||'').toLowerCase().includes(q)) return false;
+    return true;
+  });
+}
+
+function makeRow(it){
+  const row=document.createElement('div');
+  row.className='item';
+  const conv = it.amount
+    ? (it.cur==='CZK' ? `≈ ${fmtMoney(toNOK(it),'NOK')}` : `≈ ${fmtMoney(toCZK(it),'CZK')}`)
+    : '';
+  row.innerHTML = `
+    <div class="body">
+      <div class="txt" title="Klikni pro úpravu názvu">${esc(it.text)}</div>
+      <div class="meta">
+        <span class="tag" title="Klikni pro změnu kategorie">🏷️ ${esc(it.cat||'Ostatní')}</span>
+        <span class="who-badge w-${whoSlug(it.who)||'none'}" title="Klikni pro změnu, kdo platil">${it.who?'👤 '+esc(it.who):'👤 platil…'}</span>
+        <span class="when">${fmtDate(it.ts)}</span>
+      </div>
+      ${it.pozn?`<div class="note-badge">📝 ${esc(it.pozn)}</div>`:''}
+    </div>
+    <div class="amount" title="Klikni pro úpravu částky">
+      ${it.amount ? `<b>${fmtMoney(it.amount,it.cur)}</b><span class="conv">${conv}</span>`
+                  : `<span class="missing">doplnit cenu</span>`}
+      <span class="curbadge ${it.cur==='NOK'?'nok':''}" title="Klikni pro přepnutí měny">${it.cur==='CZK'?'Kč':'NOK'}</span>
+    </div>
+    <div class="acts">
+      <button class="iconbtn ans" title="${it.pozn?'Upravit poznámku':'Přidat poznámku'}">💬</button>
+      <button class="iconbtn del" title="Smazat">🗑</button>
+    </div>`;
+
+  row.querySelector('.txt').addEventListener('click', ()=>{
+    const t=prompt('Upravit název výdaje:', it.text);
+    if(t!=null && t.trim()) backend.update(it.id,{text:t.trim()});
+  });
+  row.querySelector('.amount').addEventListener('click', e=>{
+    if(e.target.classList.contains('curbadge')) return;
+    const a=prompt(`Částka v ${it.cur==='CZK'?'Kč':'NOK'}:`, it.amount||'');
+    if(a===null) return;
+    const v=parseFloat(String(a).replace(',','.'));
+    if(!isNaN(v) && v>=0) backend.update(it.id,{amount:v});
+  });
+  row.querySelector('.curbadge').addEventListener('click', e=>{
+    e.stopPropagation();
+    backend.update(it.id,{cur: it.cur==='CZK'?'NOK':'CZK'});
+  });
+  row.querySelector('.tag').addEventListener('click', ()=>{
+    const i=CATS.indexOf(it.cat);
+    backend.update(it.id,{cat: CATS[(i+1)%CATS.length]});
+  });
+  row.querySelector('.who-badge').addEventListener('click', ()=>{
+    const opts=['',...PEOPLE];
+    const i=opts.indexOf(it.who||'');
+    backend.update(it.id,{who: opts[(i+1)%opts.length]});
+  });
+  row.querySelector('.ans').addEventListener('click', ()=>{
+    const a=prompt('Poznámka k výdaji (prázdné pole poznámku smaže):', it.pozn||'');
+    if(a===null) return;
+    backend.update(it.id,{pozn:a.trim()});
+  });
+  row.querySelector('.del').addEventListener('click', ()=>{
+    if(confirm('Smazat tento výdaj?')) backend.remove(it.id);
+  });
+  return row;
+}
+
+function render(){
+  renderSummary();
+  kurzEl.value = kurz;
+  const vis = visibleItems().slice().sort((a,b)=>(b.ts||0)-(a.ts||0));
+  listEl.innerHTML='';
+  if(!vis.length){
+    listEl.innerHTML = `<div class="empty">${items.length?'Nic neodpovídá filtru.':'Zatím tu nejsou žádné výdaje.'}</div>`;
+    return;
+  }
+  for(const it of vis) listEl.appendChild(makeRow(it));
+}
+
+// ---------- ovládání ----------
+document.querySelectorAll('#modePills button').forEach(b=>{
+  if(b.dataset.m===mode){document.querySelectorAll('#modePills button').forEach(x=>x.classList.remove('on'));b.classList.add('on');}
+  b.addEventListener('click', ()=>{
+    mode=b.dataset.m;
+    localStorage.setItem(KEY+'-mode', mode);
+    document.querySelectorAll('#modePills button').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    render();
+  });
+});
+
+let kurzTimer=null;
+kurzEl.addEventListener('input', ()=>{
+  const v=parseFloat(kurzEl.value);
+  if(isNaN(v) || v<=0) return;
+  kurz=v; renderSummary();
+  clearTimeout(kurzTimer);
+  kurzTimer=setTimeout(()=> backend.saveKurz(v), 600);
+});
+
+$('addBtn').addEventListener('click', ()=>{
+  const text=$('newText').value.trim();
+  if(!text){ $('newText').focus(); return; }
+  const v=parseFloat(String($('newAmount').value).replace(',','.'));
+  backend.add({text, amount:(!isNaN(v)&&v>=0)?v:0, cur:$('newCur').value,
+               cat:$('newCat').value, who:$('newWho').value, pozn:'', ts:Date.now()});
+  $('newText').value=''; $('newAmount').value=''; $('newText').focus();
+});
+$('newText').addEventListener('keydown', e=>{ if(e.key==='Enter') $('addBtn').click(); });
+$('newAmount').addEventListener('keydown', e=>{ if(e.key==='Enter') $('addBtn').click(); });
+
+[fSearch,fCat,fWho].forEach(el=> el.addEventListener('input', render));
+$('clearF').addEventListener('click', ()=>{ fSearch.value=''; fCat.value=''; fWho.value=''; render(); });
+$('printBtn').addEventListener('click', ()=> window.print());
+
+// ---------- lokální záloha ----------
+function localBackend(){
+  let data=[], cfg={kurz:DEFAULT_KURZ};
+  try{ data=JSON.parse(localStorage.getItem(KEY))||[]; }catch(e){ data=[]; }
+  try{ cfg=JSON.parse(localStorage.getItem(KEY+'-cfg'))||cfg; }catch(e){}
+  const save=()=> localStorage.setItem(KEY, JSON.stringify(data));
+  const id=()=> Date.now()+'-'+Math.random().toString(36).slice(2,7);
+  const emit=()=>{ items=data.slice(); render(); };
+  if(data.length===0){
+    data=SEED.map((s,i)=>({id:'seed-'+String(i).padStart(2,'0'), cat:s[0], text:s[1], amount:s[2], cur:s[3], who:s[4]||'', pozn:s[5]||'', ts:Date.now()-((SEED.length-i)*1000)}));
+    save();
+  }
+  kurz=cfg.kurz||DEFAULT_KURZ;
+  return {
+    start(){ emit(); },
+    add(it){ data.push({id:id(), ...it}); save(); emit(); },
+    update(id_,f){ const x=data.find(d=>d.id===id_); if(x){ Object.assign(x,f); save(); emit(); } },
+    remove(id_){ data=data.filter(d=>d.id!==id_); save(); emit(); },
+    saveKurz(v){ cfg.kurz=v; localStorage.setItem(KEY+'-cfg', JSON.stringify(cfg)); }
+  };
+}
+
+// ---------- sdílený Firebase backend ----------
+async function firebaseBackend(){
+  const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
+  const { getFirestore, collection, doc, setDoc, addDoc, updateDoc, deleteDoc, onSnapshot, getDocs }
+    = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const col = collection(db, COLLECTION);
+
+  // prvotní naplnění – deterministická ID zabrání duplikaci i při více současných návštěvnících
+  const snap0 = await getDocs(col);
+  if(snap0.empty){
+    const t0=Date.now();
+    await Promise.all([
+      setDoc(doc(col, CONFIG_ID), {kurz: DEFAULT_KURZ}),
+      ...SEED.map((s,i)=> setDoc(doc(col, 'seed-'+String(i).padStart(2,'0')),
+        {cat:s[0], text:s[1], amount:s[2], cur:s[3], who:s[4]||'', pozn:s[5]||'', ts:t0-((SEED.length-i)*1000)}))
+    ]);
+  }
+  return {
+    start(){
+      onSnapshot(col, snap=>{
+        const docs = snap.docs.map(d=>({id:d.id, ...d.data()}));
+        const cfg = docs.find(d=>d.id===CONFIG_ID);
+        if(cfg && cfg.kurz>0 && document.activeElement!==kurzEl) kurz=cfg.kurz;
+        items = docs.filter(d=>d.id!==CONFIG_ID);
+        render();
+      }, err=>{
+        console.error(err);
+        statusEl.textContent='⚠️ Chyba připojení k databázi – zkontroluj pravidla Firestore.';
+        statusEl.className='statusbar warn';
+      });
+    },
+    add(it){ return addDoc(col, it); },
+    update(id_,f){ return updateDoc(doc(col,id_), f); },
+    remove(id_){ return deleteDoc(doc(col,id_)); },
+    saveKurz(v){ return setDoc(doc(col, CONFIG_ID), {kurz:v}, {merge:true}); }
+  };
+}
+
+let backend;
+const useFirebase = firebaseConfig && firebaseConfig.apiKey && firebaseConfig.apiKey.length > 10;
+if(useFirebase){
+  try{
+    backend = await firebaseBackend();
+    statusEl.textContent='🟢 Sdílené online – výdaje i kurz vidí celá posádka v reálném čase.';
+    statusEl.className='statusbar ok';
+    footEl.textContent='Data se ukládají do sdílené online databáze (Firebase) a aktualizují se všem v reálném čase. Ceny z itineráře jsou předvyplněné — u položek „doplnit cenu" stačí kliknout na částku.';
+  }catch(e){
+    console.error(e);
+    backend = localBackend();
+    statusEl.textContent='⚠️ Online databázi se nepodařilo načíst – používá se lokální ukládání na tomto zařízení.';
+    statusEl.className='statusbar warn';
+    footEl.textContent='Online databáze není dostupná, změny se ukládají jen do tohoto prohlížeče.';
+  }
+}else{
+  backend = localBackend();
+  statusEl.textContent='🔒 Jen na tomto zařízení.';
+  footEl.textContent='Změny se ukládají jen do tohoto prohlížeče (localStorage).';
+}
+backend.start();
+</script>
+</body>
+</html>
