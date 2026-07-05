@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a2c49">
+<title>Norsko 2026 — co balíme</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--modra:#0c3a5f;--modra2:#1a6ea8;--led:#eef4f9;--akcent:#c0392b;
+        --text:#182634;--slabe:#5d6e7d;--aurora:#2fbf8f;--line:#dfe9f2;
+        --red:#c0392b;--yellow:#9a6b00;--green:#1f8f57;
+        --shadow:0 1px 2px rgba(12,58,95,.05),0 8px 24px rgba(12,58,95,.09)}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Manrope',-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+       color:var(--text);background:linear-gradient(180deg,#f6fafd 0%,var(--led) 260px);line-height:1.55}
+  .topbar{background:linear-gradient(120deg,#0a2c49 0%,#155a8c 100%);color:#fff;padding:12px 18px;display:flex;
+          justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;
+          border-bottom:3px solid;border-image:linear-gradient(90deg,var(--aurora),#3a9bd5,#8b7bd8) 1;
+          box-shadow:0 2px 14px rgba(10,44,73,.22)}
+  .topbar b{font-size:.98rem;letter-spacing:-.01em}
+  .topbar a{color:#bfe0f5;text-decoration:none;font-size:.9rem;font-weight:600}
+  .topbar a:hover{color:#fff}
+  .wrap{max-width:880px;margin:22px auto;padding:0 14px}
+  h1{color:var(--modra);font-size:1.7rem;font-weight:800;letter-spacing:-.02em;margin:6px 0 2px}
+  .sub{color:var(--slabe);font-size:.92rem;margin:0 0 14px}
+
+  .statusbar{font-size:.82rem;color:var(--slabe);padding:10px 14px;border:1px solid var(--line);
+             border-radius:12px;margin:4px 0 14px;background:#fff;box-shadow:var(--shadow)}
+  .statusbar.ok{color:#1f8f57;border-color:#9bd9b5;background:#f1faf4}
+  .statusbar.warn{color:#9a6b00;border-color:#e8cf8a;background:#fdf8ea}
+
+  /* postup */
+  .progress{background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px 16px;
+            margin:0 0 14px;box-shadow:var(--shadow)}
+  .progress .lbl{display:flex;justify-content:space-between;font-size:.85rem;font-weight:600;color:var(--slabe);margin-bottom:6px}
+  .progress .bar{height:10px;border-radius:999px;background:#e6eef5;overflow:hidden;
+            box-shadow:inset 0 1px 3px rgba(12,58,95,.08)}
+  .progress .bar > i{display:block;height:100%;width:0;border-radius:999px;
+            background:linear-gradient(90deg,var(--green),#39c07e);transition:width .25s}
+
+  /* přidání položky */
+  .addform{background:#fff;border:1px solid var(--line);border-radius:14px;padding:15px;
+           margin:0 0 14px;box-shadow:var(--shadow)}
+  .addform .frow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .addform input[type=text]{flex:1;min-width:180px;background:#fff;color:var(--text);
+       border:1px solid #c8d7e4;border-radius:10px;padding:9px 12px;font:inherit;
+       transition:border-color .15s,box-shadow .15s}
+  .addform input[type=text]:focus{outline:none;border-color:var(--modra2);
+       box-shadow:0 0 0 3px rgba(26,110,168,.15)}
+  select,.addform select{background:#fff;color:var(--text);border:1px solid #c8d7e4;
+       border-radius:10px;padding:8px 10px;font:inherit}
+  .btn{background:linear-gradient(120deg,var(--modra),var(--modra2));border:0;color:#fff;font-weight:700;
+       border-radius:10px;padding:10px 17px;cursor:pointer;font:inherit;
+       box-shadow:0 4px 12px rgba(12,58,95,.22);transition:transform .15s,box-shadow .15s}
+  .btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(12,58,95,.30)}
+  .btn.ghost{background:#fff;color:var(--modra);border:1px solid var(--line);box-shadow:none}
+  .btn.ghost:hover{background:#e6f2fb;transform:none}
+
+  /* filtry */
+  .filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 6px}
+  .filters input[type=text]{flex:1;min-width:160px;background:#fff;color:var(--text);
+       border:1px solid #cdd9e3;border-radius:8px;padding:8px 10px;font:inherit}
+  .filternote{font-size:.78rem;color:var(--slabe);margin:2px 2px 12px;min-height:1em}
+
+  /* seznam */
+  .list{display:flex;flex-direction:column;gap:8px;margin-bottom:30px}
+  .item{display:flex;align-items:flex-start;gap:10px;background:#fff;border:1px solid var(--line);
+        border-left-width:4px;border-radius:12px;padding:11px 13px;
+        box-shadow:0 2px 8px rgba(12,58,95,.06);transition:box-shadow .15s,border-color .15s}
+  .item:hover{border-color:#cfe0ee;box-shadow:0 4px 14px rgba(12,58,95,.10)}
+  .item.p-red{border-left-color:var(--red)}
+  .item.p-yellow{border-left-color:var(--yellow)}
+  .item.p-green{border-left-color:var(--green)}
+  .item.done{opacity:.62}
+  .item.done .txt{text-decoration:line-through;color:var(--slabe)}
+  .item.dragging{opacity:.4}
+  .item.dragover{box-shadow:0 0 0 2px var(--modra2)}
+
+  .grip{cursor:grab;color:#b6c4d0;font-size:1.1rem;line-height:1.4;user-select:none;padding-top:1px}
+  .grip.off{opacity:.25;cursor:not-allowed}
+  .item input[type=checkbox]{width:20px;height:20px;margin-top:1px;flex:none;cursor:pointer;accent-color:var(--green)}
+  .body{flex:1;min-width:0}
+  .txt{font-size:.94rem;word-wrap:break-word}
+  .item .meta{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:5px}
+  .badge{font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:20px;cursor:pointer;border:1px solid transparent}
+  .badge.p-red{background:#fdecea;color:var(--red);border-color:#f3c5bd}
+  .badge.p-yellow{background:#fdf6e3;color:var(--yellow);border-color:#e8cf8a}
+  .badge.p-green{background:#eafaf1;color:var(--green);border-color:#9bd9b5}
+  .tag{font-size:.72rem;color:var(--slabe);background:#eef3f7;border-radius:20px;padding:2px 8px}
+  .who-badge{font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:20px;cursor:pointer;border:1px solid #cdd9e3;background:#eef3f7;color:var(--slabe)}
+  .who-badge.w-none{font-weight:600;color:var(--slabe)}
+  .who-badge.w-lucie{background:#fde7f1;color:#b0306a;border-color:#f3bcd6}
+  .who-badge.w-vladimir{background:#e7f0fb;color:#1d5fa8;border-color:#bcd6f3}
+  .who-badge.w-jiri{background:#e6f7ee;color:#1f8f57;border-color:#bce6cf}
+  .who-badge.w-jaroslava{background:#f3ebfb;color:#7a3fb0;border-color:#dcc7f0}
+  .who-badge.w-multi{background:#e7f0fb;color:#1d5fa8;border-color:#bcd6f3}
+  .who-badge.w-all{background:#fff1e0;color:#b06a00;border-color:#f0d9b0}
+  .assignpop{position:absolute;z-index:60;background:#fff;border:1px solid #cdd9e3;border-radius:10px;
+       box-shadow:0 10px 28px rgba(11,61,102,.20);padding:8px;min-width:180px;display:none;flex-direction:column;gap:1px}
+  .assignpop label{display:flex;align-items:center;gap:9px;font-size:.92rem;padding:6px 8px;border-radius:7px;cursor:pointer}
+  .assignpop label:hover{background:var(--led)}
+  .assignpop label.apall{font-weight:700;color:var(--modra)}
+  .assignpop input{width:17px;height:17px;accent-color:var(--modra2);cursor:pointer}
+  .assignpop .apsep{height:1px;background:#eef3f7;margin:3px 1px}
+  .assignpop .apDone{margin-top:5px;text-align:center}
+  .group-head{display:flex;align-items:center;gap:8px;margin:16px 2px 4px;font-size:.9rem;font-weight:700;color:var(--modra)}
+  .group-head:first-child{margin-top:2px}
+  .group-head .cnt{font-weight:400;color:var(--slabe);font-size:.8rem}
+  .group-head .dot{width:10px;height:10px;border-radius:50%;background:#cdd9e3;flex:none}
+  .group-head .dot.w-lucie{background:#e0539c}.group-head .dot.w-vladimir{background:#2f74cc}
+  .group-head .dot.w-jiri{background:#2aa468}.group-head .dot.w-jaroslava{background:#9159c4}
+  .acts{display:flex;gap:2px;flex:none}
+  .iconbtn{background:none;border:none;color:var(--slabe);cursor:pointer;font-size:.95rem;
+           padding:3px 6px;border-radius:6px;line-height:1}
+  .iconbtn:hover{background:var(--led);color:var(--modra)}
+  .iconbtn.del:hover{color:var(--akcent);background:#fdecea}
+  .empty{color:var(--slabe);font-style:italic;padding:18px 4px;text-align:center}
+  .note{margin-top:6px;font-size:.8rem;color:var(--slabe);font-style:italic}
+
+  /* per-person odškrtávání u položek přiřazených víc lidem */
+  .pchecks{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+  .pcheck{display:flex;align-items:center;gap:5px;font-size:.8rem;color:var(--text);
+          background:var(--led);border:1px solid var(--line);border-radius:20px;padding:3px 9px 3px 6px;cursor:pointer}
+  .pcheck input{width:15px;height:15px;accent-color:var(--green);cursor:pointer}
+  .pcheck.on{color:var(--slabe);text-decoration:line-through}
+  .pfrac{font-size:.72rem;color:var(--slabe);background:#eef3f7;border-radius:20px;padding:2px 8px;flex:none;white-space:nowrap}
+
+  @media print{
+    .topbar,.addform,.filters,.filternote,.statusbar,.grip,.acts,.progress .bar,.note{display:none}
+    body{background:#fff}.item{box-shadow:none;break-inside:avoid}
+    .badge,.who-badge{cursor:default}
+  }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <b>🎒 Norsko 2026 — co balíme</b>
+  <span><a href="index.html">← rozcestník</a> &nbsp; <a href="co_zaridit.html">co zařídit →</a></span>
+</div>
+<div class="wrap">
+  <h1>Co balíme na cestu do Norska</h1>
+  <p class="sub">Společný balicí seznam. Odškrtni sbalené. Klikem na <b>👤</b> přiřadíš, kdo danou položku balí — pokud
+     je přiřazeno víc lidí, každý si ji odškrtne <b>sám za sebe</b> (položka je hotová, až mají zaškrtnuto všichni
+     přiřazení). Jde přidávat, mazat, upravovat, měnit prioritu klikem na štítek, řadit přetažením za <b>⠿</b>
+     a filtrovat/seskupovat podle řešitele. Vše sdílené pro celou posádku v reálném čase.</p>
+
+  <div id="status" class="statusbar"></div>
+
+  <div class="progress">
+    <div class="lbl"><span id="progLbl">Hotovo 0 / 0</span><span id="progPct">0 %</span></div>
+    <div class="bar"><i id="progBar"></i></div>
+  </div>
+
+  <div class="addform">
+    <div class="frow">
+      <input type="text" id="newText" placeholder="Nová položka k zabalení…">
+      <select id="newPrio">
+        <option value="red">🔴 nutné</option>
+        <option value="yellow" selected>🟡 důležité</option>
+        <option value="green">🟢 dobré mít</option>
+      </select>
+      <select id="newCat"></select>
+      <button type="button" class="btn ghost" id="newWhoBtn">👤 Přiřadit…</button>
+      <button class="btn" id="addBtn">Přidat</button>
+    </div>
+  </div>
+
+  <div class="filters">
+    <input type="text" id="fSearch" placeholder="🔎 hledat v textu…">
+    <select id="fCat"><option value="">Všechny kategorie</option></select>
+    <select id="fPrio">
+      <option value="">Všechny priority</option>
+      <option value="red">🔴 nutné</option>
+      <option value="yellow">🟡 důležité</option>
+      <option value="green">🟢 dobré mít</option>
+    </select>
+    <select id="fStatus">
+      <option value="">Vše</option>
+      <option value="open">Jen nesbalené</option>
+      <option value="done">Jen sbalené</option>
+    </select>
+    <select id="fWho"><option value="">Všichni řešitelé</option></select>
+    <select id="fGroup">
+      <option value="">Bez seskupení</option>
+      <option value="who">👥 Seskupit podle řešitele</option>
+    </select>
+    <button class="btn ghost" id="clearF">Zrušit filtry</button>
+    <button class="btn ghost" id="printBtn">🖨️ Tisk</button>
+  </div>
+  <div class="filternote" id="filterNote"></div>
+
+  <div class="list" id="list"></div>
+
+  <p class="note" id="footnote"></p>
+</div>
+
+<script type="module">
+// Sdílený online backend (Firebase / Firestore) – balicí seznam vidí celá posádka v reálném čase.
+// Stejný projekt jako "co zařídit", ale vlastní kolekce, ať se data nemíchají.
+const firebaseConfig = {
+  apiKey: "AIzaSyCLU7cH1tXPqnaxVV_-BsSNssl-NU9Pz1I",
+  authDomain: "rd-modrice-e9477.firebaseapp.com",
+  projectId: "rd-modrice-e9477",
+  storageBucket: "rd-modrice-e9477.firebasestorage.app",
+  messagingSenderId: "941681195558",
+  appId: "1:941681195558:web:3aac10f182e784cdb3c4e7"
+};
+const COLLECTION = 'co-balime-norsko';
+const KEY = 'norsko2026-co-balime-v1';
+
+const CATS = ['Doklady + finance','Elektronika','Oblečení — vrchní část','Oblečení — kalhoty',
+  'Oblečení — spodní prádlo','Oblečení — obuv','Dítě — oblečení','Dítě — výbava','Pes',
+  'Turistika','Lékárnička','Hygiena','Jídlo + výbava','Obytné auto'];
+
+// Výchozí sada položek (naplní se jen při prvním načtení do prázdné databáze) — sestaveno z balicího seznamu.
+const SEED = [
+  ['red','Doklady + finance','Občanské průkazy / pasy všech členů výpravy'],
+  ['red','Doklady + finance','Řidičské průkazy'],
+  ['red','Doklady + finance','Technický průkaz vozidla'],
+  ['red','Doklady + finance','Zelená karta (pojištění auta)'],
+  ['red','Doklady + finance','Cestovní pojištění všech osob'],
+  ['red','Doklady + finance','Evropské kartičky zdravotního pojištění (EHIC)'],
+  ['red','Doklady + finance','Rezervace trajektu Hirtshals → Kristiansand'],
+  ['red','Doklady + finance','Rezervace Trolltunga shuttle + parkování'],
+  ['red','Doklady + finance','Rezervace Geiranger fjord plavby'],
+  ['red','Doklady + finance','Rezervace parkování Besseggen (Gjendesheim)'],
+  ['yellow','Doklady + finance','Platební karty'],
+  ['yellow','Doklady + finance','Hotovost v NOK'],
+
+  ['yellow','Elektronika','Mobilní telefony všech členů'],
+  ['yellow','Elektronika','Nabíječky (všechny typy)'],
+  ['yellow','Elektronika','Autonabíječka / USB adaptér'],
+  ['yellow','Elektronika','Powerbanky'],
+  ['green','Elektronika','Fotoaparát + nabíječka'],
+  ['yellow','Elektronika','Čelovky'],
+  ['green','Elektronika','SD karty / úložiště'],
+  ['yellow','Elektronika','Offline mapy (Mapy.com / Organic Maps / Google offline)'],
+
+  ['yellow','Oblečení — vrchní část','Funkční/merino trička (2×)'],
+  ['yellow','Oblečení — vrchní část','Běžná trička (2×)'],
+  ['yellow','Oblečení — vrchní část','Mikina'],
+  ['yellow','Oblečení — vrchní část','Fleece vrstva'],
+  ['yellow','Oblečení — vrchní část','Teplejší bunda (péřová / izolační)'],
+  ['yellow','Oblečení — vrchní část','Nepromokavá bunda'],
+  ['yellow','Oblečení — vrchní část','Čepice + kšiltovka'],
+  ['yellow','Oblečení — vrchní část','Lehké rukavice'],
+
+  ['yellow','Oblečení — kalhoty','Turistické kalhoty / sportovní legíny'],
+  ['green','Oblečení — kalhoty','Kraťasy'],
+  ['green','Oblečení — kalhoty','Pohodlné „civilní" kalhoty na večer'],
+  ['green','Oblečení — kalhoty','Tepláky'],
+
+  ['yellow','Oblečení — spodní prádlo','Spodní prádlo (7–8×)'],
+  ['yellow','Oblečení — spodní prádlo','Ponožky (7–8×)'],
+  ['yellow','Oblečení — spodní prádlo','Turistické ponožky (2× a více)'],
+  ['green','Oblečení — spodní prádlo','Sportovní podprsenky'],
+
+  ['yellow','Oblečení — obuv','Turistické boty do hor'],
+  ['yellow','Oblečení — obuv','Lehčí outdoorová obuv'],
+  ['green','Oblečení — obuv','Lehké nazouvací boty / tenisky'],
+  ['green','Oblečení — obuv','Sandály / crocsy'],
+
+  ['yellow','Dítě — oblečení','Body/trička (7–8×)'],
+  ['yellow','Dítě — oblečení','Kalhoty (5×)'],
+  ['yellow','Dítě — oblečení','Mikiny (3×)'],
+  ['yellow','Dítě — oblečení','Bundy (lehčí + teplejší)'],
+  ['yellow','Dítě — oblečení','Boty'],
+  ['yellow','Dítě — oblečení','Capáčky (teplé, kožené)'],
+  ['yellow','Dítě — oblečení','Nepromokavý overal'],
+  ['yellow','Dítě — oblečení','Ponožky'],
+  ['yellow','Dítě — oblečení','Čepice (tenká + teplá)'],
+  ['yellow','Dítě — oblečení','Rukavice'],
+  ['yellow','Dítě — oblečení','Pyžama (3×)'],
+
+  ['red','Dítě — výbava','Autosedačka'],
+  ['yellow','Dítě — výbava','Nosítko'],
+  ['yellow','Dítě — výbava','Pláštěnka na nosítko'],
+  ['yellow','Dítě — výbava','Kočárek + pláštěnka na něj'],
+  ['yellow','Dítě — výbava','Nosící bunda, vsadka'],
+  ['red','Dítě — výbava','Plenky'],
+  ['yellow','Dítě — výbava','Vlhčené ubrousky'],
+  ['yellow','Dítě — výbava','Přebalovací podložka'],
+  ['yellow','Dítě — výbava','Sáčky na plenky, sáčky na zvracení'],
+  ['green','Dítě — výbava','Nočník'],
+  ['yellow','Dítě — výbava','Lahvičky / hrníček, misky'],
+  ['red','Dítě — výbava','Jídlo (Beba 2–3×, ovocné přesnídávky, ovesné vločky, chia semínka, skořice, tyčinky apod.)'],
+  ['yellow','Dítě — výbava','Lžičky'],
+  ['green','Dítě — výbava','Bryndáky'],
+  ['yellow','Dítě — výbava','Oblíbená hračka'],
+  ['yellow','Dítě — výbava','Deka'],
+  ['red','Dítě — výbava','Opalovací krém SPF 50'],
+  ['green','Dítě — výbava','Sluneční klobouček'],
+  ['red','Dítě — výbava','Lékárna'],
+  ['red','Dítě — výbava','Léky pro Adámka'],
+
+  ['red','Pes','EU pas + očkování'],
+  ['yellow','Pes','Obojek'],
+  ['yellow','Pes','Postroj'],
+  ['yellow','Pes','Vodítko + dlouhé vodítko'],
+  ['green','Pes','Batoh pro psa'],
+  ['yellow','Pes','Granule'],
+  ['green','Pes','Pamlsky'],
+  ['yellow','Pes','Misky (cestovní + normální)'],
+  ['yellow','Pes','Sáčky na exkrementy'],
+  ['green','Pes','Ručník'],
+  ['yellow','Pes','Deka'],
+  ['yellow','Pes','Léky (pokud jsou potřeba)'],
+
+  ['yellow','Turistika','Turistické hole'],
+  ['yellow','Turistika','Batohy'],
+  ['yellow','Turistika','Lahve na vodu / pytle na vodu'],
+  ['red','Turistika','Opalovací krém SPF 50'],
+  ['yellow','Turistika','Repelent'],
+  ['yellow','Turistika','Sluneční brýle'],
+  ['green','Turistika','Kapesníky'],
+  ['green','Turistika','Malý ručník'],
+  ['yellow','Turistika','Pláštěnky + pláštěnky na batohy'],
+  ['green','Turistika','Deštník'],
+  ['green','Turistika','Vazelína na promazání nohou'],
+  ['yellow','Turistika','Čelovky'],
+
+  ['red','Lékárnička','Pravidelně užívané léky'],
+  ['red','Lékárnička','Léky proti bolesti a horečce'],
+  ['yellow','Lékárnička','Léky na alergii'],
+  ['yellow','Lékárnička','Léky proti průjmu'],
+  ['red','Lékárnička','Náplasti (včetně puchýřových)'],
+  ['red','Lékárnička','Dezinfekce'],
+  ['yellow','Lékárnička','Elastické obinadlo'],
+  ['yellow','Lékárnička','Pinzeta'],
+  ['yellow','Lékárnička','Teploměr'],
+
+  ['yellow','Hygiena','Kartáčky + pasta'],
+  ['yellow','Hygiena','Sprchový gel + šampon'],
+  ['green','Hygiena','Deodorant'],
+  ['green','Hygiena','Krém'],
+  ['green','Hygiena','Balzám na rty'],
+  ['green','Hygiena','Hřeben'],
+  ['yellow','Hygiena','Ručníky + osušky'],
+  ['yellow','Hygiena','Vlhčené ubrousky'],
+
+  ['yellow','Jídlo + výbava','Káva + čaj'],
+  ['green','Jídlo + výbava','Kofeinové tablety'],
+  ['green','Jídlo + výbava','Základní koření'],
+  ['yellow','Jídlo + výbava','Trvanlivé potraviny na start cesty'],
+  ['yellow','Jídlo + výbava','Ovesné vločky atd.'],
+  ['yellow','Jídlo + výbava','Těstoviny / rýže'],
+  ['yellow','Jídlo + výbava','Snacky na túry'],
+  ['green','Jídlo + výbava','Oříšky'],
+  ['yellow','Jídlo + výbava','Voda + lahve'],
+  ['green','Jídlo + výbava','Termoska'],
+
+  ['yellow','Obytné auto','Povlečení, peřiny a polštáře'],
+  ['yellow','Obytné auto','Hadice + redukce na vodu'],
+  ['yellow','Obytné auto','Kabel do kempu (elektrika)'],
+  ['red','Obytné auto','Chemie do WC'],
+  ['red','Obytné auto','Toaletní papír do WC'],
+  ['yellow','Obytné auto','Vyrovnávací klíny pod auto'],
+  ['yellow','Obytné auto','Prodlužovací kabel'],
+  ['green','Obytné auto','Smetáček + lopatka'],
+  ['yellow','Obytné auto','Utěrky + houbičky'],
+  ['yellow','Obytné auto','Jar'],
+  ['yellow','Obytné auto','Odpadkové pytle'],
+  ['green','Obytné auto','Kolíčky + šňůra na prádlo'],
+  ['yellow','Obytné auto','Prací prostředek'],
+];
+
+const PRIO_RANK = {red:0, yellow:1, green:2};
+const PRIO_LABEL = {red:'🔴 nutné', yellow:'🟡 důležité', green:'🟢 dobré mít'};
+const PRIO_CYCLE = {red:'yellow', yellow:'green', green:'red'};
+
+// posádka, na kterou jde položka přiřadit (položka může mít víc lidí; všichni = celá posádka)
+const PEOPLE = ['Lucie','Vladimír','Jiří','Jaroslava'];
+const NAME_FIX = {Jirka:'Jiří', Jarka:'Jaroslava'};
+const fixName = n => NAME_FIX[n] || n;
+const whoSlug = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+const whoClass = s => 'w-' + (s ? whoSlug(s) : 'none');
+const whoArr = it => (Array.isArray(it.who) ? it.who : (it.who ? [it.who] : [])).filter(Boolean).map(fixName);
+const isAll = arr => arr.length>0 && PEOPLE.every(p=>arr.includes(p));
+const whoLabel = arr => !arr.length ? '👤 přiřadit' : (isAll(arr) ? '👥 Všichni' : '👤 '+arr.join(', '));
+const whoBadgeClass = arr => !arr.length ? 'w-none' : (isAll(arr) ? 'w-all' : (arr.length===1 ? whoClass(arr[0]) : 'w-multi'));
+let newWhoSel = [];
+
+// odškrtávání sbalení: sledované per osobu (klíč '_' = obecně, když není nikdo přiřazený)
+const doneMap = it => it.doneBy || {};
+const doneKey = it => whoArr(it)[0] || '_';
+const isDoneFor = (it,p) => !!doneMap(it)[p];
+const fullyDone = it => { const w=whoArr(it); return w.length ? w.every(p=>isDoneFor(it,p)) : isDoneFor(it,'_'); };
+const unitsFor = it => whoArr(it).length || 1;
+const doneUnitsFor = it => { const w=whoArr(it); return w.length ? w.filter(p=>isDoneFor(it,p)).length : (isDoneFor(it,'_')?1:0); };
+
+const $ = id => document.getElementById(id);
+const listEl=$('list'), statusEl=$('status'), footEl=$('footnote'), filterNote=$('filterNote');
+const fSearch=$('fSearch'), fCat=$('fCat'), fPrio=$('fPrio'), fStatus=$('fStatus'), fWho=$('fWho'), fGroup=$('fGroup');
+
+for(const c of CATS){
+  fCat.insertAdjacentHTML('beforeend', `<option value="${c}">${c}</option>`);
+  $('newCat').insertAdjacentHTML('beforeend', `<option value="${c}">${c}</option>`);
+}
+fWho.insertAdjacentHTML('beforeend', `<option value="__none">👤 Nepřiřazené</option>`);
+for(const p of PEOPLE){
+  fWho.insertAdjacentHTML('beforeend', `<option value="${p}">👤 ${p}</option>`);
+}
+
+let items = [];
+const esc = s => (s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const filtersActive = () => !!(fSearch.value.trim() || fCat.value || fPrio.value || fStatus.value || fWho.value);
+
+function visibleItems(){
+  const q = fSearch.value.trim().toLowerCase();
+  return items.filter(it=>{
+    if(fCat.value && it.cat !== fCat.value) return false;
+    if(fPrio.value && it.prio !== fPrio.value) return false;
+    if(fStatus.value === 'open' && fullyDone(it)) return false;
+    if(fStatus.value === 'done' && !fullyDone(it)) return false;
+    if(fWho.value === '__none' && whoArr(it).length) return false;
+    if(fWho.value && fWho.value !== '__none' && !whoArr(it).includes(fWho.value)) return false;
+    if(q && !(it.text||'').toLowerCase().includes(q)) return false;
+    return true;
+  });
+}
+
+function renderProgress(){
+  let total=0, done=0;
+  for(const it of items){ total += unitsFor(it); done += doneUnitsFor(it); }
+  const pct = total ? Math.round(done/total*100) : 0;
+  $('progLbl').textContent = `Hotovo ${done} / ${total}`;
+  $('progPct').textContent = pct + ' %';
+  $('progBar').style.width = pct + '%';
+}
+
+// forPerson: pokud je zadán (seskupení podle řešitele), checkbox řeší jen sbalení té jedné osoby
+function makeRow(it, dndOff, forPerson){
+  const w = whoArr(it);
+  const multi = !forPerson && w.length > 1;
+  const key = forPerson || doneKey(it);
+  const rowDone = forPerson ? isDoneFor(it, forPerson) : fullyDone(it);
+  const row = document.createElement('div');
+  row.className = `item p-${it.prio}${rowDone?' done':''}`;
+  row.dataset.id = it.id;
+  row.draggable = !dndOff;
+
+  const pchecksHtml = multi ? `<div class="pchecks">${w.map(p=>
+    `<label class="pcheck${isDoneFor(it,p)?' on':''}" data-p="${esc(p)}"><input type="checkbox" ${isDoneFor(it,p)?'checked':''}> ${esc(p)}</label>`
+  ).join('')}</div>` : '';
+
+  row.innerHTML = `
+    <span class="grip${dndOff?' off':''}" title="${dndOff?'Řazení vypnuto při filtru/seskupení':'Přetáhni pro změnu pořadí'}">⠿</span>
+    ${multi ? `<span class="pfrac" title="Kolik přiřazených má sbaleno">${doneUnitsFor(it)}/${w.length}</span>` : `<input type="checkbox" ${rowDone?'checked':''} title="Sbaleno">`}
+    <div class="body">
+      <div class="txt">${esc(it.text)}</div>
+      <div class="meta">
+        <span class="badge p-${it.prio}" title="Klikni pro změnu priority">${PRIO_LABEL[it.prio]}</span>
+        <span class="tag">${esc(it.cat||'')}</span>
+        <span class="who-badge ${whoBadgeClass(w)}" title="Klikni pro přiřazení (lze i víc lidem)">${esc(whoLabel(w))}</span>
+      </div>
+      ${pchecksHtml}
+    </div>
+    <div class="acts">
+      <button class="iconbtn edit" title="Upravit text položky">✏️</button>
+      <button class="iconbtn del" title="Smazat">🗑</button>
+    </div>`;
+
+  if(multi){
+    row.querySelectorAll('.pcheck').forEach(lbl=>{
+      lbl.querySelector('input').addEventListener('change', e=>{
+        backend.update(it.id, {['doneBy.'+lbl.dataset.p]: e.target.checked});
+      });
+    });
+  } else {
+    row.querySelector('input[type=checkbox]').addEventListener('change', e=>{
+      backend.update(it.id, {['doneBy.'+key]: e.target.checked});
+    });
+  }
+  row.querySelector('.badge').addEventListener('click', ()=> backend.update(it.id, {prio: PRIO_CYCLE[it.prio]}));
+  row.querySelector('.who-badge').addEventListener('click', (e)=> openAssign(e.currentTarget, w, sel=> backend.update(it.id, {who: sel})));
+  row.querySelector('.edit').addEventListener('click', ()=>{
+    const t = prompt('Upravit položku:', it.text);
+    if(t!=null && t.trim()) backend.update(it.id, {text: t.trim()});
+  });
+  row.querySelector('.del').addEventListener('click', ()=>{
+    if(confirm('Smazat tuto položku?')) backend.remove(it.id);
+  });
+  if(!dndOff) attachDnD(row);
+  return row;
+}
+
+function render(){
+  renderProgress();
+  const vis = visibleItems();
+  const grouping = fGroup.value;
+  const blocked = filtersActive() || !!grouping;
+  filterNote.textContent = blocked
+    ? `Zobrazeno ${vis.length} z ${items.length}. Ruční řazení přetažením je vypnuté — zruš filtry i seskupení pro změnu pořadí.`
+    : (items.length ? 'Pořadí změníš přetažením za ⠿.' : '');
+
+  listEl.innerHTML = '';
+  if(vis.length === 0){
+    listEl.innerHTML = `<div class="empty">${items.length ? 'Nic neodpovídá filtru.' : 'Zatím tu nejsou žádné položky.'}</div>`;
+    return;
+  }
+  if(grouping === 'who'){
+    const renderGroup = (person, grp) => {
+      if(!grp.length) return;
+      const head = document.createElement('div');
+      head.className = 'group-head';
+      head.innerHTML = `<span class="dot ${person?whoClass(person):''}"></span>`
+        + (person ? '👤 '+esc(person) : '👤 Nepřiřazené')
+        + ` <span class="cnt">(${grp.filter(i=>!(person?isDoneFor(i,person):fullyDone(i))).length} nesbalených / ${grp.length})</span>`;
+      listEl.appendChild(head);
+      for(const it of grp) listEl.appendChild(makeRow(it, blocked, person || null));
+    };
+    for(const person of PEOPLE) renderGroup(person, vis.filter(it => whoArr(it).includes(person)));
+    renderGroup('', vis.filter(it => whoArr(it).length === 0));
+    return;
+  }
+  for(const it of vis) listEl.appendChild(makeRow(it, blocked));
+}
+
+let dragId = null;
+function attachDnD(row){
+  row.addEventListener('dragstart', e=>{ dragId = row.dataset.id; row.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; });
+  row.addEventListener('dragend', ()=>{ dragId=null; row.classList.remove('dragging'); [...listEl.children].forEach(c=>c.classList.remove('dragover')); });
+  row.addEventListener('dragover', e=>{ e.preventDefault(); row.classList.add('dragover'); });
+  row.addEventListener('dragleave', ()=> row.classList.remove('dragover'));
+  row.addEventListener('drop', e=>{
+    e.preventDefault(); row.classList.remove('dragover');
+    const targetId = row.dataset.id;
+    if(!dragId || dragId===targetId) return;
+    const arr = items.slice().sort((a,b)=>(a.order||0)-(b.order||0));
+    const from = arr.findIndex(x=>x.id===dragId), to = arr.findIndex(x=>x.id===targetId);
+    if(from<0||to<0) return;
+    const [moved] = arr.splice(from,1);
+    arr.splice(to,0,moved);
+    arr.forEach((x,i)=>{ if(x.order!==i) backend.update(x.id, {order:i}); });
+  });
+}
+
+$('addBtn').addEventListener('click', ()=>{
+  const text = $('newText').value.trim();
+  if(!text){ $('newText').focus(); return; }
+  const maxOrder = items.reduce((m,i)=>Math.max(m, i.order||0), -1);
+  backend.add({text, prio:$('newPrio').value, cat:$('newCat').value, who:newWhoSel.slice(), doneBy:{}, order:maxOrder+1});
+  $('newText').value=''; newWhoSel=[]; renderNewWhoBtn(); $('newText').focus();
+});
+$('newText').addEventListener('keydown', e=>{ if(e.key==='Enter') $('addBtn').click(); });
+
+[fSearch,fCat,fPrio,fStatus,fWho,fGroup].forEach(el=> el.addEventListener('input', render));
+$('clearF').addEventListener('click', ()=>{ fSearch.value=''; fCat.value=''; fPrio.value=''; fStatus.value=''; fWho.value=''; fGroup.value=''; render(); });
+$('printBtn').addEventListener('click', ()=> window.print());
+
+const pop = document.createElement('div');
+pop.className = 'assignpop';
+document.body.appendChild(pop);
+let popCommit = null;
+function closeAssign(){ pop.style.display='none'; popCommit=null; }
+function openAssign(anchor, current, onDone){
+  pop.innerHTML =
+    `<label class="apall"><input type="checkbox" class="apAll"> 👥 Všichni</label>
+     <div class="apsep"></div>` +
+    PEOPLE.map(pn=>`<label><input type="checkbox" class="apOne" value="${pn}"> 👤 ${pn}</label>`).join('') +
+    `<div class="apsep"></div><button class="btn apDone">Hotovo</button>`;
+  const ones = [...pop.querySelectorAll('.apOne')];
+  const all = pop.querySelector('.apAll');
+  const cur = new Set(current);
+  ones.forEach(cb=> cb.checked = cur.has(cb.value));
+  const syncAll = ()=> all.checked = ones.every(cb=>cb.checked);
+  syncAll();
+  all.addEventListener('change', ()=>{ ones.forEach(cb=> cb.checked = all.checked); });
+  ones.forEach(cb=> cb.addEventListener('change', syncAll));
+  popCommit = ()=>{ const sel = ones.filter(cb=>cb.checked).map(cb=>cb.value); closeAssign(); onDone(sel); };
+  pop.querySelector('.apDone').addEventListener('click', popCommit);
+  pop.style.display='flex';
+  const r = anchor.getBoundingClientRect();
+  pop.style.top = (window.scrollY + r.bottom + 5) + 'px';
+  pop.style.left = (window.scrollX + r.left) + 'px';
+  const pr = pop.getBoundingClientRect();
+  if(pr.right > window.innerWidth - 8) pop.style.left = (window.scrollX + window.innerWidth - 8 - pr.width) + 'px';
+}
+document.addEventListener('mousedown', e=>{
+  if(pop.style.display==='none') return;
+  if(pop.contains(e.target)) return;
+  if(e.target.closest && e.target.closest('.who-badge')) return;
+  if(popCommit) popCommit(); else closeAssign();
+});
+
+function renderNewWhoBtn(){ $('newWhoBtn').textContent = newWhoSel.length ? whoLabel(newWhoSel) : '👤 Přiřadit…'; }
+$('newWhoBtn').addEventListener('click', e=> openAssign(e.currentTarget, newWhoSel, sel=>{ newWhoSel = sel; renderNewWhoBtn(); }));
+renderNewWhoBtn();
+
+// vloží hodnotu do vnořené cesty typu "doneBy.Lucie" (Firestore to umí nativně, pro localStorage si to uděláme ručně)
+function applyPatch(obj, patch){
+  for(const [k,v] of Object.entries(patch)){
+    const parts = k.split('.');
+    let cur = obj;
+    for(let i=0;i<parts.length-1;i++){ cur[parts[i]] = cur[parts[i]] || {}; cur = cur[parts[i]]; }
+    cur[parts[parts.length-1]] = v;
+  }
+}
+
+// ---- lokální záloha ----
+function localBackend(){
+  let data=[];
+  try{ data = JSON.parse(localStorage.getItem(KEY)) || []; }catch(e){ data=[]; }
+  const save=()=> localStorage.setItem(KEY, JSON.stringify(data));
+  const id=()=> Date.now()+'-'+Math.random().toString(36).slice(2,7);
+  const emit=()=>{ items=data.slice(); render(); };
+  if(data.length===0){ data = SEED.map((s,i)=>({id:id(), prio:s[0], cat:s[1], text:s[2], doneBy:{}, order:i})); save(); }
+  return {
+    start(){ emit(); },
+    add(it){ data.push({id:id(), ...it}); save(); emit(); },
+    update(id_, f){ const x=data.find(d=>d.id===id_); if(x){ applyPatch(x,f); save(); emit(); } },
+    remove(id_){ data=data.filter(d=>d.id!==id_); save(); emit(); }
+  };
+}
+
+// ---- sdílený Firebase backend ----
+async function firebaseBackend(){
+  const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
+  const { getFirestore, collection, doc, setDoc, addDoc, updateDoc, deleteDoc, onSnapshot, getDocs }
+    = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const col = collection(db, COLLECTION);
+
+  const snap0 = await getDocs(col);
+  if(snap0.empty){
+    await Promise.all(SEED.map((s,i)=>{
+      const n = String(i).padStart(3,'0');
+      return setDoc(doc(col, 'seed-'+n), {prio:s[0], cat:s[1], text:s[2], doneBy:{}, order:i});
+    }));
+  }
+  return {
+    start(){
+      onSnapshot(col, snap=>{
+        items = snap.docs.map(d=>({id:d.id, ...d.data()})).sort((a,b)=>(a.order||0)-(b.order||0));
+        render();
+      }, err=>{
+        console.error(err);
+        statusEl.textContent='⚠️ Chyba připojení k databázi – zkontroluj pravidla Firestore.';
+        statusEl.className='statusbar warn';
+      });
+    },
+    add(it){ return addDoc(col, it); },
+    update(id_, f){ return updateDoc(doc(col, id_), f); },
+    remove(id_){ return deleteDoc(doc(col, id_)); }
+  };
+}
+
+let backend;
+const useFirebase = firebaseConfig && firebaseConfig.apiKey && firebaseConfig.apiKey.length > 10;
+if(useFirebase){
+  try{
+    backend = await firebaseBackend();
+    statusEl.textContent='🟢 Sdílené online – balicí seznam i odškrtnutí vidí celá posádka v reálném čase.';
+    statusEl.className='statusbar ok';
+    footEl.textContent='Data se ukládají do sdílené online databáze (Firebase) a aktualizují se všem v reálném čase.';
+  }catch(e){
+    console.error(e);
+    backend = localBackend();
+    statusEl.textContent='⚠️ Online databázi se nepodařilo načíst – používá se lokální ukládání na tomto zařízení.';
+    statusEl.className='statusbar warn';
+    footEl.textContent='Online databáze není dostupná, změny se ukládají jen do tohoto prohlížeče.';
+  }
+}else{
+  backend = localBackend();
+  statusEl.textContent='🔒 Jen na tomto zařízení.';
+  footEl.textContent='Změny se ukládají jen do tohoto prohlížeče (localStorage).';
+}
+backend.start();
+</script>
+</body>
+</html>
