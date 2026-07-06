@@ -273,12 +273,8 @@
       <input type="number" id="ostatni" value="20" min="0"><span class="unit">kg</span>
     </div>
     <div class="row" data-mode="podrobna">
-      <label>Namontované doplňky <span class="hint">nosič kol, markýza, solární panel — počítej celou vahou, i když jsou na voze trvale</span></label>
+      <label>Namontované doplňky <span class="hint">markýza, solární panel — počítej celou vahou, i když jsou na voze trvale</span></label>
       <input type="number" id="doplnky" value="15" min="0"><span class="unit">kg</span>
-    </div>
-    <div class="row" data-mode="podrobna">
-      <label>Elektronika &amp; nabíječky <span class="hint">foťák, powerbanky, kabely</span></label>
-      <input type="number" id="elektro" value="5" min="0"><span class="unit">kg</span>
     </div>
     <div class="row" data-mode="podrobna">
       <label>Nářadí, klíny &amp; lano</label>
@@ -288,6 +284,62 @@
       <label>Provozní <span class="hint">AdBlue, náhradní plyn, chemie WC</span></label>
       <input type="number" id="provoz" value="10" min="0"><span class="unit">kg</span>
     </div>
+
+    <!-- osobní elektronika, vybavení a ostatní věci po osobách -->
+    <div class="subhead" data-mode="podrobna">Osobní elektronika (foťák, powerbanky, kabely)</div>
+    <div class="row" data-mode="podrobna">
+      <label>Lucie</label>
+      <input type="number" id="elektro_lucie" value="1.5" min="0"><span class="unit">kg</span>
+    </div>
+    <div class="row" data-mode="podrobna">
+      <label>Vladimír</label>
+      <input type="number" id="elektro_vladimir" value="1.5" min="0"><span class="unit">kg</span>
+    </div>
+    <div class="row" data-mode="podrobna">
+      <label>Jiří</label>
+      <input type="number" id="elektro_jirka" value="1.5" min="0"><span class="unit">kg</span>
+    </div>
+    <div class="row" data-mode="podrobna">
+      <label>Jaroslava</label>
+      <input type="number" id="elektro_jarka" value="1.5" min="0"><span class="unit">kg</span>
+    </div>
+
+    <div class="subhead" data-mode="podrobna">Vybavení (např. pruty)</div>
+    <div class="row" data-mode="podrobna">
+      <label>Lucie</label>
+      <input type="number" id="vybaveni_lucie" value="3" min="0"><span class="unit">kg</span>
+    </div>
+    <div class="row" data-mode="podrobna">
+      <label>Vladimír</label>
+      <input type="number" id="vybaveni_vladimir" value="3" min="0"><span class="unit">kg</span>
+    </div>
+    <div class="row" data-mode="podrobna">
+      <label>Jiří</label>
+      <input type="number" id="vybaveni_jirka" value="3" min="0"><span class="unit">kg</span>
+    </div>
+    <div class="row" data-mode="podrobna">
+      <label>Jaroslava</label>
+      <input type="number" id="vybaveni_jarka" value="3" min="0"><span class="unit">kg</span>
+    </div>
+
+    <div class="subhead" data-mode="podrobna">Ostatní věci</div>
+    <div class="row" data-mode="podrobna">
+      <label>Lucie</label>
+      <input type="number" id="veci_lucie" value="3" min="0"><span class="unit">kg</span>
+    </div>
+    <div class="row" data-mode="podrobna">
+      <label>Vladimír</label>
+      <input type="number" id="veci_vladimir" value="3" min="0"><span class="unit">kg</span>
+    </div>
+    <div class="row" data-mode="podrobna">
+      <label>Jiří</label>
+      <input type="number" id="veci_jirka" value="3" min="0"><span class="unit">kg</span>
+    </div>
+    <div class="row" data-mode="podrobna">
+      <label>Jaroslava</label>
+      <input type="number" id="veci_jarka" value="3" min="0"><span class="unit">kg</span>
+    </div>
+
     <p class="note">Hodnoty jsou orientační — uprav podle reality. Přepínač <b>Základní/Podrobná</b> nahoře určuje, které položky se počítají. Doporučení z podkladů: vůz před odjezdem zvážit na nákladní váze.</p>
   </div>
 </div>
@@ -314,14 +366,20 @@ const ADULTS=['dosp_lucie','dosp_vladimir','dosp_jirka','dosp_jarka'];
 const ids=[...ADULTS,'dite_kg','pes','obleceni',
   'obleceni_lucie','obleceni_vladimir','obleceni_jirka','obleceni_jarka','dite','kocarek','pes_vyb','jidlo',
   'jidlo_napoje','jidlo_hotova','jidlo_priloha','jidlo_cerstve','jidlo_svacinky','jidlo_ostatni','kuchyne',
-  'voda','outdoor','outdoor_obuv','batohy','ostatni','doplnky','elektro','naradi','provoz'];
+  'voda','outdoor','outdoor_obuv','batohy','ostatni','doplnky','naradi','provoz',
+  'elektro_lucie','elektro_vladimir','elektro_jirka','elektro_jarka',
+  'vybaveni_lucie','vybaveni_vladimir','vybaveni_jirka','vybaveni_jarka',
+  'veci_lucie','veci_vladimir','veci_jirka','veci_jarka'];
 // které položky vybavení se počítají v daném režimu
 const EQUIP={
   zakladni:['obleceni','jidlo','voda','outdoor','ostatni'],
   podrobna:['obleceni_lucie','obleceni_vladimir','obleceni_jirka','obleceni_jarka','dite','kocarek','pes_vyb',
             'jidlo_napoje','jidlo_hotova','jidlo_priloha',
             'jidlo_cerstve','jidlo_svacinky','jidlo_ostatni','kuchyne','voda','outdoor_obuv','batohy',
-            'doplnky','elektro','naradi','provoz']
+            'doplnky','naradi','provoz',
+            'elektro_lucie','elektro_vladimir','elektro_jirka','elektro_jarka',
+            'vybaveni_lucie','vybaveni_vladimir','vybaveni_jirka','vybaveni_jarka',
+            'veci_lucie','veci_vladimir','veci_jirka','veci_jarka']
 };
 const MODES=['zakladni','podrobna'];
 // paušály z pohotovostní hmotnosti — checkbox rozhodne, jestli se odečtou z naloženého (výrobce už s nimi počítá)
@@ -333,7 +391,10 @@ const DEFAULTS={mode:'zakladni',
   obleceni_lucie:11.5,obleceni_vladimir:11.5,obleceni_jirka:11.5,obleceni_jarka:11.5,
   dite:6,kocarek:6,pes_vyb:10,jidlo_napoje:12,jidlo_hotova:14.6,jidlo_priloha:4.75,
   jidlo_cerstve:10.2,jidlo_svacinky:5.7,jidlo_ostatni:2.2,kuchyne:10,outdoor_obuv:15,batohy:8,
-  doplnky:15,elektro:5,naradi:8,provoz:10,
+  doplnky:15,naradi:8,provoz:10,
+  elektro_lucie:1.5,elektro_vladimir:1.5,elektro_jirka:1.5,elektro_jarka:1.5,
+  vybaveni_lucie:3,vybaveni_vladimir:3,vybaveni_jirka:3,vybaveni_jarka:3,
+  veci_lucie:3,veci_vladimir:3,veci_jirka:3,veci_jarka:3,
   cb_ridic:false,cb_voda20:false};
 
 const $ = id => document.getElementById(id);
