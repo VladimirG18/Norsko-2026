@@ -183,7 +183,7 @@
         <span class="go">Otevřít balicí seznam <i>→</i></span>
       </div>
     </a>
-    <a class="card" href="vuz.html" data-foto="u:photo-1441974231531-c6227db76b6e|w:Låtefossen">
+    <a class="card" href="vuz.html" data-foto="https://www.bezkempu.cz/data/photos/rent/840x536xe/16978_1000017789.jpeg|u:photo-1441974231531-c6227db76b6e|w:Låtefossen">
       <div class="cimg"><span class="ph">🏔️</span><img alt="" loading="lazy" referrerpolicy="no-referrer"></div>
       <div class="ico">🚐</div>
       <div class="cbody">
@@ -192,7 +192,7 @@
         <span class="go">Otevřít kartu <i>→</i></span>
       </div>
     </a>
-    <a class="card" href="dotazy_vuz.html" data-foto="u:photo-1476514525535-07fb3b4ae5f1|w:Aurlandsfjord">
+    <a class="card" href="dotazy_vuz.html" data-foto="https://www.bezkempu.cz/data/photos/rent/840x536xe/11784_IMG-20240407-104521.jpg|https://www.bezkempu.cz/data/photos/rent/1920x1080xi/11784_IMG-20240407-104521.jpg|u:photo-1476514525535-07fb3b4ae5f1|w:Aurlandsfjord">
       <div class="cimg"><span class="ph">🏔️</span><img alt="" loading="lazy" referrerpolicy="no-referrer"></div>
       <div class="ico">❓</div>
       <div class="cbody">
@@ -278,7 +278,8 @@
 // Fotky Norska. Primárně kvalitní snímky z Unsplash CDN (stabilní adresy,
 // hotlink povolen), záložně fotka místa z Wikipedie, a když nic nevyjde,
 // zůstane gradientní podklad — nikdy prázdné šedé pole.
-// Kandidát „u:photo-…" = Unsplash, „w:Název článku" = Wikipedie.
+// Kandidát „u:photo-…" = Unsplash, „w:Název článku" = Wikipedie,
+// přímá http(s) adresa = použije se rovnou (např. fotky vozu z inzerátu).
 function unsplashUrl(id, px){
   return `https://images.unsplash.com/${id}?q=80&w=${px}&auto=format&fit=crop`;
 }
@@ -305,7 +306,8 @@ function zkusObrazek(url){
 async function najdiFotku(defs, px){
   for(const def of defs){
     const urls = def.startsWith('u:') ? [unsplashUrl(def.slice(2), px)]
-                                      : await wikiUrls(def.slice(2), px);
+               : def.startsWith('w:') ? await wikiUrls(def.slice(2), px)
+               : [def];
     for(const url of urls){
       if(await zkusObrazek(url)) return url;
     }
