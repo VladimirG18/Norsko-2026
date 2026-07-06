@@ -29,6 +29,9 @@
   .wrap{max-width:880px;margin:22px auto;padding:0 14px}
   h1{color:var(--modra);font-size:1.7rem;font-weight:800;letter-spacing:-.02em;margin:6px 0 2px}
   .sub{color:var(--slabe);font-size:.92rem;margin:0 0 14px}
+  .vozfoto{display:block;width:100%;max-height:230px;object-fit:cover;object-position:center 60%;
+       border-radius:14px;margin:2px 0 14px;border:1px solid var(--line);
+       box-shadow:0 4px 14px rgba(12,58,95,.12);background:linear-gradient(150deg,#d5e5f1,#e9f2f8)}
 
   .statusbar{font-size:.82rem;color:var(--slabe);padding:10px 14px;border:1px solid var(--line);
              border-radius:12px;margin:4px 0 14px;background:#fff;box-shadow:var(--shadow)}
@@ -113,7 +116,7 @@
   .note{margin-top:6px;font-size:.8rem;color:var(--slabe);font-style:italic}
 
   @media print{
-    .topbar,.addform,.filters,.filternote,.statusbar,.grip,.acts,.progress .bar,.note{display:none}
+    .topbar,.addform,.filters,.filternote,.statusbar,.grip,.acts,.progress .bar,.note,.vozfoto{display:none}
     body{background:#fff}.item{box-shadow:none;break-inside:avoid}
     .badge{cursor:default}
   }
@@ -125,6 +128,9 @@
   <span><a href="index.html">← rozcestník</a> &nbsp; <a href="vuz.html">karta vozu →</a></span>
 </div>
 <div class="wrap">
+  <img class="vozfoto" src="https://www.bezkempu.cz/data/photos/rent/1920x1080xi/11784_IMG-20240407-104521.jpg"
+       alt="Interiér obytného vozu CI Horon 84 M Elite" referrerpolicy="no-referrer"
+       onerror="this.style.display='none'">
   <h1>Dotazy k obytnému vozu</h1>
   <p class="sub">Co ověřit u majitele před cestou. Klikni na <b>💬</b> a zapiš odpověď — dotaz se sám odškrtne.
      Můžeš taky přidávat, mazat a upravovat dotazy, klikem na štítek měnit prioritu, přetažením za <b>⠿</b> řadit a nahoře filtrovat.</p>

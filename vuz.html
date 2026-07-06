@@ -81,9 +81,24 @@
   .feat .y::before{content:"✓ ";color:var(--zelena);font-weight:800}
   .feat .n{color:var(--slabe)} .feat .n::before{content:"✕ ";color:var(--akcent);font-weight:800}
   .listnote{font-size:.9rem;margin:8px 2px 0;color:var(--text)}
-  @media(max-width:620px){.crit{grid-template-columns:1fr}.feat{grid-template-columns:1fr}}
+
+  /* fotogalerie z inzerátu */
+  .galerie{margin:26px 0 0;padding-top:20px;border-top:1px solid var(--line)}
+  .galerie h2{margin:0 0 12px;color:var(--modra);font-size:1.15rem;font-weight:800;letter-spacing:-.01em}
+  .ggrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}
+  .ggrid a{display:block;border-radius:12px;overflow:hidden;border:1px solid var(--line);
+       aspect-ratio:4/3;background:linear-gradient(150deg,#d5e5f1,#e9f2f8);
+       box-shadow:0 2px 8px rgba(12,58,95,.08);transition:transform .15s ease,box-shadow .15s ease}
+  .ggrid a:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(12,58,95,.18)}
+  .ggrid img{width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .6s ease}
+  .ggrid img.loaded{opacity:1}
+  .gnote{font-size:.82rem;color:var(--slabe);margin:10px 2px 0}
+  .gnote a{color:var(--modra2)}
+
+  @media(max-width:620px){.crit{grid-template-columns:1fr}.feat{grid-template-columns:1fr}
+       .ggrid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}}
   @media print{
-    body{background:#fff}.topbar,.accctl{display:none}
+    body{background:#fff}.topbar,.accctl,.galerie{display:none}
     .sheet{box-shadow:none;margin:0;max-width:100%;padding:0}
     details.acc{box-shadow:none;break-inside:avoid}
     details.acc>summary .chev{display:none}
@@ -287,6 +302,13 @@
       </table>
     </div>
   </details>
+
+  <div class="galerie">
+    <h2>📸 Fotky vozu z inzerátu</h2>
+    <div class="ggrid" id="ggrid"></div>
+    <p class="gnote">Kliknutím otevřeš fotku v plné velikosti · kompletní galerie v
+       <a href="https://www.bezkempu.cz/pujcovna-karavanu/800?date=2026-07-18,2026-08-01" target="_blank" rel="noopener">inzerátu na bezkempu.cz</a>.</p>
+  </div>
 </div>
 
 <script>
@@ -295,6 +317,30 @@
   document.getElementById('collapseAll').addEventListener('click', ()=> accs().forEach(d=> d.open=false));
   // při tisku rozbal vše, ať je v PDF/papíru kompletní obsah
   window.addEventListener('beforeprint', ()=> accs().forEach(d=> d.open=true));
+
+  // Fotogalerie vozu z inzerátu na bezkempu.cz. Každá položka = kandidátní
+  // adresy téhož snímku (větší varianta první, ověřená jako záloha);
+  // dlaždice se ukáže, až se snímek načte — žádné prázdné rámečky.
+  const FOTKY=[
+    ['https://www.bezkempu.cz/data/photos/rent/1920x1080xi/16978_1000017789.jpeg',
+     'https://www.bezkempu.cz/data/photos/rent/840x536xe/16978_1000017789.jpeg'],
+    ['https://www.bezkempu.cz/data/photos/rent/1920x1080xi/11784_IMG-20240407-104521.jpg'],
+  ];
+  const ggrid=document.getElementById('ggrid');
+  FOTKY.forEach((kandidati,i)=>{
+    const a=document.createElement('a');
+    a.target='_blank'; a.rel='noopener'; a.style.display='none';
+    const img=document.createElement('img');
+    img.alt='CI Horon 84 M Elite — fotografie '+(i+1)+' z inzerátu';
+    // pozor: ne loading='lazy' — dlaždice je do načtení skrytá a líné
+    // stahování by se u skrytého obrázku nikdy nespustilo
+    img.referrerPolicy='no-referrer';
+    a.appendChild(img); ggrid.appendChild(a);
+    let j=0;
+    img.onload=()=>{a.href=img.src;a.style.display='';img.classList.add('loaded')};
+    img.onerror=()=>{ j++; if(j<kandidati.length) img.src=kandidati[j]; else a.remove(); };
+    img.src=kandidati[j];
+  });
 </script>
 </body>
 </html>
