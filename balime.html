@@ -104,6 +104,14 @@
   .qty:hover{filter:brightness(.97)}
   .qsplit{font-size:.7rem;color:var(--slabe);background:#f2f6fa;border:1px solid var(--line);
           border-radius:20px;padding:2px 7px;white-space:nowrap}
+  .thumb{width:46px;height:46px;flex:none;border-radius:9px;object-fit:cover;cursor:zoom-in;
+         border:1px solid var(--line);box-shadow:0 1px 4px rgba(12,58,95,.12);margin-top:1px}
+  .iconbtn.photo.has{color:var(--modra2)}
+  .lightbox{position:fixed;inset:0;z-index:80;background:rgba(8,25,40,.86);display:none;
+            flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:zoom-out;padding:20px}
+  .lightbox img{max-width:min(92vw,900px);max-height:82vh;border-radius:12px;
+                box-shadow:0 18px 60px rgba(0,0,0,.5);background:#fff}
+  .lightbox .lbcap{color:#dfeaf4;font-size:.95rem;font-weight:600;text-align:center;max-width:92vw}
   .who-badge{font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:20px;cursor:pointer;border:1px solid #cdd9e3;background:#eef3f7;color:var(--slabe)}
   .who-badge.w-none{font-weight:600;color:var(--slabe)}
   .who-badge.w-lucie{background:#fde7f1;color:#b0306a;border-color:#f3bcd6}
@@ -145,7 +153,7 @@
   .pfrac{font-size:.72rem;color:var(--slabe);background:#eef3f7;border-radius:20px;padding:2px 8px;flex:none;white-space:nowrap}
 
   @media print{
-    .topbar,.addform,.filters,.filternote,.statusbar,.grip,.acts,.progress .bar,.note{display:none}
+    .topbar,.addform,.filters,.filternote,.statusbar,.grip,.acts,.progress .bar,.note,.lightbox,.assignpop{display:none}
     body{background:#fff}.item{box-shadow:none;break-inside:avoid}
     .badge,.who-badge,.qty{cursor:default}
   }
@@ -161,6 +169,7 @@
   <p class="sub">Společný balicí seznam. Odškrtni sbalené. Klikem na <b>👤</b> přiřadíš, kdo danou položku balí — pokud
      je přiřazeno víc lidí, každý si ji odškrtne <b>sám za sebe</b> (položka je hotová, až mají zaškrtnuto všichni
      přiřazení). Jde přidávat, mazat, upravovat, u položek zadávat <b>množství (ks)</b> klikem na štítek s počtem,
+     ke každé položce přidat <b>fotku</b> přes 📷 (ze souborů, nebo na telefonu rovnou vyfocením),
      měnit prioritu klikem na štítek, řadit přetažením za <b>⠿</b>
      a filtrovat/seskupovat podle řešitele. Vše sdílené pro celou posádku v reálném čase.</p>
 
@@ -530,6 +539,7 @@ function makeRow(it, dndOff, forPerson){
   row.innerHTML = `
     <span class="grip${dndOff?' off':''}" title="${dndOff?'Řazení vypnuto při filtru/seskupení':'Přetáhni pro změnu pořadí'}">⠿</span>
     ${multi ? `<span class="pfrac" title="Kolik přiřazených má sbaleno">${doneUnitsFor(it)}/${w.length}</span>` : `<input type="checkbox" ${rowDone?'checked':''} title="Sbaleno">`}
+    ${it.photo ? `<img class="thumb" src="${esc(it.photo)}" alt="" title="Klikni pro zvětšení">` : ''}
     <div class="body">
       <div class="txt">${esc(it.text)}</div>
       <div class="meta">
@@ -542,6 +552,7 @@ function makeRow(it, dndOff, forPerson){
       ${pchecksHtml}
     </div>
     <div class="acts">
+      <button class="iconbtn photo${it.photo?' has':''}" title="${it.photo?'Fotka — zobrazit / změnit / odebrat':'Přidat fotku (ze souborů nebo vyfocením)'}">📷</button>
       <button class="iconbtn edit" title="Upravit text položky">✏️</button>
       <button class="iconbtn del" title="Smazat">🗑</button>
     </div>`;
@@ -567,6 +578,9 @@ function makeRow(it, dndOff, forPerson){
     if(!isNaN(n) && n>0) backend.update(it.id, {qty: n});
   });
   row.querySelector('.who-badge').addEventListener('click', (e)=> openAssign(e.currentTarget, w, sel=> backend.update(it.id, {who: sel})));
+  row.querySelector('.photo').addEventListener('click', e=> openPhotoMenu(e.currentTarget, it));
+  const th = row.querySelector('.thumb');
+  if(th) th.addEventListener('click', ()=> openLightbox(it));
   row.querySelector('.edit').addEventListener('click', ()=>{
     const t = prompt('Upravit položku:', it.text);
     if(t!=null && t.trim()) backend.update(it.id, {text: t.trim()});
@@ -710,6 +724,97 @@ function renderNewWhoBtn(){ $('newWhoBtn').textContent = newWhoSel.length ? whoL
 $('newWhoBtn').addEventListener('click', e=> openAssign(e.currentTarget, newWhoSel, sel=>{ newWhoSel = sel; renderNewWhoBtn(); }));
 renderNewWhoBtn();
 
+// ---- fotky u položek ----
+// Fotka se v prohlížeči zmenší a zkomprimuje (JPEG) a uloží se přímo k položce jako data URL,
+// takže se sdílí přes stejnou databázi jako zbytek seznamu (limit dokumentu Firestore je 1 MB).
+// Vstup bez `capture` otevře výběr souborů/galerii, vstup s `capture` na telefonu rovnou fotoaparát.
+const photoFile = document.createElement('input');
+photoFile.type='file'; photoFile.accept='image/*'; photoFile.style.display='none';
+const photoCam = document.createElement('input');
+photoCam.type='file'; photoCam.accept='image/*'; photoCam.setAttribute('capture','environment'); photoCam.style.display='none';
+document.body.append(photoFile, photoCam);
+
+let photoTarget = null; // id položky, ke které se právě vybírá fotka
+
+async function compressImage(file){
+  const url = URL.createObjectURL(file);
+  try{
+    const img = await new Promise((res,rej)=>{
+      const im = new Image();
+      im.onload = ()=>res(im);
+      im.onerror = ()=>rej(new Error('obrázek nejde načíst'));
+      im.src = url;
+    });
+    let max = 900, q = .72, out = '';
+    for(let i=0;i<5;i++){
+      const sc = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
+      const cv = document.createElement('canvas');
+      cv.width = Math.max(1, Math.round(img.naturalWidth*sc));
+      cv.height = Math.max(1, Math.round(img.naturalHeight*sc));
+      cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+      out = cv.toDataURL('image/jpeg', q);
+      if(out.length < 700000) break;   // s rezervou pod limitem dokumentu
+      max = Math.round(max*.7); q = Math.max(.5, q-.08);
+    }
+    return out;
+  } finally { URL.revokeObjectURL(url); }
+}
+
+async function onPhotoPicked(input){
+  const f = input.files && input.files[0];
+  input.value = '';
+  const id_ = photoTarget; photoTarget = null;
+  if(!f || !id_) return;
+  try{
+    const dataUrl = await compressImage(f);
+    if(dataUrl && dataUrl.length < 900000) backend.update(id_, {photo: dataUrl});
+    else alert('Fotku se nepodařilo dostatečně zmenšit, zkus jinou.');
+  }catch(e){ console.error(e); alert('Fotku se nepodařilo načíst.'); }
+}
+photoFile.addEventListener('change', ()=> onPhotoPicked(photoFile));
+photoCam.addEventListener('change', ()=> onPhotoPicked(photoCam));
+
+const photoPop = document.createElement('div');
+photoPop.className = 'assignpop';
+document.body.appendChild(photoPop);
+function closePhotoMenu(){ photoPop.style.display='none'; }
+function openPhotoMenu(anchor, it){
+  photoPop.innerHTML =
+    (it.photo ? `<label class="ppView">🖼 Zobrazit fotku</label>` : '') +
+    `<label class="ppFile">📁 Ze souborů</label>
+     <label class="ppCam">📷 Vyfotit</label>` +
+    (it.photo ? `<div class="apsep"></div><label class="ppDel">🗑 Odebrat fotku</label>` : '');
+  const on = (sel,fn)=>{ const el = photoPop.querySelector(sel); if(el) el.addEventListener('click', ()=>{ closePhotoMenu(); fn(); }); };
+  on('.ppView', ()=> openLightbox(it));
+  on('.ppFile', ()=>{ photoTarget = it.id; photoFile.click(); });
+  on('.ppCam',  ()=>{ photoTarget = it.id; photoCam.click(); });
+  on('.ppDel',  ()=>{ if(confirm('Odebrat fotku u této položky?')) backend.update(it.id, {photo: null}); });
+  photoPop.style.display='flex';
+  const r = anchor.getBoundingClientRect();
+  photoPop.style.top = (window.scrollY + r.bottom + 5) + 'px';
+  photoPop.style.left = (window.scrollX + r.left) + 'px';
+  const pr = photoPop.getBoundingClientRect();
+  if(pr.right > window.innerWidth - 8) photoPop.style.left = (window.scrollX + window.innerWidth - 8 - pr.width) + 'px';
+}
+document.addEventListener('mousedown', e=>{
+  if(photoPop.style.display==='none') return;
+  if(photoPop.contains(e.target)) return;
+  if(e.target.closest && e.target.closest('.iconbtn.photo')) return;
+  closePhotoMenu();
+});
+
+// lightbox – zvětšená fotka přes celou obrazovku, zavře se klikem nebo Escape
+const lb = document.createElement('div');
+lb.className = 'lightbox';
+document.body.appendChild(lb);
+function openLightbox(it){
+  if(!it.photo) return;
+  lb.innerHTML = `<img src="${esc(it.photo)}" alt=""><div class="lbcap">${esc(it.text)}</div>`;
+  lb.style.display='flex';
+}
+lb.addEventListener('click', ()=>{ lb.style.display='none'; lb.innerHTML=''; });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && lb.style.display!=='none'){ lb.style.display='none'; lb.innerHTML=''; } });
+
 // vloží hodnotu do vnořené cesty typu "doneBy.Lucie" (Firestore to umí nativně, pro localStorage si to uděláme ručně)
 function applyPatch(obj, patch){
   for(const [k,v] of Object.entries(patch)){
@@ -724,7 +829,8 @@ function applyPatch(obj, patch){
 function localBackend(){
   let data=[];
   try{ data = JSON.parse(localStorage.getItem(KEY)) || []; }catch(e){ data=[]; }
-  const save=()=> localStorage.setItem(KEY, JSON.stringify(data));
+  const save=()=>{ try{ localStorage.setItem(KEY, JSON.stringify(data)); }
+    catch(e){ alert('Nepodařilo se uložit – úložiště prohlížeče je plné (fotky zabírají hodně místa).'); } };
   const id=()=> Date.now()+'-'+Math.random().toString(36).slice(2,7);
   const emit=()=>{ items=data.slice(); render(); };
   if(data.length===0){ data = SEED.map((s,i)=>({id:id(), prio:s[0], cat:s[1], text:s[2], qty:(s[3] ?? null), who:(s[4] || []), split:(s[5] ?? null), doneBy:{}, order:i})); save(); }
