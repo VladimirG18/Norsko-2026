@@ -231,6 +231,8 @@ const KEY = 'norsko2026-co-balime-v2';
 // Verze výchozí sady. Po jejím zvýšení se do sdílené databáze doplní nově přidané
 // položky (stávající data ani odškrtnutí se nemažou).
 const SEED_VERSION = 2;
+// Dokument s verzí držíme uvnitř stejné kolekce, aby na něj platila stejná pravidla Firestore.
+const SEED_META_ID = '_seedmeta';
 
 const CATS = ['Doklady + finance','Elektronika','Oblečení — vrchní část','Oblečení — kalhoty',
   'Oblečení — spodní prádlo','Oblečení — obuv','Dítě — oblečení','Dítě — výbava','Pes',
@@ -792,7 +794,7 @@ async function firebaseBackend(){
     const s = SEED[i];
     return setDoc(doc(col, seedId(i)), {prio:s[0], cat:s[1], text:s[2], qty:(s[3] ?? null), doneBy:{}, order:i});
   };
-  const metaRef = doc(db, COLLECTION + '-meta', 'state');
+  const metaRef = doc(col, SEED_META_ID);
   const snap0 = await getDocs(col);
   if(snap0.empty){
     // první naplnění prázdné databáze celou výchozí sadou
@@ -812,7 +814,7 @@ async function firebaseBackend(){
   return {
     start(){
       onSnapshot(col, snap=>{
-        items = snap.docs.map(d=>({id:d.id, ...d.data()})).sort((a,b)=>(a.order||0)-(b.order||0));
+        items = snap.docs.filter(d=>d.id!==SEED_META_ID).map(d=>({id:d.id, ...d.data()})).sort((a,b)=>(a.order||0)-(b.order||0));
         render();
       }, err=>{
         console.error(err);
