@@ -102,6 +102,8 @@
        background:#e7f0fb;color:#1d5fa8;border:1px solid #bcd6f3;white-space:nowrap}
   .qty.empty{font-weight:600;color:var(--slabe);background:#eef3f7;border-color:#dfe9f2}
   .qty:hover{filter:brightness(.97)}
+  .qsplit{font-size:.7rem;color:var(--slabe);background:#f2f6fa;border:1px solid var(--line);
+          border-radius:20px;padding:2px 7px;white-space:nowrap}
   .who-badge{font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:20px;cursor:pointer;border:1px solid #cdd9e3;background:#eef3f7;color:var(--slabe)}
   .who-badge.w-none{font-weight:600;color:var(--slabe)}
   .who-badge.w-lucie{background:#fde7f1;color:#b0306a;border-color:#f3bcd6}
@@ -227,67 +229,149 @@ const firebaseConfig = {
   appId: "1:941681195558:web:3aac10f182e784cdb3c4e7"
 };
 const COLLECTION = 'co-balime-norsko';
-const KEY = 'norsko2026-co-balime-v2';
+const KEY = 'norsko2026-co-balime-v3';
 // Verze výchozí sady. Po jejím zvýšení se do sdílené databáze doplní nově přidané
 // položky (stávající data ani odškrtnutí se nemažou).
-const SEED_VERSION = 2;
+const SEED_VERSION = 3;
 // Dokument s verzí držíme uvnitř stejné kolekce, aby na něj platila stejná pravidla Firestore.
 const SEED_META_ID = '_seedmeta';
 
-const CATS = ['Doklady + finance','Elektronika','Oblečení — vrchní část','Oblečení — kalhoty',
-  'Oblečení — spodní prádlo','Oblečení — obuv','Dítě — oblečení','Dítě — výbava','Pes',
-  'Turistika','Lékárnička','Hygiena','Jídlo + výbava','Obytné auto',
-  'Peníze','Doklady/Dokumenty','Oblečení','Léky','Kosmetika/drogerie','Klíče','Doplňky',
-  'Batohy/Tašky/Obaly'];
+const CATS = ['Doklady + finance','Elektronika','Oblečení','Hygiena','Lékárnička','Doplňky',
+  'Batohy/Tašky/Obaly','Turistika','Klíče','Dítě — oblečení','Dítě — výbava','Pes',
+  'Jídlo + výbava','Obytné auto'];
 
-// Výchozí sada položek (naplní se jen při prvním načtení do prázdné databáze) — sestaveno z balicího seznamu.
+// Výchozí sada = sloučený balicí seznam (původní cestovní položky + položky z Excelu
+// „Příprava na dovolenou Norsko"). 4. hodnota = množství (ks, součet manžel+manželka),
+// 5. = kdo balí, 6. = rozpad manžel / manželka. Doplní se i do sdílené databáze podle SEED_VERSION.
 const SEED = [
-  ['red','Doklady + finance','Občanské průkazy / pasy všech členů výpravy'],
-  ['red','Doklady + finance','Řidičské průkazy'],
+  // — Doklady + finance —
+  ['red','Doklady + finance','Hotovost EUR',2,['Vladimír','Lucie'],'1 / 1'],
+  ['red','Doklady + finance','Hotovost NOK',2,['Vladimír','Lucie'],'1 / 1'],
+  ['red','Doklady + finance','Pas',2,['Vladimír','Lucie'],'1 / 1'],
+  ['red','Doklady + finance','Řidičský průkaz',2,['Vladimír','Lucie'],'1 / 1'],
+  ['red','Doklady + finance','Ostatní doklady',2,['Vladimír','Lucie'],'1 / 1'],
+  ['red','Doklady + finance','Kartička cestovního pojištění',2,['Vladimír','Lucie'],'1 / 1'],
+  ['yellow','Doklady + finance','Platební karty'],
+  ['red','Doklady + finance','Evropské kartičky zdravotního pojištění (EHIC)'],
   ['red','Doklady + finance','Technický průkaz vozidla'],
   ['red','Doklady + finance','Zelená karta (pojištění auta)'],
-  ['red','Doklady + finance','Cestovní pojištění všech osob'],
-  ['red','Doklady + finance','Evropské kartičky zdravotního pojištění (EHIC)'],
   ['red','Doklady + finance','Rezervace trajektu Hirtshals → Kristiansand'],
   ['red','Doklady + finance','Rezervace Trolltunga shuttle + parkování'],
   ['red','Doklady + finance','Rezervace Geiranger fjord plavby'],
   ['red','Doklady + finance','Rezervace parkování Besseggen (Gjendesheim)'],
-  ['yellow','Doklady + finance','Platební karty'],
-  ['yellow','Doklady + finance','Hotovost v NOK'],
 
-  ['yellow','Elektronika','Mobilní telefony všech členů'],
-  ['yellow','Elektronika','Nabíječky (všechny typy)'],
+  // — Elektronika —
+  ['yellow','Elektronika','Čelovka',2,['Vladimír','Lucie'],'1 / 1'],
+  ['yellow','Elektronika','Náhradní baterie do čelovky manžel',1,['Vladimír'],'1 / –'],
+  ['yellow','Elektronika','Náhradní baterie do čelovky manželka',1,['Vladimír','Lucie'],'– / 1'],
+  ['red','Elektronika','Redukce do zásuvky (od každého typu 1)',1,['Vladimír','Lucie'],'1 / –'],
+  ['red','Elektronika','Mobil',2,['Vladimír','Lucie'],'1 / 1'],
+  ['green','Elektronika','Chytrý prsten',1,['Vladimír'],'1 / –'],
+  ['yellow','Elektronika','Power banka 20 000 mAh',2,['Vladimír','Lucie'],'1 / 1'],
+  ['yellow','Elektronika','Power banka 5 000 mAh',1,['Vladimír','Lucie'],'1 / –'],
+  ['yellow','Elektronika','Chytré hodinky',2,['Vladimír','Lucie'],'1 / 1'],
+  ['yellow','Elektronika','USB C kabel',6,['Vladimír','Lucie'],'4 / 2'],
+  ['yellow','Elektronika','Lightning Appel kabel',1,['Lucie'],'– / 1'],
+  ['yellow','Elektronika','Sluchátka',2,['Vladimír','Lucie'],'1 / 1'],
+  ['red','Elektronika','Redukce (nabíječka) USB do sítě',2,['Vladimír','Lucie'],'1 / 1'],
+  ['yellow','Elektronika','Nabíjecí kabel na hodinky',2,['Vladimír','Lucie'],'1 / 1'],
+  ['yellow','Elektronika','Notebook - pracovní',1,['Vladimír'],'1 / –'],
+  ['yellow','Elektronika','Kabel k notebooku',1,['Vladimír'],'1 / –'],
+  ['yellow','Elektronika','Myš s obalem',1,['Vladimír'],'1 / –'],
   ['yellow','Elektronika','Autonabíječka / USB adaptér'],
-  ['yellow','Elektronika','Powerbanky'],
   ['green','Elektronika','Fotoaparát + nabíječka'],
-  ['yellow','Elektronika','Čelovky'],
   ['green','Elektronika','SD karty / úložiště'],
   ['yellow','Elektronika','Offline mapy (Mapy.com / Organic Maps / Google offline)'],
 
-  ['yellow','Oblečení — vrchní část','Funkční/merino trička (2×)'],
-  ['yellow','Oblečení — vrchní část','Běžná trička (2×)'],
-  ['yellow','Oblečení — vrchní část','Mikina'],
-  ['yellow','Oblečení — vrchní část','Fleece vrstva'],
-  ['yellow','Oblečení — vrchní část','Teplejší bunda (péřová / izolační)'],
-  ['yellow','Oblečení — vrchní část','Nepromokavá bunda'],
-  ['yellow','Oblečení — vrchní část','Čepice + kšiltovka'],
-  ['yellow','Oblečení — vrchní část','Lehké rukavice'],
+  // — Oblečení —
+  ['red','Oblečení','Bunda nepromokavá Mountain equipment',2,['Vladimír','Lucie'],'1 / 1'],
+  ['yellow','Oblečení','Mikina merino - Decathlon',2,['Vladimír','Lucie'],'1 / 1'],
+  ['yellow','Oblečení','Mikina tlustá - Patagonia',1,['Vladimír','Lucie'],'1 / –'],
+  ['yellow','Oblečení','Kalhoty',1,['Vladimír'],'1 / –'],
+  ['green','Oblečení','Volné kalhoty',1,['Lucie'],'– / 1'],
+  ['yellow','Oblečení','Kraťasy sportovní',3,['Vladimír','Lucie'],'2 / 1'],
+  ['yellow','Oblečení','Kalhoty turistické',3,['Vladimír','Lucie'],'2 / 1'],
+  ['yellow','Oblečení','Tričko s krátkými rukávy bez límenčku - společenské',1,['Vladimír','Lucie'],'1 / ?'],
+  ['yellow','Oblečení','Tričko s krátkými rukávy bez límenčku - sportovní',1,['Vladimír','Lucie'],'1 / ?'],
+  ['yellow','Oblečení','Tričko s krátkými rukávy (merino)',8,['Vladimír','Lucie'],'4 / 4'],
+  ['yellow','Oblečení','Tričko s dlouhýmy rukávy',1,['Lucie'],'– / ?'],
+  ['yellow','Oblečení','Tričko s dlouhýmy rukávy (merino)',1,['Lucie'],'– / ?'],
+  ['yellow','Oblečení','Tričko s ramínky/bez rukávů',1,['Lucie'],'– / ?'],
+  ['yellow','Oblečení','Tričko s ramínky/bez rukávů (merino)',1,['Lucie'],'– / ?'],
+  ['yellow','Oblečení','Spodní prádlo (spodek)',7,['Vladimír','Lucie'],'1 / 6'],
+  ['yellow','Oblečení','Tenisky - společenské',2,['Vladimír','Lucie'],'1 / 1'],
+  ['yellow','Oblečení','Běžecké boty silníční',2,['Vladimír','Lucie'],'1 / 1'],
+  ['yellow','Oblečení','Běžecké boty trailové',3,['Vladimír','Lucie'],'1 / 2'],
+  ['yellow','Oblečení','Boty pohorky Salomon',1,['Vladimír'],'1 / –'],
+  ['yellow','Oblečení','Pantofle',2,['Vladimír','Lucie'],'1 / 1'],
+  ['yellow','Oblečení','Rukavice',2,['Vladimír','Lucie'],'1 / 1'],
+  ['yellow','Oblečení','Tunel/nákrčník',2,['Vladimír','Lucie'],'1 / 1'],
+  ['yellow','Oblečení','Podzimní čepice',2,['Vladimír','Lucie'],'1 / 1'],
+  ['yellow','Oblečení','Plavky',2,['Vladimír','Lucie'],'1 / 1'],
+  ['yellow','Oblečení','Ponožky vysoké společenské',4,['Vladimír','Lucie'],'2 / 2'],
+  ['yellow','Oblečení','Ponožky nízké společenské',4,['Vladimír','Lucie'],'2 / 2'],
+  ['yellow','Oblečení','Ponožky vysoké sportovní',6,['Vladimír','Lucie'],'3 / 3'],
+  ['yellow','Oblečení','Ponožky nízké sportovní',6,['Vladimír','Lucie'],'3 / 3'],
+  ['yellow','Oblečení','Ponožky vysoké teplé',6,['Vladimír','Lucie'],'3 / 3'],
+  ['yellow','Oblečení','Podprsenka normální',3,['Lucie'],'– / 3'],
+  ['yellow','Oblečení','Podprsenka sportovní',3,['Lucie'],'– / 3'],
+  ['green','Oblečení','Šátek',1,['Lucie'],'– / ?'],
+  ['yellow','Oblečení','Kšiltovka',2,['Vladimír','Lucie'],'1 / 1'],
+  ['yellow','Oblečení','Boty do vody',2,['Vladimír','Lucie'],'1 / 1'],
 
-  ['yellow','Oblečení — kalhoty','Turistické kalhoty / sportovní legíny'],
-  ['green','Oblečení — kalhoty','Kraťasy'],
-  ['green','Oblečení — kalhoty','Pohodlné „civilní" kalhoty na večer'],
-  ['green','Oblečení — kalhoty','Tepláky'],
+  // — Hygiena —
+  ['yellow','Hygiena','Deodorant',1,['Vladimír','Lucie'],'– / 1'],
+  ['yellow','Hygiena','Antiperspirant',2,['Vladimír','Lucie'],'1 / 1'],
+  ['yellow','Hygiena','Kartáček',2,['Vladimír','Lucie'],'1 / 1'],
+  ['yellow','Hygiena','Kosmetika/drogerie pro oba',1,['Vladimír','Lucie'],'– / 1'],
+  ['green','Hygiena','Parfém',2,['Vladimír','Lucie'],'1 / 1'],
+  ['yellow','Hygiena','Menstruakční potřeby',1,['Lucie'],'– / 1'],
+  ['yellow','Hygiena','Zubní pasta'],
+  ['yellow','Hygiena','Sprchový gel + šampon'],
 
-  ['yellow','Oblečení — spodní prádlo','Spodní prádlo (7–8×)'],
-  ['yellow','Oblečení — spodní prádlo','Ponožky (7–8×)'],
-  ['yellow','Oblečení — spodní prádlo','Turistické ponožky (2× a více)'],
-  ['green','Oblečení — spodní prádlo','Sportovní podprsenky'],
+  // — Lékárnička —
+  ['red','Lékárnička','Vlastní léky a doplňky',2,['Vladimír','Lucie'],'1 / 1'],
+  ['red','Lékárnička','Léky proti bolesti a horečce'],
+  ['yellow','Lékárnička','Léky na alergii'],
+  ['yellow','Lékárnička','Léky proti průjmu'],
+  ['red','Lékárnička','Náplasti (včetně puchýřových)'],
+  ['red','Lékárnička','Dezinfekce'],
+  ['yellow','Lékárnička','Elastické obinadlo'],
+  ['yellow','Lékárnička','Pinzeta'],
+  ['yellow','Lékárnička','Teploměr'],
 
-  ['yellow','Oblečení — obuv','Turistické boty do hor'],
-  ['yellow','Oblečení — obuv','Lehčí outdoorová obuv'],
-  ['green','Oblečení — obuv','Lehké nazouvací boty / tenisky'],
-  ['green','Oblečení — obuv','Sandály / crocsy'],
+  // — Doplňky —
+  ['green','Doplňky','Polštářek do letadla',1,['Vladimír','Lucie'],'1 / –'],
+  ['yellow','Doplňky','Ručník velký, rychleschnoucí',2,['Vladimír','Lucie'],'1 / 1'],
+  ['yellow','Doplňky','Obal na batoh proti dešti',2,['Vladimír','Lucie'],'1 / 1'],
+  ['green','Doplňky','Maska na spaní',1,['Vladimír','Lucie'],'1 / ?'],
+  ['green','Doplňky','Špunty do uší',2,['Vladimír','Lucie'],'1 / 1'],
+  ['yellow','Doplňky','Plášťenka',2,['Vladimír','Lucie'],'1 / 1'],
+  ['yellow','Doplňky','Deštník',2,['Vladimír','Lucie'],'1 / 1'],
+  ['yellow','Doplňky','Sluneční brýle standardní',2,['Vladimír','Lucie'],'1 / 1'],
+  ['green','Doplňky','Sluneční brýle běžecké',1,['Vladimír','Lucie'],'1 / –'],
+  ['green','Doplňky','Umělohmotný příbor z Decathlonu',1,['Vladimír'],'1 / –'],
+  ['green','Doplňky','Propiska',2,['Vladimír','Lucie'],'1 / 1'],
 
+  // — Batohy/Tašky/Obaly —
+  ['yellow','Batohy/Tašky/Obaly','Ledvinka',2,['Vladimír','Lucie'],'1 / 1'],
+  ['yellow','Batohy/Tašky/Obaly','Batoh do letadla',1,['Vladimír','Lucie'],'1 / –'],
+  ['yellow','Batohy/Tašky/Obaly','Skládací batůžek z Runczech nebo Nike',2,['Vladimír','Lucie'],'1 / 1'],
+  ['yellow','Batohy/Tašky/Obaly','Igelitové pytle (např. na prádlo)',2,['Vladimír','Lucie'],'1 / 1'],
+  ['yellow','Batohy/Tašky/Obaly','Různé obaly/krabičky (průhledné)',4,['Vladimír','Lucie'],'3 / 1'],
+
+  // — Turistika —
+  ['yellow','Turistika','Turistické hole'],
+  ['yellow','Turistika','Lahve na vodu / pytle na vodu'],
+  ['red','Turistika','Opalovací krém SPF 50'],
+  ['yellow','Turistika','Repelent'],
+  ['green','Turistika','Kapesníky'],
+  ['green','Turistika','Vazelína na promazání nohou'],
+
+  // — Klíče —
+  ['red','Klíče','Klíče od domova',1,['Vladimír','Lucie'],'– / 1'],
+
+  // — Dítě — oblečení —
   ['yellow','Dítě — oblečení','Body/trička (7–8×)'],
   ['yellow','Dítě — oblečení','Kalhoty (5×)'],
   ['yellow','Dítě — oblečení','Mikiny (3×)'],
@@ -300,6 +384,7 @@ const SEED = [
   ['yellow','Dítě — oblečení','Rukavice'],
   ['yellow','Dítě — oblečení','Pyžama (3×)'],
 
+  // — Dítě — výbava —
   ['red','Dítě — výbava','Autosedačka'],
   ['yellow','Dítě — výbava','Nosítko'],
   ['yellow','Dítě — výbava','Pláštěnka na nosítko'],
@@ -321,6 +406,7 @@ const SEED = [
   ['red','Dítě — výbava','Lékárna'],
   ['red','Dítě — výbava','Léky pro Adámka'],
 
+  // — Pes —
   ['red','Pes','EU pas + očkování'],
   ['yellow','Pes','Obojek'],
   ['yellow','Pes','Postroj'],
@@ -334,38 +420,7 @@ const SEED = [
   ['yellow','Pes','Deka'],
   ['yellow','Pes','Léky (pokud jsou potřeba)'],
 
-  ['yellow','Turistika','Turistické hole'],
-  ['yellow','Turistika','Batohy'],
-  ['yellow','Turistika','Lahve na vodu / pytle na vodu'],
-  ['red','Turistika','Opalovací krém SPF 50'],
-  ['yellow','Turistika','Repelent'],
-  ['yellow','Turistika','Sluneční brýle'],
-  ['green','Turistika','Kapesníky'],
-  ['green','Turistika','Malý ručník'],
-  ['yellow','Turistika','Pláštěnky + pláštěnky na batohy'],
-  ['green','Turistika','Deštník'],
-  ['green','Turistika','Vazelína na promazání nohou'],
-  ['yellow','Turistika','Čelovky'],
-
-  ['red','Lékárnička','Pravidelně užívané léky'],
-  ['red','Lékárnička','Léky proti bolesti a horečce'],
-  ['yellow','Lékárnička','Léky na alergii'],
-  ['yellow','Lékárnička','Léky proti průjmu'],
-  ['red','Lékárnička','Náplasti (včetně puchýřových)'],
-  ['red','Lékárnička','Dezinfekce'],
-  ['yellow','Lékárnička','Elastické obinadlo'],
-  ['yellow','Lékárnička','Pinzeta'],
-  ['yellow','Lékárnička','Teploměr'],
-
-  ['yellow','Hygiena','Kartáčky + pasta'],
-  ['yellow','Hygiena','Sprchový gel + šampon'],
-  ['green','Hygiena','Deodorant'],
-  ['green','Hygiena','Krém'],
-  ['green','Hygiena','Balzám na rty'],
-  ['green','Hygiena','Hřeben'],
-  ['yellow','Hygiena','Ručníky + osušky'],
-  ['yellow','Hygiena','Vlhčené ubrousky'],
-
+  // — Jídlo + výbava —
   ['yellow','Jídlo + výbava','Káva + čaj'],
   ['green','Jídlo + výbava','Kofeinové tablety'],
   ['green','Jídlo + výbava','Základní koření'],
@@ -377,6 +432,7 @@ const SEED = [
   ['yellow','Jídlo + výbava','Voda + lahve'],
   ['green','Jídlo + výbava','Termoska'],
 
+  // — Obytné auto —
   ['yellow','Obytné auto','Povlečení, peřiny a polštáře'],
   ['yellow','Obytné auto','Hadice + redukce na vodu'],
   ['yellow','Obytné auto','Kabel do kempu (elektrika)'],
@@ -390,107 +446,6 @@ const SEED = [
   ['yellow','Obytné auto','Odpadkové pytle'],
   ['green','Obytné auto','Kolíčky + šňůra na prádlo'],
   ['yellow','Obytné auto','Prací prostředek'],
-
-  // === Položky z Excelu „Příprava na dovolenou Norsko" (4. hodnota = množství v ks; součet za manžela + manželku) ===
-  // — Peníze —
-  ['red','Peníze','Hotovost EUR',2],
-  ['red','Peníze','Hotovost NOK',2],
-
-  // — Doklady/Dokumenty —
-  ['red','Doklady/Dokumenty','Pas',2],
-  ['red','Doklady/Dokumenty','Řidičský průkaz',2],
-  ['red','Doklady/Dokumenty','Ostatní doklady',2],
-  ['red','Doklady/Dokumenty','Kartička cestovního pojištění',2],
-
-  // — Oblečení —
-  ['red','Oblečení','Bunda nepromokavá Mountain equipment',2],
-  ['yellow','Oblečení','Mikina merino - Decathlon',2],
-  ['yellow','Oblečení','Mikina tlustá - Patagonia',1],
-  ['yellow','Oblečení','Kalhoty',1],
-  ['green','Oblečení','Volné kalhoty',1],
-  ['yellow','Oblečení','Kraťasy sportovní',3],
-  ['yellow','Oblečení','Kalhoty turistické',3],
-  ['yellow','Oblečení','Tričko s krátkými rukávy bez límenčku - společenské',1],
-  ['yellow','Oblečení','Tričko s krátkými rukávy bez límenčku - sportovní',1],
-  ['yellow','Oblečení','Tričko s krátkými rukávy (merino)',8],
-  ['yellow','Oblečení','Tričko s dlouhýmy rukávy',1],
-  ['yellow','Oblečení','Tričko s dlouhýmy rukávy (merino)',1],
-  ['yellow','Oblečení','Tričko s ramínky/bez rukávů',1],
-  ['yellow','Oblečení','Tričko s ramínky/bez rukávů (merino)',1],
-  ['yellow','Oblečení','Spodní prádlo (spodek)',7],
-  ['yellow','Oblečení','Tenisky - společenské',2],
-  ['yellow','Oblečení','Běžecké boty silníční',2],
-  ['yellow','Oblečení','Běžecké boty trailové',3],
-  ['yellow','Oblečení','Boty pohorky Salomon',1],
-  ['yellow','Oblečení','Pantofle',2],
-  ['yellow','Oblečení','Rukavice',2],
-  ['yellow','Oblečení','Tunel/nákrčník',2],
-  ['yellow','Oblečení','Podzimní čepice',2],
-  ['yellow','Oblečení','Plavky',2],
-  ['yellow','Oblečení','Ponožky vysoké společenské',4],
-  ['yellow','Oblečení','Ponožky nízké společenské',4],
-  ['yellow','Oblečení','Ponožky vysoké sportovní',6],
-  ['yellow','Oblečení','Ponožky nízké sportovní',6],
-  ['yellow','Oblečení','Ponožky vysoké teplé',6],
-  ['yellow','Oblečení','Podprsenka normální',3],
-  ['yellow','Oblečení','Podprsenka sportovní',3],
-  ['green','Oblečení','Šátek',1],
-  ['yellow','Oblečení','Kšiltovka',2],
-  ['yellow','Oblečení','Boty do vody',2],
-
-  // — Léky —
-  ['red','Léky','Vlastní léky a doplňky',2],
-  ['red','Léky','Lékárnička',1],
-
-  // — Kosmetika/drogerie —
-  ['yellow','Kosmetika/drogerie','Deodorant',1],
-  ['yellow','Kosmetika/drogerie','Antiperspirant',2],
-  ['yellow','Kosmetika/drogerie','Kartáček',2],
-  ['yellow','Kosmetika/drogerie','Kosmetika/drogerie pro oba',1],
-  ['green','Kosmetika/drogerie','Parfém',2],
-  ['yellow','Kosmetika/drogerie','Menstruakční potřeby',1],
-
-  // — Klíče —
-  ['red','Klíče','Klíče od domova',1],
-
-  // — Elektronika —
-  ['yellow','Elektronika','Čelovka',2],
-  ['yellow','Elektronika','Náhradní baterie do čelovky manžel',1],
-  ['yellow','Elektronika','Náhradní baterie do čelovky manželka',1],
-  ['red','Elektronika','Redukce do zásuvky (od každého typu 1)',1],
-  ['red','Elektronika','Mobil',2],
-  ['green','Elektronika','Chytrý prsten',1],
-  ['yellow','Elektronika','Power banka 20 000 mAh',2],
-  ['yellow','Elektronika','Power banka 5 000 mAh',1],
-  ['yellow','Elektronika','Chytré hodinky',2],
-  ['yellow','Elektronika','USB C kabel',6],
-  ['yellow','Elektronika','Lightning Appel kabel',1],
-  ['yellow','Elektronika','Sluchátka',2],
-  ['red','Elektronika','Redukce (nabíječka) USB do sítě',2],
-  ['yellow','Elektronika','Nabíjecí kabel na hodinky',2],
-  ['yellow','Elektronika','Notebook - pracovní',1],
-  ['yellow','Elektronika','Kabel k notebooku',1],
-  ['yellow','Elektronika','Myš s obalem',1],
-
-  // — Doplňky —
-  ['green','Doplňky','Polštářek do letadla',1],
-  ['yellow','Doplňky','Ručník velký, rychleschnoucí',2],
-  ['yellow','Doplňky','Obal na batoh proti dešti',2],
-  ['green','Doplňky','Maska na spaní',1],
-  ['green','Doplňky','Špunty do uší',2],
-  ['yellow','Doplňky','Plášťenka',2],
-  ['yellow','Doplňky','Deštník',2],
-  ['yellow','Doplňky','Sluneční brýle standardní',2],
-  ['green','Doplňky','Sluneční brýle běžecké',1],
-  ['green','Doplňky','Umělohmotný příbor z Decathlonu',1],
-  ['green','Doplňky','Propiska',2],
-
-  // — Batohy/Tašky/Obaly —
-  ['yellow','Batohy/Tašky/Obaly','Ledvinka',2],
-  ['yellow','Batohy/Tašky/Obaly','Batoh do letadla',1],
-  ['yellow','Batohy/Tašky/Obaly','Skládací batůžek z Runczech nebo Nike',2],
-  ['yellow','Batohy/Tašky/Obaly','Igelitové pytle (např. na prádlo)',2],
-  ['yellow','Batohy/Tašky/Obaly','Různé obaly/krabičky (průhledné)',4],
 ];
 
 const PRIO_RANK = {red:0, yellow:1, green:2};
@@ -579,6 +534,7 @@ function makeRow(it, dndOff, forPerson){
       <div class="txt">${esc(it.text)}</div>
       <div class="meta">
         <span class="qty${it.qty==null?' empty':''}" title="Množství (počet kusů) — klikni pro změnu">${it.qty!=null ? it.qty+'×' : '+ ks'}</span>
+        ${it.split ? `<span class="qsplit" title="Množství — manžel (Vladimír) / manželka (Lucie)">${esc(it.split)}</span>` : ''}
         <span class="badge p-${it.prio}" title="Klikni pro změnu priority">${PRIO_LABEL[it.prio]}</span>
         <span class="tag">${esc(it.cat||'')}</span>
         <span class="who-badge ${whoBadgeClass(w)}" title="Klikni pro přiřazení (lze i víc lidem)">${esc(whoLabel(w))}</span>
@@ -771,7 +727,7 @@ function localBackend(){
   const save=()=> localStorage.setItem(KEY, JSON.stringify(data));
   const id=()=> Date.now()+'-'+Math.random().toString(36).slice(2,7);
   const emit=()=>{ items=data.slice(); render(); };
-  if(data.length===0){ data = SEED.map((s,i)=>({id:id(), prio:s[0], cat:s[1], text:s[2], qty:(s[3] ?? null), doneBy:{}, order:i})); save(); }
+  if(data.length===0){ data = SEED.map((s,i)=>({id:id(), prio:s[0], cat:s[1], text:s[2], qty:(s[3] ?? null), who:(s[4] || []), split:(s[5] ?? null), doneBy:{}, order:i})); save(); }
   return {
     start(){ emit(); },
     add(it){ data.push({id:id(), ...it}); save(); emit(); },
@@ -789,25 +745,26 @@ async function firebaseBackend(){
   const db = getFirestore(app);
   const col = collection(db, COLLECTION);
 
-  const seedId = i => 'seed-' + String(i).padStart(3,'0');
+    const seedId = i => 'seed-' + String(i).padStart(3,'0');
   const writeSeed = i => {
     const s = SEED[i];
-    return setDoc(doc(col, seedId(i)), {prio:s[0], cat:s[1], text:s[2], qty:(s[3] ?? null), doneBy:{}, order:i});
+    return setDoc(doc(col, seedId(i)), {prio:s[0], cat:s[1], text:s[2], qty:(s[3] ?? null), who:(s[4] || []), split:(s[5] ?? null), doneBy:{}, order:i});
   };
   const metaRef = doc(col, SEED_META_ID);
   const snap0 = await getDocs(col);
   if(snap0.empty){
-    // první naplnění prázdné databáze celou výchozí sadou
+    // první naplnění prázdné databáze
     await Promise.all(SEED.map((_,i)=> writeSeed(i)));
     await setDoc(metaRef, {seedVersion: SEED_VERSION});
   }else{
-    // databáze už existuje – jen doplníme nově přidané výchozí položky podle verze,
-    // beze změny stávajících položek a bez ztráty odškrtnutí
     let applied = 0;
     try{ const ms = await getDoc(metaRef); if(ms.exists()) applied = ms.data().seedVersion || 0; }catch(e){}
     if(applied < SEED_VERSION){
-      const have = new Set(snap0.docs.map(d=>d.id));
-      await Promise.all(SEED.map((_,i)=> have.has(seedId(i)) ? null : writeSeed(i)).filter(Boolean));
+      // přestavba výchozí sady: přepíšeme výchozí položky a odstraníme přebytečné
+      // (ručně přidané položky s vlastním id zůstanou zachované)
+      await Promise.all(SEED.map((_,i)=> writeSeed(i)));
+      const stale = snap0.docs.filter(d=>{ const m=/^seed-(\d+)$/.exec(d.id); return m && (+m[1]) >= SEED.length; });
+      await Promise.all(stale.map(d=> deleteDoc(doc(col, d.id))));
       await setDoc(metaRef, {seedVersion: SEED_VERSION});
     }
   }
