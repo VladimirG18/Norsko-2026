@@ -53,6 +53,11 @@
        transition:border-color .15s,box-shadow .15s}
   .addform input[type=text]:focus{outline:none;border-color:var(--modra2);
        box-shadow:0 0 0 3px rgba(26,110,168,.15)}
+  .addform input[type=number]{width:78px;flex:none;background:#fff;color:var(--text);
+       border:1px solid #c8d7e4;border-radius:10px;padding:9px 10px;font:inherit;
+       transition:border-color .15s,box-shadow .15s}
+  .addform input[type=number]:focus{outline:none;border-color:var(--modra2);
+       box-shadow:0 0 0 3px rgba(26,110,168,.15)}
   select,.addform select{background:#fff;color:var(--text);border:1px solid #c8d7e4;
        border-radius:10px;padding:8px 10px;font:inherit}
   .btn{background:linear-gradient(120deg,var(--modra),var(--modra2));border:0;color:#fff;font-weight:700;
@@ -93,6 +98,10 @@
   .badge.p-yellow{background:#fdf6e3;color:var(--yellow);border-color:#e8cf8a}
   .badge.p-green{background:#eafaf1;color:var(--green);border-color:#9bd9b5}
   .tag{font-size:.72rem;color:var(--slabe);background:#eef3f7;border-radius:20px;padding:2px 8px}
+  .qty{font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:20px;cursor:pointer;
+       background:#e7f0fb;color:#1d5fa8;border:1px solid #bcd6f3;white-space:nowrap}
+  .qty.empty{font-weight:600;color:var(--slabe);background:#eef3f7;border-color:#dfe9f2}
+  .qty:hover{filter:brightness(.97)}
   .who-badge{font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:20px;cursor:pointer;border:1px solid #cdd9e3;background:#eef3f7;color:var(--slabe)}
   .who-badge.w-none{font-weight:600;color:var(--slabe)}
   .who-badge.w-lucie{background:#fde7f1;color:#b0306a;border-color:#f3bcd6}
@@ -136,7 +145,7 @@
   @media print{
     .topbar,.addform,.filters,.filternote,.statusbar,.grip,.acts,.progress .bar,.note{display:none}
     body{background:#fff}.item{box-shadow:none;break-inside:avoid}
-    .badge,.who-badge{cursor:default}
+    .badge,.who-badge,.qty{cursor:default}
   }
 </style>
 </head>
@@ -149,7 +158,8 @@
   <h1>Co balíme na cestu do Norska</h1>
   <p class="sub">Společný balicí seznam. Odškrtni sbalené. Klikem na <b>👤</b> přiřadíš, kdo danou položku balí — pokud
      je přiřazeno víc lidí, každý si ji odškrtne <b>sám za sebe</b> (položka je hotová, až mají zaškrtnuto všichni
-     přiřazení). Jde přidávat, mazat, upravovat, měnit prioritu klikem na štítek, řadit přetažením za <b>⠿</b>
+     přiřazení). Jde přidávat, mazat, upravovat, u položek zadávat <b>množství (ks)</b> klikem na štítek s počtem,
+     měnit prioritu klikem na štítek, řadit přetažením za <b>⠿</b>
      a filtrovat/seskupovat podle řešitele. Vše sdílené pro celou posádku v reálném čase.</p>
 
   <div id="status" class="statusbar"></div>
@@ -162,6 +172,7 @@
   <div class="addform">
     <div class="frow">
       <input type="text" id="newText" placeholder="Nová položka k zabalení…">
+      <input type="number" id="newQty" min="1" step="1" placeholder="ks" title="Množství (počet kusů) — nepovinné">
       <select id="newPrio">
         <option value="red">🔴 nutné</option>
         <option value="yellow" selected>🟡 důležité</option>
@@ -216,11 +227,16 @@ const firebaseConfig = {
   appId: "1:941681195558:web:3aac10f182e784cdb3c4e7"
 };
 const COLLECTION = 'co-balime-norsko';
-const KEY = 'norsko2026-co-balime-v1';
+const KEY = 'norsko2026-co-balime-v2';
+// Verze výchozí sady. Po jejím zvýšení se do sdílené databáze doplní nově přidané
+// položky (stávající data ani odškrtnutí se nemažou).
+const SEED_VERSION = 2;
 
 const CATS = ['Doklady + finance','Elektronika','Oblečení — vrchní část','Oblečení — kalhoty',
   'Oblečení — spodní prádlo','Oblečení — obuv','Dítě — oblečení','Dítě — výbava','Pes',
-  'Turistika','Lékárnička','Hygiena','Jídlo + výbava','Obytné auto'];
+  'Turistika','Lékárnička','Hygiena','Jídlo + výbava','Obytné auto',
+  'Peníze','Doklady/Dokumenty','Oblečení','Léky','Kosmetika/drogerie','Klíče','Doplňky',
+  'Batohy/Tašky/Obaly'];
 
 // Výchozí sada položek (naplní se jen při prvním načtení do prázdné databáze) — sestaveno z balicího seznamu.
 const SEED = [
@@ -372,6 +388,107 @@ const SEED = [
   ['yellow','Obytné auto','Odpadkové pytle'],
   ['green','Obytné auto','Kolíčky + šňůra na prádlo'],
   ['yellow','Obytné auto','Prací prostředek'],
+
+  // === Položky z Excelu „Příprava na dovolenou Norsko" (4. hodnota = množství v ks; součet za manžela + manželku) ===
+  // — Peníze —
+  ['red','Peníze','Hotovost EUR',2],
+  ['red','Peníze','Hotovost NOK',2],
+
+  // — Doklady/Dokumenty —
+  ['red','Doklady/Dokumenty','Pas',2],
+  ['red','Doklady/Dokumenty','Řidičský průkaz',2],
+  ['red','Doklady/Dokumenty','Ostatní doklady',2],
+  ['red','Doklady/Dokumenty','Kartička cestovního pojištění',2],
+
+  // — Oblečení —
+  ['red','Oblečení','Bunda nepromokavá Mountain equipment',2],
+  ['yellow','Oblečení','Mikina merino - Decathlon',2],
+  ['yellow','Oblečení','Mikina tlustá - Patagonia',1],
+  ['yellow','Oblečení','Kalhoty',1],
+  ['green','Oblečení','Volné kalhoty',1],
+  ['yellow','Oblečení','Kraťasy sportovní',3],
+  ['yellow','Oblečení','Kalhoty turistické',3],
+  ['yellow','Oblečení','Tričko s krátkými rukávy bez límenčku - společenské',1],
+  ['yellow','Oblečení','Tričko s krátkými rukávy bez límenčku - sportovní',1],
+  ['yellow','Oblečení','Tričko s krátkými rukávy (merino)',8],
+  ['yellow','Oblečení','Tričko s dlouhýmy rukávy',1],
+  ['yellow','Oblečení','Tričko s dlouhýmy rukávy (merino)',1],
+  ['yellow','Oblečení','Tričko s ramínky/bez rukávů',1],
+  ['yellow','Oblečení','Tričko s ramínky/bez rukávů (merino)',1],
+  ['yellow','Oblečení','Spodní prádlo (spodek)',7],
+  ['yellow','Oblečení','Tenisky - společenské',2],
+  ['yellow','Oblečení','Běžecké boty silníční',2],
+  ['yellow','Oblečení','Běžecké boty trailové',3],
+  ['yellow','Oblečení','Boty pohorky Salomon',1],
+  ['yellow','Oblečení','Pantofle',2],
+  ['yellow','Oblečení','Rukavice',2],
+  ['yellow','Oblečení','Tunel/nákrčník',2],
+  ['yellow','Oblečení','Podzimní čepice',2],
+  ['yellow','Oblečení','Plavky',2],
+  ['yellow','Oblečení','Ponožky vysoké společenské',4],
+  ['yellow','Oblečení','Ponožky nízké společenské',4],
+  ['yellow','Oblečení','Ponožky vysoké sportovní',6],
+  ['yellow','Oblečení','Ponožky nízké sportovní',6],
+  ['yellow','Oblečení','Ponožky vysoké teplé',6],
+  ['yellow','Oblečení','Podprsenka normální',3],
+  ['yellow','Oblečení','Podprsenka sportovní',3],
+  ['green','Oblečení','Šátek',1],
+  ['yellow','Oblečení','Kšiltovka',2],
+  ['yellow','Oblečení','Boty do vody',2],
+
+  // — Léky —
+  ['red','Léky','Vlastní léky a doplňky',2],
+  ['red','Léky','Lékárnička',1],
+
+  // — Kosmetika/drogerie —
+  ['yellow','Kosmetika/drogerie','Deodorant',1],
+  ['yellow','Kosmetika/drogerie','Antiperspirant',2],
+  ['yellow','Kosmetika/drogerie','Kartáček',2],
+  ['yellow','Kosmetika/drogerie','Kosmetika/drogerie pro oba',1],
+  ['green','Kosmetika/drogerie','Parfém',2],
+  ['yellow','Kosmetika/drogerie','Menstruakční potřeby',1],
+
+  // — Klíče —
+  ['red','Klíče','Klíče od domova',1],
+
+  // — Elektronika —
+  ['yellow','Elektronika','Čelovka',2],
+  ['yellow','Elektronika','Náhradní baterie do čelovky manžel',1],
+  ['yellow','Elektronika','Náhradní baterie do čelovky manželka',1],
+  ['red','Elektronika','Redukce do zásuvky (od každého typu 1)',1],
+  ['red','Elektronika','Mobil',2],
+  ['green','Elektronika','Chytrý prsten',1],
+  ['yellow','Elektronika','Power banka 20 000 mAh',2],
+  ['yellow','Elektronika','Power banka 5 000 mAh',1],
+  ['yellow','Elektronika','Chytré hodinky',2],
+  ['yellow','Elektronika','USB C kabel',6],
+  ['yellow','Elektronika','Lightning Appel kabel',1],
+  ['yellow','Elektronika','Sluchátka',2],
+  ['red','Elektronika','Redukce (nabíječka) USB do sítě',2],
+  ['yellow','Elektronika','Nabíjecí kabel na hodinky',2],
+  ['yellow','Elektronika','Notebook - pracovní',1],
+  ['yellow','Elektronika','Kabel k notebooku',1],
+  ['yellow','Elektronika','Myš s obalem',1],
+
+  // — Doplňky —
+  ['green','Doplňky','Polštářek do letadla',1],
+  ['yellow','Doplňky','Ručník velký, rychleschnoucí',2],
+  ['yellow','Doplňky','Obal na batoh proti dešti',2],
+  ['green','Doplňky','Maska na spaní',1],
+  ['green','Doplňky','Špunty do uší',2],
+  ['yellow','Doplňky','Plášťenka',2],
+  ['yellow','Doplňky','Deštník',2],
+  ['yellow','Doplňky','Sluneční brýle standardní',2],
+  ['green','Doplňky','Sluneční brýle běžecké',1],
+  ['green','Doplňky','Umělohmotný příbor z Decathlonu',1],
+  ['green','Doplňky','Propiska',2],
+
+  // — Batohy/Tašky/Obaly —
+  ['yellow','Batohy/Tašky/Obaly','Ledvinka',2],
+  ['yellow','Batohy/Tašky/Obaly','Batoh do letadla',1],
+  ['yellow','Batohy/Tašky/Obaly','Skládací batůžek z Runczech nebo Nike',2],
+  ['yellow','Batohy/Tašky/Obaly','Igelitové pytle (např. na prádlo)',2],
+  ['yellow','Batohy/Tašky/Obaly','Různé obaly/krabičky (průhledné)',4],
 ];
 
 const PRIO_RANK = {red:0, yellow:1, green:2};
@@ -459,6 +576,7 @@ function makeRow(it, dndOff, forPerson){
     <div class="body">
       <div class="txt">${esc(it.text)}</div>
       <div class="meta">
+        <span class="qty${it.qty==null?' empty':''}" title="Množství (počet kusů) — klikni pro změnu">${it.qty!=null ? it.qty+'×' : '+ ks'}</span>
         <span class="badge p-${it.prio}" title="Klikni pro změnu priority">${PRIO_LABEL[it.prio]}</span>
         <span class="tag">${esc(it.cat||'')}</span>
         <span class="who-badge ${whoBadgeClass(w)}" title="Klikni pro přiřazení (lze i víc lidem)">${esc(whoLabel(w))}</span>
@@ -482,6 +600,14 @@ function makeRow(it, dndOff, forPerson){
     });
   }
   row.querySelector('.badge').addEventListener('click', ()=> backend.update(it.id, {prio: PRIO_CYCLE[it.prio]}));
+  row.querySelector('.qty').addEventListener('click', ()=>{
+    const v = prompt('Množství (počet kusů) — nech prázdné pro žádné:', it.qty!=null ? it.qty : '');
+    if(v===null) return;
+    const t = v.trim();
+    if(t===''){ backend.update(it.id, {qty: null}); return; }
+    const n = parseInt(t, 10);
+    if(!isNaN(n) && n>0) backend.update(it.id, {qty: n});
+  });
   row.querySelector('.who-badge').addEventListener('click', (e)=> openAssign(e.currentTarget, w, sel=> backend.update(it.id, {who: sel})));
   row.querySelector('.edit').addEventListener('click', ()=>{
     const t = prompt('Upravit položku:', it.text);
@@ -575,9 +701,11 @@ function attachDnD(row){
 $('addBtn').addEventListener('click', ()=>{
   const text = $('newText').value.trim();
   if(!text){ $('newText').focus(); return; }
+  const qv = parseInt($('newQty').value, 10);
+  const qty = (!isNaN(qv) && qv>0) ? qv : null;
   const maxOrder = items.reduce((m,i)=>Math.max(m, i.order||0), -1);
-  backend.add({text, prio:$('newPrio').value, cat:$('newCat').value, who:newWhoSel.slice(), doneBy:{}, order:maxOrder+1});
-  $('newText').value=''; newWhoSel=[]; renderNewWhoBtn(); $('newText').focus();
+  backend.add({text, prio:$('newPrio').value, cat:$('newCat').value, who:newWhoSel.slice(), qty, doneBy:{}, order:maxOrder+1});
+  $('newText').value=''; $('newQty').value=''; newWhoSel=[]; renderNewWhoBtn(); $('newText').focus();
 });
 $('newText').addEventListener('keydown', e=>{ if(e.key==='Enter') $('addBtn').click(); });
 
@@ -641,7 +769,7 @@ function localBackend(){
   const save=()=> localStorage.setItem(KEY, JSON.stringify(data));
   const id=()=> Date.now()+'-'+Math.random().toString(36).slice(2,7);
   const emit=()=>{ items=data.slice(); render(); };
-  if(data.length===0){ data = SEED.map((s,i)=>({id:id(), prio:s[0], cat:s[1], text:s[2], doneBy:{}, order:i})); save(); }
+  if(data.length===0){ data = SEED.map((s,i)=>({id:id(), prio:s[0], cat:s[1], text:s[2], qty:(s[3] ?? null), doneBy:{}, order:i})); save(); }
   return {
     start(){ emit(); },
     add(it){ data.push({id:id(), ...it}); save(); emit(); },
@@ -653,18 +781,33 @@ function localBackend(){
 // ---- sdílený Firebase backend ----
 async function firebaseBackend(){
   const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
-  const { getFirestore, collection, doc, setDoc, addDoc, updateDoc, deleteDoc, onSnapshot, getDocs }
+  const { getFirestore, collection, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, onSnapshot, getDocs }
     = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
   const col = collection(db, COLLECTION);
 
+  const seedId = i => 'seed-' + String(i).padStart(3,'0');
+  const writeSeed = i => {
+    const s = SEED[i];
+    return setDoc(doc(col, seedId(i)), {prio:s[0], cat:s[1], text:s[2], qty:(s[3] ?? null), doneBy:{}, order:i});
+  };
+  const metaRef = doc(db, COLLECTION + '-meta', 'state');
   const snap0 = await getDocs(col);
   if(snap0.empty){
-    await Promise.all(SEED.map((s,i)=>{
-      const n = String(i).padStart(3,'0');
-      return setDoc(doc(col, 'seed-'+n), {prio:s[0], cat:s[1], text:s[2], doneBy:{}, order:i});
-    }));
+    // první naplnění prázdné databáze celou výchozí sadou
+    await Promise.all(SEED.map((_,i)=> writeSeed(i)));
+    await setDoc(metaRef, {seedVersion: SEED_VERSION});
+  }else{
+    // databáze už existuje – jen doplníme nově přidané výchozí položky podle verze,
+    // beze změny stávajících položek a bez ztráty odškrtnutí
+    let applied = 0;
+    try{ const ms = await getDoc(metaRef); if(ms.exists()) applied = ms.data().seedVersion || 0; }catch(e){}
+    if(applied < SEED_VERSION){
+      const have = new Set(snap0.docs.map(d=>d.id));
+      await Promise.all(SEED.map((_,i)=> have.has(seedId(i)) ? null : writeSeed(i)).filter(Boolean));
+      await setDoc(metaRef, {seedVersion: SEED_VERSION});
+    }
   }
   return {
     start(){
