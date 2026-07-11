@@ -195,7 +195,8 @@
      a uvidíš jen věci, které se ho týkají) a <b>společné věci</b> pro celou výpravu. Klikem na <b>👤</b> u položky
      nastavíš, kterých členů se týká — položka se pak objeví v sekci každého z nich; bez výběru (nebo s výběrem
      všech) patří do společných věcí. Každý si položku odškrtává <b>sám za sebe</b> a přes 📷 u ní může mít
-     <b>vlastní fotku</b> (ze souborů, nebo na telefonu vyfocením), <b>převzít fotku</b> od jiného člena, nebo být
+     <b>vlastní fotku</b> (ze souborů, na telefonu vyfocením, nebo vložením odkazu na obrázek z internetu),
+     <b>převzít fotku</b> od jiného člena, nebo být
      bez ní. Dál jde přidávat, mazat, upravovat, zadávat množství (ks), měnit prioritu klikem na štítek a řadit
      přetažením za <b>⠿</b>. Vše sdílené pro celou posádku v reálném čase.</p>
 
@@ -615,7 +616,7 @@ function makeRow(it, dndOff, forPerson){
   row.innerHTML = `
     <span class="grip${dndOff?' off':''}" title="${dndOff?'Řazení vypnuto při filtru/seskupení':'Přetáhni pro změnu pořadí'}">⠿</span>
     ${multi ? `<span class="pfrac" title="Kolik přiřazených má sbaleno">${doneUnitsFor(it)}/${w.length}</span>` : `<input type="checkbox" ${rowDone?'checked':''} title="Sbaleno">`}
-    ${pv ? `<img class="thumb" src="${esc(pv)}" alt="" title="Klikni pro zvětšení">` : ''}
+    ${pv ? `<img class="thumb" src="${esc(pv)}" alt="" title="Klikni pro zvětšení" loading="lazy" referrerpolicy="no-referrer">` : ''}
     <div class="body">
       <div class="txt">${esc(it.text)}</div>
       <div class="meta">
@@ -628,7 +629,7 @@ function makeRow(it, dndOff, forPerson){
       ${pchecksHtml}
     </div>
     <div class="acts">
-      <button class="iconbtn photo${pv?' has':''}" title="${pv?'Fotka — zobrazit / změnit / odebrat':'Přidat fotku (ze souborů nebo vyfocením)'}">📷</button>
+      <button class="iconbtn photo${pv?' has':''}" title="${pv?'Fotka — zobrazit / změnit / odebrat':'Přidat fotku (ze souborů, vyfocením nebo z odkazu)'}">📷</button>
       <button class="iconbtn edit" title="Upravit text položky">✏️</button>
       <button class="iconbtn del" title="Smazat">🗑</button>
     </div>`;
@@ -813,6 +814,8 @@ renderNewWhoBtn();
 // fotku jiného člena, nebo být bez ní (u společných věcí je jeden sdílený slot '_').
 // K položce se ukládají jen malé miniatury (`thumbs`, ~5 kB) a odkazy na převzaté fotky
 // (`thumbRef`); plné fotky jdou do vlastní kolekce pod id položky a stahují se až při zobrazení.
+// Fotka jde přidat i vložením URL z internetu — když ji server nedovolí stáhnout (CORS),
+// uloží se místo dat přímo odkaz (miniatura i plná verze je pak http(s) adresa).
 // Starší formát (jedna fotka v polích `thumb`/`photo`) se dál umí zobrazit.
 // Vstup bez `capture` otevře výběr souborů/galerii, vstup s `capture` na telefonu rovnou fotoaparát.
 const photoFile = document.createElement('input');
@@ -861,6 +864,27 @@ function scaleToDataUrl(img, max, q){
   return cv.toDataURL('image/jpeg', q);
 }
 
+// zmenší načtený obrázek na plnou verzi (pod limit dokumentu) + miniaturu
+function shrinkImage(img){
+  let max = 900, q = .72, full = '';
+  for(let i=0;i<5;i++){
+    full = scaleToDataUrl(img, max, q);
+    if(full.length < 700000) break;   // s rezervou pod limitem dokumentu (1 MB)
+    max = Math.round(max*.7); q = Math.max(.5, q-.08);
+  }
+  if(!full || full.length >= 900000) return null;
+  return {full, thumb: scaleToDataUrl(img, 140, .6)};
+}
+
+// uloží fotku ke slotu (plná zvlášť, miniatura k položce, zruší případné převzetí)
+async function savePhoto(id_, key, full, thumb){
+  await backend.setPhoto(id_, key, full);   // plná fotka zvlášť — seznam zůstává lehký
+  const patch = {['thumbs.'+key]: thumb, ['thumbRef.'+key]: null};
+  if(key === '_'){ patch.thumb = null; patch.photo = null; } // úklid staršího formátu
+  await backend.update(id_, patch);
+  photoCache[id_] = Object.assign({}, photoCache[id_], {[key]: full});
+}
+
 async function onPhotoPicked(input){
   const f = input.files && input.files[0];
   input.value = '';
@@ -868,20 +892,50 @@ async function onPhotoPicked(input){
   if(!f || !t) return;
   try{
     const img = await loadImage(f);
-    let max = 900, q = .72, full = '';
-    for(let i=0;i<5;i++){
-      full = scaleToDataUrl(img, max, q);
-      if(full.length < 700000) break;   // s rezervou pod limitem dokumentu (1 MB)
-      max = Math.round(max*.7); q = Math.max(.5, q-.08);
-    }
-    if(!full || full.length >= 900000){ alert('Fotku se nepodařilo dostatečně zmenšit, zkus jinou.'); return; }
-    const thumb = scaleToDataUrl(img, 140, .6);
-    await backend.setPhoto(t.id, t.key, full);   // plná fotka zvlášť — seznam zůstává lehký
-    const patch = {['thumbs.'+t.key]: thumb, ['thumbRef.'+t.key]: null};
-    if(t.key === '_'){ patch.thumb = null; patch.photo = null; } // úklid staršího formátu
-    await backend.update(t.id, patch);
-    photoCache[t.id] = Object.assign({}, photoCache[t.id], {[t.key]: full});
+    const out = shrinkImage(img);
+    if(!out){ alert('Fotku se nepodařilo dostatečně zmenšit, zkus jinou.'); return; }
+    await savePhoto(t.id, t.key, out.full, out.thumb);
   }catch(e){ console.error(e); alert('Fotku se nepodařilo načíst nebo uložit.'); }
+}
+
+// fotka z odkazu: nejdřív zkusíme obrázek stáhnout a zkomprimovat jako u souboru
+// (trvalá kopie nezávislá na e-shopu — funguje, když to server povolí přes CORS);
+// když stažení nejde, ověříme, že se odkaz dá zobrazit, a uložíme přímo URL.
+async function photoFromUrl(url){
+  try{
+    const ctl = new AbortController();
+    const tm = setTimeout(()=>ctl.abort(), 8000);
+    const resp = await fetch(url, {signal: ctl.signal, mode: 'cors'});
+    clearTimeout(tm);
+    if(resp.ok){
+      const blob = await resp.blob();
+      const out = shrinkImage(await loadImage(blob));
+      if(out) return out;
+    }
+  }catch(e){ /* CORS/síť — obrázek uložíme jen jako odkaz */ }
+  await new Promise((res,rej)=>{
+    const im = new Image();
+    im.referrerPolicy = 'no-referrer';
+    const t = setTimeout(()=>rej(new Error('timeout')), 10000);
+    im.onload = ()=>{ clearTimeout(t); res(); };
+    im.onerror = ()=>{ clearTimeout(t); rej(new Error('obrázek z odkazu nejde načíst')); };
+    im.src = url;
+  });
+  return {full: url, thumb: url};
+}
+
+async function addPhotoFromUrl(it, key){
+  let u = prompt('Vlož odkaz (URL) na obrázek — třeba z e-shopu, kde jsi věc koupil:');
+  if(u == null) return;
+  u = u.trim();
+  if(!u) return;
+  if(!/^https?:\/\//i.test(u)){ alert('Odkaz musí začínat http:// nebo https://'); return; }
+  // na https stránce se http obrázky nezobrazí — zkusíme zabezpečenou verzi odkazu
+  if(location.protocol === 'https:' && /^http:\/\//i.test(u)) u = 'https://' + u.slice(7);
+  try{
+    const {full, thumb} = await photoFromUrl(u);
+    await savePhoto(it.id, key, full, thumb);
+  }catch(e){ console.error(e); alert('Z odkazu se nepodařilo načíst obrázek — zkontroluj, že vede přímo na fotku (končí např. .jpg).'); }
 }
 photoFile.addEventListener('change', ()=> onPhotoPicked(photoFile));
 photoCam.addEventListener('change', ()=> onPhotoPicked(photoCam));
@@ -898,13 +952,15 @@ function openPhotoMenu(anchor, it, key){
   photoPop.innerHTML =
     (has ? `<label class="ppView">🖼 Zobrazit fotku</label>` : '') +
     `<label class="ppFile">📁 Ze souborů</label>
-     <label class="ppCam">📷 Vyfotit</label>` +
+     <label class="ppCam">📷 Vyfotit</label>
+     <label class="ppUrl">🌐 Z odkazu (URL)</label>` +
     others.map(p=>`<label class="ppRef" data-p="${esc(p)}">${ref===p?'✓ ':''}🔗 Převzít fotku od: ${esc(p)}</label>`).join('') +
     (has ? `<div class="apsep"></div><label class="ppDel">🗑 Odebrat fotku</label>` : '');
   const on = (sel,fn)=>{ const el = photoPop.querySelector(sel); if(el) el.addEventListener('click', ()=>{ closePhotoMenu(); fn(); }); };
   on('.ppView', ()=> openLightbox(it, key));
   on('.ppFile', ()=>{ photoTarget = {id: it.id, key}; photoFile.click(); });
   on('.ppCam',  ()=>{ photoTarget = {id: it.id, key}; photoCam.click(); });
+  on('.ppUrl',  ()=> addPhotoFromUrl(it, key));
   photoPop.querySelectorAll('.ppRef').forEach(el=> el.addEventListener('click', ()=>{
     closePhotoMenu();
     backend.update(it.id, {['thumbRef.'+key]: el.dataset.p, ['thumbs.'+key]: null});
@@ -944,7 +1000,7 @@ async function openLightbox(it, key){
   const cap = it.text + (key !== '_' ? ` — ${ref ? 'fotka od: '+ref : key}` : '');
   // hned ukážeme miniaturu, plná verze se dotáhne na pozadí
   const cached = photoCache[it.id];
-  lb.innerHTML = `<img src="${esc((cached && effFull(it, key, cached)) || preview)}" alt=""><div class="lbcap">${esc(cap)}</div>`;
+  lb.innerHTML = `<img src="${esc((cached && effFull(it, key, cached)) || preview)}" alt="" referrerpolicy="no-referrer"><div class="lbcap">${esc(cap)}</div>`;
   lb.style.display='flex';
   if(!cached){
     const m = await backend.getPhotos(it.id);
