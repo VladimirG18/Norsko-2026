@@ -535,11 +535,12 @@ function makeRow(it, dndOff, forPerson){
   const pchecksHtml = multi ? `<div class="pchecks">${w.map(p=>
     `<label class="pcheck${isDoneFor(it,p)?' on':''}" data-p="${esc(p)}"><input type="checkbox" ${isDoneFor(it,p)?'checked':''}> ${esc(p)}</label>`
   ).join('')}</div>` : '';
+  const pv = it.thumb || it.photo; // miniatura (it.photo = starší formát s fotkou přímo v položce)
 
   row.innerHTML = `
     <span class="grip${dndOff?' off':''}" title="${dndOff?'Řazení vypnuto při filtru/seskupení':'Přetáhni pro změnu pořadí'}">⠿</span>
     ${multi ? `<span class="pfrac" title="Kolik přiřazených má sbaleno">${doneUnitsFor(it)}/${w.length}</span>` : `<input type="checkbox" ${rowDone?'checked':''} title="Sbaleno">`}
-    ${it.photo ? `<img class="thumb" src="${esc(it.photo)}" alt="" title="Klikni pro zvětšení">` : ''}
+    ${pv ? `<img class="thumb" src="${esc(pv)}" alt="" title="Klikni pro zvětšení">` : ''}
     <div class="body">
       <div class="txt">${esc(it.text)}</div>
       <div class="meta">
@@ -552,7 +553,7 @@ function makeRow(it, dndOff, forPerson){
       ${pchecksHtml}
     </div>
     <div class="acts">
-      <button class="iconbtn photo${it.photo?' has':''}" title="${it.photo?'Fotka — zobrazit / změnit / odebrat':'Přidat fotku (ze souborů nebo vyfocením)'}">📷</button>
+      <button class="iconbtn photo${pv?' has':''}" title="${pv?'Fotka — zobrazit / změnit / odebrat':'Přidat fotku (ze souborů nebo vyfocením)'}">📷</button>
       <button class="iconbtn edit" title="Upravit text položky">✏️</button>
       <button class="iconbtn del" title="Smazat">🗑</button>
     </div>`;
@@ -586,7 +587,7 @@ function makeRow(it, dndOff, forPerson){
     if(t!=null && t.trim()) backend.update(it.id, {text: t.trim()});
   });
   row.querySelector('.del').addEventListener('click', ()=>{
-    if(confirm('Smazat tuto položku?')) backend.remove(it.id);
+    if(confirm('Smazat tuto položku?')){ backend.remove(it.id); backend.deletePhoto(it.id); delete photoCache[it.id]; }
   });
   if(!dndOff) attachDnD(row);
   return row;
@@ -725,8 +726,9 @@ $('newWhoBtn').addEventListener('click', e=> openAssign(e.currentTarget, newWhoS
 renderNewWhoBtn();
 
 // ---- fotky u položek ----
-// Fotka se v prohlížeči zmenší a zkomprimuje (JPEG) a uloží se přímo k položce jako data URL,
-// takže se sdílí přes stejnou databázi jako zbytek seznamu (limit dokumentu Firestore je 1 MB).
+// Aby seznam zůstal rychlý i se stovkami fotek, ukládá se k položce jen malá miniatura (`thumb`,
+// ~5 kB) a plná fotka jde do vlastní kolekce/úložiště pod id položky — stahuje se až při zobrazení.
+// Starší formát (plná fotka v poli `photo` přímo u položky) se dál umí zobrazit.
 // Vstup bez `capture` otevře výběr souborů/galerii, vstup s `capture` na telefonu rovnou fotoaparát.
 const photoFile = document.createElement('input');
 photoFile.type='file'; photoFile.accept='image/*'; photoFile.style.display='none';
@@ -734,30 +736,25 @@ const photoCam = document.createElement('input');
 photoCam.type='file'; photoCam.accept='image/*'; photoCam.setAttribute('capture','environment'); photoCam.style.display='none';
 document.body.append(photoFile, photoCam);
 
-let photoTarget = null; // id položky, ke které se právě vybírá fotka
+let photoTarget = null;   // id položky, ke které se právě vybírá fotka
+const photoCache = {};    // už stažené plné fotky (id → data URL), ať se nestahují opakovaně
 
-async function compressImage(file){
+function loadImage(file){
   const url = URL.createObjectURL(file);
-  try{
-    const img = await new Promise((res,rej)=>{
-      const im = new Image();
-      im.onload = ()=>res(im);
-      im.onerror = ()=>rej(new Error('obrázek nejde načíst'));
-      im.src = url;
-    });
-    let max = 900, q = .72, out = '';
-    for(let i=0;i<5;i++){
-      const sc = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
-      const cv = document.createElement('canvas');
-      cv.width = Math.max(1, Math.round(img.naturalWidth*sc));
-      cv.height = Math.max(1, Math.round(img.naturalHeight*sc));
-      cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
-      out = cv.toDataURL('image/jpeg', q);
-      if(out.length < 700000) break;   // s rezervou pod limitem dokumentu
-      max = Math.round(max*.7); q = Math.max(.5, q-.08);
-    }
-    return out;
-  } finally { URL.revokeObjectURL(url); }
+  return new Promise((res,rej)=>{
+    const im = new Image();
+    im.onload = ()=>{ URL.revokeObjectURL(url); res(im); };
+    im.onerror = ()=>{ URL.revokeObjectURL(url); rej(new Error('obrázek nejde načíst')); };
+    im.src = url;
+  });
+}
+function scaleToDataUrl(img, max, q){
+  const sc = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
+  const cv = document.createElement('canvas');
+  cv.width = Math.max(1, Math.round(img.naturalWidth*sc));
+  cv.height = Math.max(1, Math.round(img.naturalHeight*sc));
+  cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+  return cv.toDataURL('image/jpeg', q);
 }
 
 async function onPhotoPicked(input){
@@ -766,10 +763,19 @@ async function onPhotoPicked(input){
   const id_ = photoTarget; photoTarget = null;
   if(!f || !id_) return;
   try{
-    const dataUrl = await compressImage(f);
-    if(dataUrl && dataUrl.length < 900000) backend.update(id_, {photo: dataUrl});
-    else alert('Fotku se nepodařilo dostatečně zmenšit, zkus jinou.');
-  }catch(e){ console.error(e); alert('Fotku se nepodařilo načíst.'); }
+    const img = await loadImage(f);
+    let max = 900, q = .72, full = '';
+    for(let i=0;i<5;i++){
+      full = scaleToDataUrl(img, max, q);
+      if(full.length < 700000) break;   // s rezervou pod limitem dokumentu (1 MB)
+      max = Math.round(max*.7); q = Math.max(.5, q-.08);
+    }
+    if(!full || full.length >= 900000){ alert('Fotku se nepodařilo dostatečně zmenšit, zkus jinou.'); return; }
+    const thumb = scaleToDataUrl(img, 140, .6);
+    await backend.setPhoto(id_, full);                 // plná fotka zvlášť — seznam zůstává lehký
+    await backend.update(id_, {thumb, photo: null});   // miniatura k položce; photo=null smaže starší formát
+    photoCache[id_] = full;
+  }catch(e){ console.error(e); alert('Fotku se nepodařilo načíst nebo uložit.'); }
 }
 photoFile.addEventListener('change', ()=> onPhotoPicked(photoFile));
 photoCam.addEventListener('change', ()=> onPhotoPicked(photoCam));
@@ -779,16 +785,21 @@ photoPop.className = 'assignpop';
 document.body.appendChild(photoPop);
 function closePhotoMenu(){ photoPop.style.display='none'; }
 function openPhotoMenu(anchor, it){
+  const has = !!(it.thumb || it.photo);
   photoPop.innerHTML =
-    (it.photo ? `<label class="ppView">🖼 Zobrazit fotku</label>` : '') +
+    (has ? `<label class="ppView">🖼 Zobrazit fotku</label>` : '') +
     `<label class="ppFile">📁 Ze souborů</label>
      <label class="ppCam">📷 Vyfotit</label>` +
-    (it.photo ? `<div class="apsep"></div><label class="ppDel">🗑 Odebrat fotku</label>` : '');
+    (has ? `<div class="apsep"></div><label class="ppDel">🗑 Odebrat fotku</label>` : '');
   const on = (sel,fn)=>{ const el = photoPop.querySelector(sel); if(el) el.addEventListener('click', ()=>{ closePhotoMenu(); fn(); }); };
   on('.ppView', ()=> openLightbox(it));
   on('.ppFile', ()=>{ photoTarget = it.id; photoFile.click(); });
   on('.ppCam',  ()=>{ photoTarget = it.id; photoCam.click(); });
-  on('.ppDel',  ()=>{ if(confirm('Odebrat fotku u této položky?')) backend.update(it.id, {photo: null}); });
+  on('.ppDel',  ()=>{ if(confirm('Odebrat fotku u této položky?')){
+    backend.update(it.id, {thumb: null, photo: null});
+    backend.deletePhoto(it.id);
+    delete photoCache[it.id];
+  }});
   photoPop.style.display='flex';
   const r = anchor.getBoundingClientRect();
   photoPop.style.top = (window.scrollY + r.bottom + 5) + 'px';
@@ -807,10 +818,24 @@ document.addEventListener('mousedown', e=>{
 const lb = document.createElement('div');
 lb.className = 'lightbox';
 document.body.appendChild(lb);
-function openLightbox(it){
-  if(!it.photo) return;
-  lb.innerHTML = `<img src="${esc(it.photo)}" alt=""><div class="lbcap">${esc(it.text)}</div>`;
+let lbFor = null; // id položky právě otevřené v lightboxu
+async function openLightbox(it){
+  const preview = it.thumb || it.photo;
+  if(!preview) return;
+  lbFor = it.id;
+  // hned ukážeme miniaturu (nebo starší plnou fotku), plná verze se dotáhne na pozadí
+  lb.innerHTML = `<img src="${esc(photoCache[it.id] || preview)}" alt=""><div class="lbcap">${esc(it.text)}</div>`;
   lb.style.display='flex';
+  if(!photoCache[it.id]){
+    const full = (await backend.getPhoto(it.id)) || it.photo || null;
+    if(full){
+      photoCache[it.id] = full;
+      if(lbFor === it.id && lb.style.display !== 'none'){
+        const im = lb.querySelector('img');
+        if(im) im.src = full;
+      }
+    }
+  }
 }
 lb.addEventListener('click', ()=>{ lb.style.display='none'; lb.innerHTML=''; });
 document.addEventListener('keydown', e=>{ if(e.key==='Escape' && lb.style.display!=='none'){ lb.style.display='none'; lb.innerHTML=''; } });
@@ -829,8 +854,11 @@ function applyPatch(obj, patch){
 function localBackend(){
   let data=[];
   try{ data = JSON.parse(localStorage.getItem(KEY)) || []; }catch(e){ data=[]; }
-  const save=()=>{ try{ localStorage.setItem(KEY, JSON.stringify(data)); }
-    catch(e){ alert('Nepodařilo se uložit – úložiště prohlížeče je plné (fotky zabírají hodně místa).'); } };
+  let photos={};
+  try{ photos = JSON.parse(localStorage.getItem(KEY+'-fotky')) || {}; }catch(e){ photos={}; }
+  const quotaMsg = ()=> alert('Nepodařilo se uložit – úložiště prohlížeče je plné (fotky zabírají hodně místa).');
+  const save=()=>{ try{ localStorage.setItem(KEY, JSON.stringify(data)); }catch(e){ quotaMsg(); } };
+  const savePhotos=()=>{ try{ localStorage.setItem(KEY+'-fotky', JSON.stringify(photos)); }catch(e){ quotaMsg(); } };
   const id=()=> Date.now()+'-'+Math.random().toString(36).slice(2,7);
   const emit=()=>{ items=data.slice(); render(); };
   if(data.length===0){ data = SEED.map((s,i)=>({id:id(), prio:s[0], cat:s[1], text:s[2], qty:(s[3] ?? null), who:(s[4] || []), split:(s[5] ?? null), doneBy:{}, order:i})); save(); }
@@ -838,7 +866,10 @@ function localBackend(){
     start(){ emit(); },
     add(it){ data.push({id:id(), ...it}); save(); emit(); },
     update(id_, f){ const x=data.find(d=>d.id===id_); if(x){ applyPatch(x,f); save(); emit(); } },
-    remove(id_){ data=data.filter(d=>d.id!==id_); save(); emit(); }
+    remove(id_){ data=data.filter(d=>d.id!==id_); save(); emit(); },
+    setPhoto(id_, dataUrl){ photos[id_]=dataUrl; savePhotos(); },
+    async getPhoto(id_){ return photos[id_] || null; },
+    deletePhoto(id_){ if(id_ in photos){ delete photos[id_]; savePhotos(); } }
   };
 }
 
@@ -850,6 +881,8 @@ async function firebaseBackend(){
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
   const col = collection(db, COLLECTION);
+  // plné fotky mimo hlavní kolekci — snapshot seznamu tak zůstává malý a fotka se čte až na kliknutí
+  const fotky = collection(db, COLLECTION + '-fotky');
 
     const seedId = i => 'seed-' + String(i).padStart(3,'0');
   const writeSeed = i => {
@@ -887,7 +920,13 @@ async function firebaseBackend(){
     },
     add(it){ return addDoc(col, it); },
     update(id_, f){ return updateDoc(doc(col, id_), f); },
-    remove(id_){ return deleteDoc(doc(col, id_)); }
+    remove(id_){ return deleteDoc(doc(col, id_)); },
+    setPhoto(id_, dataUrl){ return setDoc(doc(fotky, id_), {photo: dataUrl}); },
+    async getPhoto(id_){
+      try{ const s = await getDoc(doc(fotky, id_)); return s.exists() ? (s.data().photo || null) : null; }
+      catch(e){ console.error(e); return null; }
+    },
+    deletePhoto(id_){ return deleteDoc(doc(fotky, id_)).catch(e=>console.error(e)); }
   };
 }
 
