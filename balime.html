@@ -104,6 +104,10 @@
   .qty:hover{filter:brightness(.97)}
   .qsplit{font-size:.7rem;color:var(--slabe);background:#f2f6fa;border:1px solid var(--line);
           border-radius:20px;padding:2px 7px;white-space:nowrap}
+  .money{font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:20px;cursor:pointer;
+         background:#eafaf1;color:#1f8f57;border:1px solid #9bd9b5;white-space:nowrap}
+  .money.empty{font-weight:600;color:var(--slabe);background:#eef3f7;border-color:#dfe9f2}
+  .money:hover{filter:brightness(.97)}
   .thumb{width:46px;height:46px;flex:none;border-radius:9px;object-fit:cover;cursor:zoom-in;
          border:1px solid var(--line);box-shadow:0 1px 4px rgba(12,58,95,.12);margin-top:1px}
 
@@ -180,7 +184,7 @@
   @media print{
     .topbar,.addform,.filters,.filternote,.statusbar,.grip,.acts,.progress .bar,.note,.lightbox,.assignpop{display:none}
     body{background:#fff}.item{box-shadow:none;break-inside:avoid}
-    .badge,.who-badge,.qty{cursor:default}
+    .badge,.who-badge,.qty,.money{cursor:default}
   }
 </style>
 </head>
@@ -197,7 +201,8 @@
      všech) patří do společných věcí. Každý si položku odškrtává <b>sám za sebe</b> a přes 📷 u ní může mít
      <b>vlastní fotku</b> (ze souborů, na telefonu vyfocením, nebo vložením odkazu na obrázek z internetu),
      <b>převzít fotku</b> od jiného člena, nebo být
-     bez ní. Dál jde přidávat, mazat, upravovat, zadávat množství (ks), měnit prioritu klikem na štítek a řadit
+     bez ní. Dál jde přidávat, mazat, upravovat, zadávat množství (ks), u hotovosti zapsat částku
+     (Kč / NOK / EUR) klikem na 💰, měnit prioritu klikem na štítek a řadit
      přetažením za <b>⠿</b>. Vše sdílené pro celou posádku v reálném čase.</p>
 
   <div id="status" class="statusbar"></div>
@@ -596,6 +601,21 @@ function renderViewHead(){
   vh.style.display='flex';
 }
 
+// ---- částka u hotovosti ----
+// U položek s hotovostí (podle textu) jde zapsat, kolik peněz to je — v Kč, NOK nebo EUR.
+const isCashItem = it => /hotovost/i.test(it.text||'');
+const CUR_MAP = {'kč':'Kč','czk':'Kč','nok':'NOK','eur':'EUR','€':'EUR'};
+function parseMoney(s){
+  const m = /^([\d\s.,]+)\s*(kč|czk|nok|eur|€)?$/i.exec((s||'').trim());
+  if(!m) return null;
+  const amount = parseFloat(m[1].replace(/\s/g,'').replace(',','.'));
+  if(isNaN(amount) || amount <= 0) return null;
+  return {amount, cur: m[2] ? CUR_MAP[m[2].toLowerCase()] : null};
+}
+const fmtMoney = mo => mo.amount.toLocaleString('cs-CZ') + ' ' + mo.cur;
+// výchozí měna podle názvu položky („Hotovost EUR" → EUR), jinak Kč
+const defaultCur = text => /eur/i.test(text||'') ? 'EUR' : (/nok/i.test(text||'') ? 'NOK' : 'Kč');
+
 // forPerson: pokud je zadán (podstránka člena posádky), checkbox i fotka patří jen tomuto členovi
 function makeRow(it, dndOff, forPerson){
   const w = whoArr(it);
@@ -622,6 +642,7 @@ function makeRow(it, dndOff, forPerson){
       <div class="meta">
         <span class="qty${it.qty==null?' empty':''}" title="Množství (počet kusů) — klikni pro změnu">${it.qty!=null ? it.qty+'×' : '+ ks'}</span>
         ${it.split ? `<span class="qsplit" title="Množství — manžel (Vladimír) / manželka (Lucie)">${esc(it.split)}</span>` : ''}
+        ${isCashItem(it) ? `<span class="money${it.money?'':' empty'}" title="Kolik hotovosti — klikni pro změnu">💰 ${it.money ? esc(fmtMoney(it.money)) : '+ částka'}</span>` : ''}
         <span class="badge p-${it.prio}" title="Klikni pro změnu priority">${PRIO_LABEL[it.prio]}</span>
         <span class="tag">${esc(it.cat||'')}</span>
         <span class="who-badge ${whoBadgeClass(w)}" title="Klikni pro přiřazení (lze i víc lidem)">${esc(whoLabel(w))}</span>
@@ -653,6 +674,17 @@ function makeRow(it, dndOff, forPerson){
     if(t===''){ backend.update(it.id, {qty: null}); return; }
     const n = parseInt(t, 10);
     if(!isNaN(n) && n>0) backend.update(it.id, {qty: n});
+  });
+  const moneyEl = row.querySelector('.money');
+  if(moneyEl) moneyEl.addEventListener('click', ()=>{
+    const v = prompt('Kolik hotovosti? Napiš částku a měnu (Kč / NOK / EUR), např. „5000 NOK" nebo „10 000 Kč". Nech prázdné pro odebrání:',
+                     it.money ? fmtMoney(it.money) : '');
+    if(v === null) return;
+    if(!v.trim()){ backend.update(it.id, {money: null}); return; }
+    const p = parseMoney(v);
+    if(!p){ alert('Částce nerozumím — napiš třeba „5000 NOK", „800 EUR" nebo „10 000 Kč".'); return; }
+    const cur = p.cur || (it.money && it.money.cur) || defaultCur(it.text);
+    backend.update(it.id, {money: {amount: p.amount, cur}});
   });
   row.querySelector('.who-badge').addEventListener('click', (e)=> openAssign(e.currentTarget, w, sel=> backend.update(it.id, {who: sel})));
   row.querySelector('.photo').addEventListener('click', e=> openPhotoMenu(e.currentTarget, it, pKey));
