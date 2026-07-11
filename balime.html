@@ -108,12 +108,9 @@
          background:#eafaf1;color:#1f8f57;border:1px solid #9bd9b5;white-space:nowrap}
   .money.empty{font-weight:600;color:var(--slabe);background:#eef3f7;border-color:#dfe9f2}
   .money:hover{filter:brightness(.97)}
-  .notechip{font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:20px;cursor:pointer;
-            background:#fdf6e3;color:#9a6b00;border:1px solid #e8cf8a;white-space:nowrap}
-  .notechip.empty{font-weight:600;color:var(--slabe);background:#eef3f7;border-color:#dfe9f2}
-  .notechip:hover{filter:brightness(.97)}
+  .iconbtn.note.has{color:#9a6b00;background:#fdf6e3;border-radius:6px}
   .notetext{font-size:.82rem;color:#7a6510;background:#fdf9ec;border-left:3px solid #e8cf8a;
-            border-radius:0 8px 8px 0;padding:4px 9px;margin-top:5px;cursor:pointer;white-space:pre-wrap}
+            border-radius:0 8px 8px 0;padding:3px 9px;margin-top:4px;cursor:pointer;white-space:pre-wrap}
   .item.done .notetext{color:var(--slabe)}
   .thumb{width:46px;height:46px;flex:none;border-radius:9px;object-fit:cover;cursor:zoom-in;
          border:1px solid var(--line);box-shadow:0 1px 4px rgba(12,58,95,.12);margin-top:1px}
@@ -188,11 +185,18 @@
   .pcheck.on{color:var(--slabe);text-decoration:line-through}
   .pfrac{font-size:.72rem;color:var(--slabe);background:#eef3f7;border-radius:20px;padding:2px 8px;flex:none;white-space:nowrap}
 
+  /* kompaktnější řádky seznamu — nižší čipy i dlaždice položek */
+  .badge,.tag,.qty,.qsplit,.money,.who-badge,.pfrac{font-size:.68rem;padding:1px 7px}
+  .item{padding:7px 11px}
+  .item .meta{margin-top:2px;gap:5px}
+  .thumb{width:38px;height:38px}
+  .item input[type=checkbox]{width:19px;height:19px}
+  .iconbtn{font-size:.9rem;padding:2px 5px}
+
   @media print{
     .topbar,.addform,.filters,.filternote,.statusbar,.grip,.acts,.progress .bar,.note,.lightbox,.assignpop{display:none}
     body{background:#fff}.item{box-shadow:none;break-inside:avoid}
-    .badge,.who-badge,.qty,.money,.notechip{cursor:default}
-    .notechip.empty{display:none}
+    .badge,.who-badge,.qty,.money{cursor:default}
   }
 </style>
 </head>
@@ -647,12 +651,11 @@ function makeRow(it, dndOff, forPerson){
     ${pv ? `<img class="thumb" src="${esc(pv)}" alt="" title="Klikni pro zvětšení" loading="lazy" referrerpolicy="no-referrer">` : ''}
     <div class="body">
       <div class="txt">${esc(it.text)}</div>
-      ${it.note ? `<div class="notetext" title="Klikni pro úpravu poznámky">📝 ${esc(it.note)}</div>` : ''}
+      ${it.note && notesOpen.has(it.id) ? `<div class="notetext" title="Klikni pro úpravu poznámky">📝 ${esc(it.note)}</div>` : ''}
       <div class="meta">
         <span class="qty${it.qty==null?' empty':''}" title="Množství (počet kusů) — klikni pro změnu">${it.qty!=null ? it.qty+'×' : '+ ks'}</span>
         ${it.split ? `<span class="qsplit" title="Množství — manžel (Vladimír) / manželka (Lucie)">${esc(it.split)}</span>` : ''}
         ${isCashItem(it) ? `<span class="money${it.money?'':' empty'}" title="Kolik hotovosti — klikni pro změnu">💰 ${it.money ? esc(fmtMoney(it.money)) : '+ částka'}</span>` : ''}
-        <span class="notechip${it.note?'':' empty'}" title="${it.note?'Upravit poznámku':'Přidat poznámku'}">📝 ${it.note?'poznámka':'+ poznámka'}</span>
         <span class="badge p-${it.prio}" title="Klikni pro změnu priority">${PRIO_LABEL[it.prio]}</span>
         <span class="tag">${esc(it.cat||'')}</span>
         <span class="who-badge ${whoBadgeClass(w)}" title="Klikni pro přiřazení (lze i víc lidem)">${esc(whoLabel(w))}</span>
@@ -660,6 +663,7 @@ function makeRow(it, dndOff, forPerson){
       ${pchecksHtml}
     </div>
     <div class="acts">
+      <button class="iconbtn note${it.note?' has':''}" title="${it.note?'Poznámka — zobrazit / upravit / odebrat':'Přidat poznámku'}">📝</button>
       <button class="iconbtn photo${pv?' has':''}" title="${pv?'Fotka — zobrazit / změnit / odebrat':'Přidat fotku (ze souborů, vyfocením nebo z odkazu)'}">📷</button>
       <button class="iconbtn edit" title="Upravit text položky">✏️</button>
       <button class="iconbtn del" title="Smazat">🗑</button>
@@ -685,11 +689,9 @@ function makeRow(it, dndOff, forPerson){
     const n = parseInt(t, 10);
     if(!isNaN(n) && n>0) backend.update(it.id, {qty: n});
   });
-  row.querySelectorAll('.notechip,.notetext').forEach(el=> el.addEventListener('click', ()=>{
-    const v = prompt('Poznámka k položce (nech prázdné pro odebrání):', it.note || '');
-    if(v === null) return;
-    backend.update(it.id, {note: v.trim() || null});
-  }));
+  row.querySelector('.iconbtn.note').addEventListener('click', e=> openNoteMenu(e.currentTarget, it));
+  const nt = row.querySelector('.notetext');
+  if(nt) nt.addEventListener('click', ()=> editNote(it));
   const moneyEl = row.querySelector('.money');
   if(moneyEl) moneyEl.addEventListener('click', ()=>{
     const v = prompt('Kolik hotovosti? Napiš částku a měnu (Kč / NOK / EUR), např. „5000 NOK" nebo „10 000 Kč". Nech prázdné pro odebrání:',
@@ -1032,6 +1034,46 @@ document.addEventListener('mousedown', e=>{
   if(photoPop.contains(e.target)) return;
   if(e.target.closest && e.target.closest('.iconbtn.photo')) return;
   closePhotoMenu();
+});
+
+// ---- poznámky u položek ----
+// Poznámka se v seznamu neukazuje, jen svítí ikonka 📝; přes menu jde poznámku
+// rozbalit pod položkou, upravit nebo odebrat. Rozbalení si stránka pamatuje do obnovení.
+const notesOpen = new Set();
+function editNote(it){
+  const v = prompt('Poznámka k položce:', it.note || '');
+  if(v === null) return;
+  const t = v.trim();
+  if(t) notesOpen.add(it.id);
+  backend.update(it.id, {note: t || null});
+}
+const notePop = document.createElement('div');
+notePop.className = 'assignpop';
+document.body.appendChild(notePop);
+function closeNoteMenu(){ notePop.style.display='none'; }
+function openNoteMenu(anchor, it){
+  notePop.innerHTML = it.note
+    ? `<label class="npView">${notesOpen.has(it.id) ? '🙈 Skrýt poznámku' : '👁 Zobrazit poznámku'}</label>
+       <label class="npEdit">✏️ Upravit poznámku</label>
+       <div class="apsep"></div><label class="npDel">🗑 Odebrat poznámku</label>`
+    : `<label class="npAdd">➕ Přidat poznámku</label>`;
+  const on = (sel,fn)=>{ const el = notePop.querySelector(sel); if(el) el.addEventListener('click', ()=>{ closeNoteMenu(); fn(); }); };
+  on('.npAdd',  ()=> editNote(it));
+  on('.npEdit', ()=> editNote(it));
+  on('.npView', ()=>{ notesOpen.has(it.id) ? notesOpen.delete(it.id) : notesOpen.add(it.id); render(); });
+  on('.npDel',  ()=>{ if(confirm('Odebrat poznámku u této položky?')){ notesOpen.delete(it.id); backend.update(it.id, {note: null}); } });
+  notePop.style.display='flex';
+  const r = anchor.getBoundingClientRect();
+  notePop.style.top = (window.scrollY + r.bottom + 5) + 'px';
+  notePop.style.left = (window.scrollX + r.left) + 'px';
+  const pr = notePop.getBoundingClientRect();
+  if(pr.right > window.innerWidth - 8) notePop.style.left = (window.scrollX + window.innerWidth - 8 - pr.width) + 'px';
+}
+document.addEventListener('mousedown', e=>{
+  if(notePop.style.display==='none') return;
+  if(notePop.contains(e.target)) return;
+  if(e.target.closest && e.target.closest('.iconbtn.note')) return;
+  closeNoteMenu();
 });
 
 // lightbox – zvětšená fotka přes celou obrazovku, zavře se klikem nebo Escape
