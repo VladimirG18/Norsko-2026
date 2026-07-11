@@ -108,6 +108,13 @@
          background:#eafaf1;color:#1f8f57;border:1px solid #9bd9b5;white-space:nowrap}
   .money.empty{font-weight:600;color:var(--slabe);background:#eef3f7;border-color:#dfe9f2}
   .money:hover{filter:brightness(.97)}
+  .notechip{font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:20px;cursor:pointer;
+            background:#fdf6e3;color:#9a6b00;border:1px solid #e8cf8a;white-space:nowrap}
+  .notechip.empty{font-weight:600;color:var(--slabe);background:#eef3f7;border-color:#dfe9f2}
+  .notechip:hover{filter:brightness(.97)}
+  .notetext{font-size:.82rem;color:#7a6510;background:#fdf9ec;border-left:3px solid #e8cf8a;
+            border-radius:0 8px 8px 0;padding:4px 9px;margin-top:5px;cursor:pointer;white-space:pre-wrap}
+  .item.done .notetext{color:var(--slabe)}
   .thumb{width:46px;height:46px;flex:none;border-radius:9px;object-fit:cover;cursor:zoom-in;
          border:1px solid var(--line);box-shadow:0 1px 4px rgba(12,58,95,.12);margin-top:1px}
 
@@ -184,7 +191,8 @@
   @media print{
     .topbar,.addform,.filters,.filternote,.statusbar,.grip,.acts,.progress .bar,.note,.lightbox,.assignpop{display:none}
     body{background:#fff}.item{box-shadow:none;break-inside:avoid}
-    .badge,.who-badge,.qty,.money{cursor:default}
+    .badge,.who-badge,.qty,.money,.notechip{cursor:default}
+    .notechip.empty{display:none}
   }
 </style>
 </head>
@@ -201,8 +209,8 @@
      všech) patří do společných věcí. Každý si položku odškrtává <b>sám za sebe</b> a přes 📷 u ní může mít
      <b>vlastní fotku</b> (ze souborů, na telefonu vyfocením, nebo vložením odkazu na obrázek z internetu),
      <b>převzít fotku</b> od jiného člena, nebo být
-     bez ní. Dál jde přidávat, mazat, upravovat, zadávat množství (ks), u hotovosti zapsat částku
-     (Kč / NOK / EUR) klikem na 💰, měnit prioritu klikem na štítek a řadit
+     bez ní. Dál jde přidávat, mazat, upravovat, zadávat množství (ks), přidat poznámku klikem na 📝,
+     u hotovosti zapsat částku (Kč / NOK / EUR) klikem na 💰, měnit prioritu klikem na štítek a řadit
      přetažením za <b>⠿</b>. Vše sdílené pro celou posádku v reálném čase.</p>
 
   <div id="status" class="statusbar"></div>
@@ -551,7 +559,7 @@ function visibleItems(){
     if(fPrio.value && it.prio !== fPrio.value) return false;
     if(fStatus.value === 'open' && done) return false;
     if(fStatus.value === 'done' && !done) return false;
-    if(q && !(it.text||'').toLowerCase().includes(q)) return false;
+    if(q && !((it.text||'').toLowerCase().includes(q) || (it.note||'').toLowerCase().includes(q))) return false;
     return true;
   });
 }
@@ -639,10 +647,12 @@ function makeRow(it, dndOff, forPerson){
     ${pv ? `<img class="thumb" src="${esc(pv)}" alt="" title="Klikni pro zvětšení" loading="lazy" referrerpolicy="no-referrer">` : ''}
     <div class="body">
       <div class="txt">${esc(it.text)}</div>
+      ${it.note ? `<div class="notetext" title="Klikni pro úpravu poznámky">📝 ${esc(it.note)}</div>` : ''}
       <div class="meta">
         <span class="qty${it.qty==null?' empty':''}" title="Množství (počet kusů) — klikni pro změnu">${it.qty!=null ? it.qty+'×' : '+ ks'}</span>
         ${it.split ? `<span class="qsplit" title="Množství — manžel (Vladimír) / manželka (Lucie)">${esc(it.split)}</span>` : ''}
         ${isCashItem(it) ? `<span class="money${it.money?'':' empty'}" title="Kolik hotovosti — klikni pro změnu">💰 ${it.money ? esc(fmtMoney(it.money)) : '+ částka'}</span>` : ''}
+        <span class="notechip${it.note?'':' empty'}" title="${it.note?'Upravit poznámku':'Přidat poznámku'}">📝 ${it.note?'poznámka':'+ poznámka'}</span>
         <span class="badge p-${it.prio}" title="Klikni pro změnu priority">${PRIO_LABEL[it.prio]}</span>
         <span class="tag">${esc(it.cat||'')}</span>
         <span class="who-badge ${whoBadgeClass(w)}" title="Klikni pro přiřazení (lze i víc lidem)">${esc(whoLabel(w))}</span>
@@ -675,6 +685,11 @@ function makeRow(it, dndOff, forPerson){
     const n = parseInt(t, 10);
     if(!isNaN(n) && n>0) backend.update(it.id, {qty: n});
   });
+  row.querySelectorAll('.notechip,.notetext').forEach(el=> el.addEventListener('click', ()=>{
+    const v = prompt('Poznámka k položce (nech prázdné pro odebrání):', it.note || '');
+    if(v === null) return;
+    backend.update(it.id, {note: v.trim() || null});
+  }));
   const moneyEl = row.querySelector('.money');
   if(moneyEl) moneyEl.addEventListener('click', ()=>{
     const v = prompt('Kolik hotovosti? Napiš částku a měnu (Kč / NOK / EUR), např. „5000 NOK" nebo „10 000 Kč". Nech prázdné pro odebrání:',
