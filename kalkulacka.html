@@ -257,12 +257,20 @@
     <!-- technika & ostatní -->
     <div class="subhead" data-mode="podrobna">Technika &amp; ostatní</div>
     <div class="row" data-mode="zakladni">
-      <label>Ostatní (AdBlue, plyn, klíny, nosič kol, markýza…)</label>
+      <label>Ostatní (AdBlue, plyn, klíny, nosič kol, markýza, FV panel…)</label>
       <input type="number" id="ostatni" value="20" min="0"><span class="unit">kg</span>
     </div>
     <div class="row" data-mode="podrobna">
-      <label>Namontované doplňky <span class="hint">markýza, solární panel — počítej celou vahou, i když jsou na voze trvale</span></label>
-      <input type="number" id="doplnky" value="15" min="0"><span class="unit">kg</span>
+      <label>Markýza <span class="hint">počítá se celou vahou, i když je na voze trvale — typicky 20–25 kg (4m Fiamma/Thule)</span></label>
+      <input type="number" id="markyza" value="22" min="0"><span class="unit">kg</span>
+    </div>
+    <div class="row" data-mode="podrobna">
+      <label>Nosič kol <span class="hint">na zadní stěnu, typicky 8–10 kg (bez kol — ta případně přidej do vybavení)</span></label>
+      <input type="number" id="nosic_kol" value="9" min="0"><span class="unit">kg</span>
+    </div>
+    <div class="row" data-mode="podrobna">
+      <label>Střešní fotovoltaický panel <span class="hint">100–150 W včetně držáků a kabeláže</span></label>
+      <input type="number" id="fv_panel" value="12" min="0"><span class="unit">kg</span>
     </div>
     <div class="row" data-mode="podrobna">
       <label>Nářadí, klíny &amp; lano</label>
@@ -354,7 +362,7 @@ const ADULTS=['dosp_lucie','dosp_vladimir','dosp_jirka','dosp_jarka'];
 const ids=[...ADULTS,'dite_kg','pes','obleceni',
   'obleceni_lucie','obleceni_vladimir','obleceni_jirka','obleceni_jarka','dite','kocarek','pes_vyb','jidlo',
   'jidlo_napoje','jidlo_hotova','jidlo_priloha','jidlo_cerstve','jidlo_svacinky','jidlo_ostatni','kuchyne',
-  'voda','ostatni','doplnky','naradi','provoz',
+  'voda','ostatni','markyza','nosic_kol','fv_panel','naradi','provoz',
   'elektro_lucie','elektro_vladimir','elektro_jirka','elektro_jarka',
   'vybaveni_lucie','vybaveni_vladimir','vybaveni_jirka','vybaveni_jarka',
   'veci_lucie','veci_vladimir','veci_jirka','veci_jarka'];
@@ -364,7 +372,7 @@ const EQUIP={
   podrobna:['obleceni_lucie','obleceni_vladimir','obleceni_jirka','obleceni_jarka','dite','kocarek','pes_vyb',
             'jidlo_napoje','jidlo_hotova','jidlo_priloha',
             'jidlo_cerstve','jidlo_svacinky','jidlo_ostatni','kuchyne','voda',
-            'doplnky','naradi','provoz',
+            'markyza','nosic_kol','fv_panel','naradi','provoz',
             'elektro_lucie','elektro_vladimir','elektro_jirka','elektro_jarka',
             'vybaveni_lucie','vybaveni_vladimir','vybaveni_jirka','vybaveni_jarka',
             'veci_lucie','veci_vladimir','veci_jirka','veci_jarka']
@@ -379,7 +387,7 @@ const DEFAULTS={mode:'zakladni',
   obleceni_lucie:11.5,obleceni_vladimir:11.5,obleceni_jirka:11.5,obleceni_jarka:11.5,
   dite:6,kocarek:6,pes_vyb:10,jidlo_napoje:12,jidlo_hotova:14.6,jidlo_priloha:4.75,
   jidlo_cerstve:10.2,jidlo_svacinky:5.7,jidlo_ostatni:2.2,kuchyne:10,
-  doplnky:15,naradi:8,provoz:10,
+  markyza:22,nosic_kol:9,fv_panel:12,naradi:8,provoz:10,
   elektro_lucie:1.5,elektro_vladimir:1.5,elektro_jirka:1.5,elektro_jarka:1.5,
   vybaveni_lucie:3,vybaveni_vladimir:3,vybaveni_jirka:3,vybaveni_jarka:3,
   veci_lucie:3,veci_vladimir:3,veci_jirka:3,veci_jarka:3,
