@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a2c49">
+<title>Norsko 2026 — checklist před odjezdem</title>
+<link rel="icon" href="favicon.ico" sizes="48x48 32x32 16x16">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--modra:#0c3a5f;--modra2:#1a6ea8;--led:#eef4f9;--akcent:#c0392b;
+        --text:#182634;--slabe:#5d6e7d;--aurora:#2fbf8f;--line:#dfe9f2;--green:#1f8f57;
+        --shadow:0 1px 2px rgba(12,58,95,.05),0 8px 24px rgba(12,58,95,.09)}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Manrope',-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+       color:var(--text);background:linear-gradient(180deg,#f6fafd 0%,var(--led) 260px);line-height:1.5}
+  .topbar{background:linear-gradient(120deg,#0a2c49 0%,#155a8c 100%);color:#fff;padding:12px 18px;display:flex;
+          justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;
+          border-bottom:3px solid;border-image:linear-gradient(90deg,var(--aurora),#3a9bd5,#8b7bd8) 1;
+          box-shadow:0 2px 14px rgba(10,44,73,.22)}
+  .topbar b{font-size:.98rem;letter-spacing:-.01em}
+  .topbar a{color:#bfe0f5;text-decoration:none;font-size:.9rem;font-weight:600}
+  .topbar a:hover{color:#fff}
+  .wrap{max-width:760px;margin:20px auto;padding:0 14px}
+  h1{color:var(--modra);font-size:1.6rem;font-weight:800;letter-spacing:-.02em;margin:6px 0 2px}
+  .sub{color:var(--slabe);font-size:.9rem;margin:0 0 12px}
+
+  .statusbar{font-size:.8rem;color:var(--slabe);padding:8px 12px;border:1px solid var(--line);
+             border-radius:10px;margin:4px 0 12px;background:#fff;box-shadow:var(--shadow)}
+  .statusbar.ok{color:#1f8f57;border-color:#9bd9b5;background:#f1faf4}
+  .statusbar.warn{color:#9a6b00;border-color:#e8cf8a;background:#fdf8ea}
+
+  .progress{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 14px;
+            margin:0 0 12px;box-shadow:var(--shadow)}
+  .progress .lbl{display:flex;justify-content:space-between;font-size:.83rem;font-weight:600;color:var(--slabe);margin-bottom:5px}
+  .progress .bar{height:9px;border-radius:999px;background:#e6eef5;overflow:hidden;
+            box-shadow:inset 0 1px 3px rgba(12,58,95,.08)}
+  .progress .bar > i{display:block;height:100%;width:0;border-radius:999px;
+            background:linear-gradient(90deg,var(--green),#39c07e);transition:width .25s}
+
+  .addform{background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px;
+           margin:0 0 12px;box-shadow:var(--shadow);display:flex;gap:8px;flex-wrap:wrap}
+  .addform input[type=text]{flex:1;min-width:180px;background:#fff;color:var(--text);
+       border:1px solid #c8d7e4;border-radius:9px;padding:8px 11px;font:inherit;
+       transition:border-color .15s,box-shadow .15s}
+  .addform input[type=text]:focus{outline:none;border-color:var(--modra2);
+       box-shadow:0 0 0 3px rgba(26,110,168,.15)}
+  .btn{background:linear-gradient(120deg,var(--modra),var(--modra2));border:0;color:#fff;font-weight:700;
+       border-radius:9px;padding:8px 15px;cursor:pointer;font:inherit;
+       box-shadow:0 4px 12px rgba(12,58,95,.22);transition:transform .15s,box-shadow .15s}
+  .btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(12,58,95,.30)}
+  .btn.ghost{background:#fff;color:var(--modra);border:1px solid var(--line);box-shadow:none;padding:7px 12px}
+  .btn.ghost:hover{background:#e6f2fb;transform:none}
+
+  .filters{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin:0 0 4px}
+  .filters input[type=text]{flex:1;min-width:150px;background:#fff;color:var(--text);
+       border:1px solid #cdd9e3;border-radius:8px;padding:7px 10px;font:inherit;font-size:.92rem}
+  .filters select{background:#fff;color:var(--text);border:1px solid #cdd9e3;border-radius:8px;padding:7px 9px;font:inherit;font-size:.92rem}
+  .filternote{font-size:.76rem;color:var(--slabe);margin:2px 2px 10px;min-height:1em}
+
+  .list{display:flex;flex-direction:column;gap:6px;margin-bottom:30px}
+  .item{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid var(--line);
+        border-left:4px solid var(--modra2);border-radius:10px;padding:6px 10px;
+        box-shadow:0 2px 8px rgba(12,58,95,.06);transition:box-shadow .15s,border-color .15s}
+  .item:hover{border-color:#cfe0ee;box-shadow:0 4px 14px rgba(12,58,95,.10)}
+  .item.done{opacity:.6;border-left-color:var(--green)}
+  .item.done .txt{text-decoration:line-through;color:var(--slabe)}
+  .item.dragging{opacity:.4}
+  .item.dragover{box-shadow:0 0 0 2px var(--modra2)}
+  .grip{cursor:grab;color:#b6c4d0;font-size:1.05rem;line-height:1.3;user-select:none}
+  .grip.off{opacity:.25;cursor:not-allowed}
+  .item input[type=checkbox]{width:19px;height:19px;flex:none;cursor:pointer;accent-color:var(--green)}
+  .txt{flex:1;min-width:0;font-size:.93rem;word-wrap:break-word}
+  .acts{display:flex;gap:1px;flex:none}
+  .iconbtn{background:none;border:none;color:var(--slabe);cursor:pointer;font-size:.88rem;
+           padding:2px 5px;border-radius:6px;line-height:1}
+  .iconbtn:hover{background:var(--led);color:var(--modra)}
+  .iconbtn.del:hover{color:var(--akcent);background:#fdecea}
+  .empty{color:var(--slabe);font-style:italic;padding:18px 4px;text-align:center}
+  .note{margin-top:6px;font-size:.8rem;color:var(--slabe);font-style:italic}
+
+  @media print{
+    .topbar,.addform,.filters,.filternote,.statusbar,.grip,.acts,.progress .bar,.note{display:none}
+    body{background:#fff}.item{box-shadow:none;break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <b>🛫 Norsko 2026 — checklist před odjezdem</b>
+  <span><a href="index.html">← rozcestník</a> &nbsp; <a href="co_zaridit.html">co zařídit →</a> &nbsp; <a href="balime.html">co balíme →</a></span>
+</div>
+<div class="wrap">
+  <h1>Checklist před odjezdem</h1>
+  <p class="sub">Poslední kontrola, než vyrazíme — dům, doklady, vůz a elektronika. Stačí odškrtávat;
+     jde i přidávat, upravovat, mazat a řadit přetažením za <b>⠿</b>. Sdílené pro celou posádku v reálném čase.</p>
+
+  <div id="status" class="statusbar"></div>
+
+  <div class="progress">
+    <div class="lbl"><span id="progLbl">Hotovo 0 / 0</span><span id="progPct">0 %</span></div>
+    <div class="bar"><i id="progBar"></i></div>
+  </div>
+
+  <div class="addform">
+    <input type="text" id="newText" placeholder="Nová položka checklistu…">
+    <button class="btn" id="addBtn">Přidat</button>
+  </div>
+
+  <div class="filters">
+    <input type="text" id="fSearch" placeholder="🔎 hledat…">
+    <select id="fStatus">
+      <option value="">Vše</option>
+      <option value="open">Jen nesplněné</option>
+      <option value="done">Jen splněné</option>
+    </select>
+    <button class="btn ghost" id="clearF">Zrušit filtry</button>
+    <button class="btn ghost" id="printBtn">🖨️ Tisk</button>
+  </div>
+  <div class="filternote" id="filterNote"></div>
+
+  <div class="list" id="list"></div>
+
+  <p class="note" id="footnote"></p>
+</div>
+
+<script type="module">
+// Sdílený online backend (Firebase / Firestore) — stejný projekt jako ostatní checklisty,
+// vlastní kolekce, ať se data nemíchají.
+const firebaseConfig = {
+  apiKey: "AIzaSyCLU7cH1tXPqnaxVV_-BsSNssl-NU9Pz1I",
+  authDomain: "rd-modrice-e9477.firebaseapp.com",
+  projectId: "rd-modrice-e9477",
+  storageBucket: "rd-modrice-e9477.firebasestorage.app",
+  messagingSenderId: "941681195558",
+  appId: "1:941681195558:web:3aac10f182e784cdb3c4e7"
+};
+const COLLECTION = 'checklist-pred-odjezdem-norsko';
+const KEY = 'norsko2026-checklist-pred-odjezdem-v1';
+
+// Výchozí sada (naplní se jen při prvním načtení do prázdné databáze) — vše jde upravit i smazat.
+const SEED = [
+  '🏠 Zavřít hlavní přívod vody',
+  '🏠 Vypnout spotřebiče (trouba, žehlička, TV…)',
+  '🏠 Vynést odpadky',
+  '🏠 Vyklidit z lednice, co se zkazí',
+  '🏠 Zalít květiny / domluvit zalévání',
+  '🏠 Dát vědět sousedům + předat klíče',
+  '🏠 Zamknout okna a dveře, zapnout alarm',
+  '📄 Zkontrolovat pasy / občanky všech',
+  '📄 Vzít rezervace: trajekt, Trolltunga, Geiranger, Besseggen',
+  '📄 Vzít hotovost EUR + NOK a zálohu na vůz (30 000 Kč)',
+  '📄 Doklady k vozu (osvědčení o registraci, zelená karta)',
+  '🐕 Monty: pas + odčervení u veterináře 24–120 h před vstupem do Norska',
+  '🚐 Převzít obytný vůz — protokol + fotky stavu',
+  '🚐 Zkontrolovat plyn, vodu a chemii WC v obytňáku',
+  '🚐 Mýtná krabička / AutoPASS ve voze',
+  '🚐 Dotankovat před trajektem',
+  '🔌 Nabít telefony, powerbanky, čelovky a hodinky',
+  '🔌 Stáhnout offline mapy a park4night',
+  '🔌 Aktivovat eSIM (Saily)',
+  '👶 Léky pro Adámka + lékárnička po ruce',
+  '🥪 Sbalit jídlo a pití na cestu',
+];
+
+const $ = id => document.getElementById(id);
+const listEl=$('list'), statusEl=$('status'), footEl=$('footnote'), filterNote=$('filterNote');
+const fSearch=$('fSearch'), fStatus=$('fStatus');
+
+let items = [];
+const esc = s => (s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const filtersActive = () => !!(fSearch.value.trim() || fStatus.value);
+
+function visibleItems(){
+  const q = fSearch.value.trim().toLowerCase();
+  return items.filter(it=>{
+    if(fStatus.value === 'open' && it.done) return false;
+    if(fStatus.value === 'done' && !it.done) return false;
+    if(q && !(it.text||'').toLowerCase().includes(q)) return false;
+    return true;
+  });
+}
+
+function renderProgress(){
+  const done = items.filter(i=>i.done).length;
+  const pct = items.length ? Math.round(done/items.length*100) : 0;
+  $('progLbl').textContent = `Hotovo ${done} / ${items.length}`;
+  $('progPct').textContent = pct + ' %';
+  $('progBar').style.width = pct + '%';
+}
+
+function makeRow(it, dndOff){
+  const row = document.createElement('div');
+  row.className = `item${it.done?' done':''}`;
+  row.dataset.id = it.id;
+  row.draggable = !dndOff;
+  row.innerHTML = `
+    <span class="grip${dndOff?' off':''}" title="${dndOff?'Řazení vypnuto při filtru':'Přetáhni pro změnu pořadí'}">⠿</span>
+    <input type="checkbox" ${it.done?'checked':''} title="Splněno">
+    <div class="txt">${esc(it.text)}</div>
+    <div class="acts">
+      <button class="iconbtn edit" title="Upravit">✏️</button>
+      <button class="iconbtn del" title="Smazat">🗑</button>
+    </div>`;
+  row.querySelector('input').addEventListener('change', e=> backend.update(it.id, {done: e.target.checked}));
+  row.querySelector('.edit').addEventListener('click', ()=>{
+    const t = prompt('Upravit položku:', it.text);
+    if(t!=null && t.trim()) backend.update(it.id, {text: t.trim()});
+  });
+  row.querySelector('.del').addEventListener('click', ()=>{
+    if(confirm('Smazat tuto položku?')) backend.remove(it.id);
+  });
+  if(!dndOff) attachDnD(row);
+  return row;
+}
+
+function render(){
+  renderProgress();
+  const vis = visibleItems();
+  const blocked = filtersActive();
+  filterNote.textContent = blocked
+    ? `Zobrazeno ${vis.length} z ${items.length}. Řazení přetažením je při filtru vypnuté.`
+    : (items.length ? 'Pořadí změníš přetažením za ⠿.' : '');
+  listEl.innerHTML = '';
+  if(vis.length === 0){
+    listEl.innerHTML = `<div class="empty">${items.length ? 'Nic neodpovídá filtru.' : 'Zatím tu nejsou žádné položky.'}</div>`;
+    return;
+  }
+  for(const it of vis) listEl.appendChild(makeRow(it, blocked));
+}
+
+let dragId = null;
+function attachDnD(row){
+  row.addEventListener('dragstart', e=>{ dragId = row.dataset.id; row.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; });
+  row.addEventListener('dragend', ()=>{ dragId=null; row.classList.remove('dragging'); [...listEl.children].forEach(c=>c.classList.remove('dragover')); });
+  row.addEventListener('dragover', e=>{ e.preventDefault(); row.classList.add('dragover'); });
+  row.addEventListener('dragleave', ()=> row.classList.remove('dragover'));
+  row.addEventListener('drop', e=>{
+    e.preventDefault(); row.classList.remove('dragover');
+    const targetId = row.dataset.id;
+    if(!dragId || dragId===targetId) return;
+    const arr = items.slice().sort((a,b)=>(a.order||0)-(b.order||0));
+    const from = arr.findIndex(x=>x.id===dragId), to = arr.findIndex(x=>x.id===targetId);
+    if(from<0||to<0) return;
+    const [moved] = arr.splice(from,1);
+    arr.splice(to,0,moved);
+    arr.forEach((x,i)=>{ if(x.order!==i) backend.update(x.id, {order:i}); });
+  });
+}
+
+$('addBtn').addEventListener('click', ()=>{
+  const text = $('newText').value.trim();
+  if(!text){ $('newText').focus(); return; }
+  const maxOrder = items.reduce((m,i)=>Math.max(m, i.order||0), -1);
+  backend.add({text, done:false, order:maxOrder+1});
+  $('newText').value=''; $('newText').focus();
+});
+$('newText').addEventListener('keydown', e=>{ if(e.key==='Enter') $('addBtn').click(); });
+[fSearch,fStatus].forEach(el=> el.addEventListener('input', render));
+$('clearF').addEventListener('click', ()=>{ fSearch.value=''; fStatus.value=''; render(); });
+$('printBtn').addEventListener('click', ()=> window.print());
+
+// ---- lokální záloha ----
+function localBackend(){
+  let data=[];
+  try{ data = JSON.parse(localStorage.getItem(KEY)) || []; }catch(e){ data=[]; }
+  const save=()=>{ try{ localStorage.setItem(KEY, JSON.stringify(data)); }catch(e){} };
+  const id=()=> Date.now()+'-'+Math.random().toString(36).slice(2,7);
+  const emit=()=>{ items=data.slice().sort((a,b)=>(a.order||0)-(b.order||0)); render(); };
+  if(data.length===0){ data = SEED.map((t,i)=>({id:id(), text:t, done:false, order:i})); save(); }
+  return {
+    start(){ emit(); },
+    add(it){ data.push({id:id(), ...it}); save(); emit(); },
+    update(id_, f){ const x=data.find(d=>d.id===id_); if(x){ Object.assign(x,f); save(); emit(); } },
+    remove(id_){ data=data.filter(d=>d.id!==id_); save(); emit(); }
+  };
+}
+
+// ---- sdílený Firebase backend ----
+async function firebaseBackend(){
+  const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
+  const { getFirestore, collection, doc, setDoc, addDoc, updateDoc, deleteDoc, onSnapshot, getDocs }
+    = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const col = collection(db, COLLECTION);
+
+  const snap0 = await getDocs(col);
+  if(snap0.empty){
+    await Promise.all(SEED.map((t,i)=>{
+      const n = String(i).padStart(3,'0');
+      return setDoc(doc(col, 'seed-'+n), {text:t, done:false, order:i});
+    }));
+  }
+  return {
+    start(){
+      onSnapshot(col, snap=>{
+        items = snap.docs.map(d=>({id:d.id, ...d.data()})).sort((a,b)=>(a.order||0)-(b.order||0));
+        render();
+      }, err=>{
+        console.error(err);
+        statusEl.textContent='⚠️ Chyba připojení k databázi – zkontroluj pravidla Firestore.';
+        statusEl.className='statusbar warn';
+      });
+    },
+    add(it){ return addDoc(col, it); },
+    update(id_, f){ return updateDoc(doc(col, id_), f); },
+    remove(id_){ return deleteDoc(doc(col, id_)); }
+  };
+}
+
+let backend;
+const useFirebase = firebaseConfig && firebaseConfig.apiKey && firebaseConfig.apiKey.length > 10;
+if(useFirebase){
+  try{
+    backend = await firebaseBackend();
+    statusEl.textContent='🟢 Sdílené online – checklist i odškrtnutí vidí celá posádka v reálném čase.';
+    statusEl.className='statusbar ok';
+    footEl.textContent='Data se ukládají do sdílené online databáze (Firebase) a aktualizují se všem v reálném čase.';
+  }catch(e){
+    console.error(e);
+    backend = localBackend();
+    statusEl.textContent='⚠️ Online databázi se nepodařilo načíst – používá se lokální ukládání na tomto zařízení.';
+    statusEl.className='statusbar warn';
+    footEl.textContent='Online databáze není dostupná, změny se ukládají jen do tohoto prohlížeče.';
+  }
+}else{
+  backend = localBackend();
+  statusEl.textContent='🔒 Jen na tomto zařízení.';
+  footEl.textContent='Změny se ukládají jen do tohoto prohlížeče (localStorage).';
+}
+backend.start();
+</script>
+</body>
+</html>
