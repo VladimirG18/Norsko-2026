@@ -106,6 +106,29 @@
           border-radius:20px;padding:2px 7px;white-space:nowrap}
   .thumb{width:46px;height:46px;flex:none;border-radius:9px;object-fit:cover;cursor:zoom-in;
          border:1px solid var(--line);box-shadow:0 1px 4px rgba(12,58,95,.12);margin-top:1px}
+
+  /* sekce: dlaždice členů posádky + společné věci */
+  .sekce-h{display:flex;align-items:center;gap:8px;color:var(--modra);font-size:1.15rem;
+           font-weight:800;letter-spacing:-.01em;margin:22px 2px 10px}
+  .sekce-h .cnt{font-weight:500;color:var(--slabe);font-size:.85rem}
+  .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin:0 0 6px}
+  .ptile{background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px 10px 12px;cursor:pointer;
+         display:flex;flex-direction:column;align-items:center;gap:7px;box-shadow:var(--shadow);
+         transition:transform .15s,box-shadow .15s,border-color .15s;text-align:center}
+  .ptile:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(12,58,95,.16);border-color:#cfe0ee}
+  .ptile img{width:62px;height:62px;border-radius:50%;object-fit:cover;
+             box-shadow:0 0 0 3px #fff,0 0 0 5px var(--line)}
+  .ptile b{font-size:.96rem;letter-spacing:-.01em}
+  .ptile .pstat{font-size:.75rem;color:var(--slabe)}
+  .ptile .pbar{width:100%;height:6px;border-radius:999px;background:#e6eef5;overflow:hidden}
+  .ptile .pbar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--green),#39c07e)}
+  .viewhead{display:none;align-items:center;gap:13px;background:#fff;border:1px solid var(--line);
+            border-radius:14px;padding:12px 15px;margin:0 0 14px;box-shadow:var(--shadow)}
+  .viewhead img{width:54px;height:54px;border-radius:50%;object-fit:cover;
+                box-shadow:0 0 0 3px #fff,0 0 0 5px var(--line)}
+  .viewhead b{font-size:1.05rem}
+  .viewhead .pstat{font-size:.8rem;color:var(--slabe)}
+  .viewhead .back{margin-left:auto;text-decoration:none}
   .iconbtn.photo.has{color:var(--modra2)}
   .lightbox{position:fixed;inset:0;z-index:80;background:rgba(8,25,40,.86);display:none;
             flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:zoom-out;padding:20px}
@@ -118,6 +141,8 @@
   .who-badge.w-vladimir{background:#e7f0fb;color:#1d5fa8;border-color:#bcd6f3}
   .who-badge.w-jiri{background:#e6f7ee;color:#1f8f57;border-color:#bce6cf}
   .who-badge.w-jaroslava{background:#f3ebfb;color:#7a3fb0;border-color:#dcc7f0}
+  .who-badge.w-adamek{background:#fff2e2;color:#b06a00;border-color:#f0d9b0}
+  .who-badge.w-monty{background:#f2ede5;color:#7a5c34;border-color:#dccbb0}
   .who-badge.w-multi{background:#e7f0fb;color:#1d5fa8;border-color:#bcd6f3}
   .who-badge.w-all{background:#fff1e0;color:#b06a00;border-color:#f0d9b0}
   .assignpop{position:absolute;z-index:60;background:#fff;border:1px solid #cdd9e3;border-radius:10px;
@@ -166,12 +191,13 @@
 </div>
 <div class="wrap">
   <h1>Co balíme na cestu do Norska</h1>
-  <p class="sub">Společný balicí seznam. Odškrtni sbalené. Klikem na <b>👤</b> přiřadíš, kdo danou položku balí — pokud
-     je přiřazeno víc lidí, každý si ji odškrtne <b>sám za sebe</b> (položka je hotová, až mají zaškrtnuto všichni
-     přiřazení). Jde přidávat, mazat, upravovat, u položek zadávat <b>množství (ks)</b> klikem na štítek s počtem,
-     ke každé položce přidat <b>fotku</b> přes 📷 (ze souborů, nebo na telefonu rovnou vyfocením),
-     měnit prioritu klikem na štítek, řadit přetažením za <b>⠿</b>
-     a filtrovat/seskupovat podle řešitele. Vše sdílené pro celou posádku v reálném čase.</p>
+  <p class="sub">Společný balicí seznam ve dvou sekcích: <b>balení podle členů posádky</b> (klikni na dlaždici člena
+     a uvidíš jen věci, které se ho týkají) a <b>společné věci</b> pro celou výpravu. Klikem na <b>👤</b> u položky
+     nastavíš, kterých členů se týká — položka se pak objeví v sekci každého z nich; bez výběru (nebo s výběrem
+     všech) patří do společných věcí. Každý si položku odškrtává <b>sám za sebe</b> a přes 📷 u ní může mít
+     <b>vlastní fotku</b> (ze souborů, nebo na telefonu vyfocením), <b>převzít fotku</b> od jiného člena, nebo být
+     bez ní. Dál jde přidávat, mazat, upravovat, zadávat množství (ks), měnit prioritu klikem na štítek a řadit
+     přetažením za <b>⠿</b>. Vše sdílené pro celou posádku v reálném čase.</p>
 
   <div id="status" class="statusbar"></div>
 
@@ -179,6 +205,8 @@
     <div class="lbl"><span id="progLbl">Hotovo 0 / 0</span><span id="progPct">0 %</span></div>
     <div class="bar"><i id="progBar"></i></div>
   </div>
+
+  <div class="viewhead" id="viewHead"></div>
 
   <div class="addform">
     <div class="frow">
@@ -195,6 +223,11 @@
     </div>
   </div>
 
+  <div id="sekcePosadka">
+    <h2 class="sekce-h">🧑‍🤝‍🧑 Balení podle členů posádky</h2>
+    <div class="tiles" id="tiles"></div>
+  </div>
+
   <div class="filters">
     <input type="text" id="fSearch" placeholder="🔎 hledat v textu…">
     <select id="fCat"><option value="">Všechny kategorie</option></select>
@@ -209,10 +242,8 @@
       <option value="open">Jen nesbalené</option>
       <option value="done">Jen sbalené</option>
     </select>
-    <select id="fWho"><option value="">Všichni řešitelé</option></select>
     <select id="fGroup">
       <option value="">Bez seskupení</option>
-      <option value="who">👥 Seskupit podle řešitele</option>
       <option value="cat">🏷️ Seskupit podle kategorie</option>
       <option value="prio">🚦 Seskupit podle priority</option>
     </select>
@@ -221,6 +252,7 @@
   </div>
   <div class="filternote" id="filterNote"></div>
 
+  <h2 class="sekce-h" id="sharedHead">🧰 Společné věci <span class="cnt" id="sharedCnt"></span></h2>
   <div class="list" id="list"></div>
 
   <p class="note" id="footnote"></p>
@@ -238,10 +270,10 @@ const firebaseConfig = {
   appId: "1:941681195558:web:3aac10f182e784cdb3c4e7"
 };
 const COLLECTION = 'co-balime-norsko';
-const KEY = 'norsko2026-co-balime-v3';
+const KEY = 'norsko2026-co-balime-v4';
 // Verze výchozí sady. Po jejím zvýšení se do sdílené databáze doplní nově přidané
 // položky (stávající data ani odškrtnutí se nemažou).
-const SEED_VERSION = 3;
+const SEED_VERSION = 4;
 // Dokument s verzí držíme uvnitř stejné kolekce, aby na něj platila stejná pravidla Firestore.
 const SEED_META_ID = '_seedmeta';
 
@@ -251,7 +283,8 @@ const CATS = ['Doklady + finance','Elektronika','Oblečení','Hygiena','Lékárn
 
 // Výchozí sada = sloučený balicí seznam (původní cestovní položky + položky z Excelu
 // „Příprava na dovolenou Norsko"). 4. hodnota = množství (ks, součet manžel+manželka),
-// 5. = kdo balí, 6. = rozpad manžel / manželka. Doplní se i do sdílené databáze podle SEED_VERSION.
+// 5. = členové posádky, kterých se položka týká (Dítě → Adámek, Pes → Monty),
+// 6. = rozpad manžel / manželka. Doplní se i do sdílené databáze podle SEED_VERSION.
 const SEED = [
   // — Doklady + finance —
   ['red','Doklady + finance','Hotovost EUR',2,['Vladimír','Lucie'],'1 / 1'],
@@ -381,53 +414,53 @@ const SEED = [
   ['red','Klíče','Klíče od domova',1,['Vladimír','Lucie'],'– / 1'],
 
   // — Dítě — oblečení —
-  ['yellow','Dítě — oblečení','Body/trička (7–8×)'],
-  ['yellow','Dítě — oblečení','Kalhoty (5×)'],
-  ['yellow','Dítě — oblečení','Mikiny (3×)'],
-  ['yellow','Dítě — oblečení','Bundy (lehčí + teplejší)'],
-  ['yellow','Dítě — oblečení','Boty'],
-  ['yellow','Dítě — oblečení','Capáčky (teplé, kožené)'],
-  ['yellow','Dítě — oblečení','Nepromokavý overal'],
-  ['yellow','Dítě — oblečení','Ponožky'],
-  ['yellow','Dítě — oblečení','Čepice (tenká + teplá)'],
-  ['yellow','Dítě — oblečení','Rukavice'],
-  ['yellow','Dítě — oblečení','Pyžama (3×)'],
+  ['yellow','Dítě — oblečení','Body/trička (7–8×)',null,['Adámek']],
+  ['yellow','Dítě — oblečení','Kalhoty (5×)',null,['Adámek']],
+  ['yellow','Dítě — oblečení','Mikiny (3×)',null,['Adámek']],
+  ['yellow','Dítě — oblečení','Bundy (lehčí + teplejší)',null,['Adámek']],
+  ['yellow','Dítě — oblečení','Boty',null,['Adámek']],
+  ['yellow','Dítě — oblečení','Capáčky (teplé, kožené)',null,['Adámek']],
+  ['yellow','Dítě — oblečení','Nepromokavý overal',null,['Adámek']],
+  ['yellow','Dítě — oblečení','Ponožky',null,['Adámek']],
+  ['yellow','Dítě — oblečení','Čepice (tenká + teplá)',null,['Adámek']],
+  ['yellow','Dítě — oblečení','Rukavice',null,['Adámek']],
+  ['yellow','Dítě — oblečení','Pyžama (3×)',null,['Adámek']],
 
   // — Dítě — výbava —
-  ['red','Dítě — výbava','Autosedačka'],
-  ['yellow','Dítě — výbava','Nosítko'],
-  ['yellow','Dítě — výbava','Pláštěnka na nosítko'],
-  ['yellow','Dítě — výbava','Kočárek + pláštěnka na něj'],
-  ['yellow','Dítě — výbava','Nosící bunda, vsadka'],
-  ['red','Dítě — výbava','Plenky'],
-  ['yellow','Dítě — výbava','Vlhčené ubrousky'],
-  ['yellow','Dítě — výbava','Přebalovací podložka'],
-  ['yellow','Dítě — výbava','Sáčky na plenky, sáčky na zvracení'],
-  ['green','Dítě — výbava','Nočník'],
-  ['yellow','Dítě — výbava','Lahvičky / hrníček, misky'],
-  ['red','Dítě — výbava','Jídlo (Beba 2–3×, ovocné přesnídávky, ovesné vločky, chia semínka, skořice, tyčinky apod.)'],
-  ['yellow','Dítě — výbava','Lžičky'],
-  ['green','Dítě — výbava','Bryndáky'],
-  ['yellow','Dítě — výbava','Oblíbená hračka'],
-  ['yellow','Dítě — výbava','Deka'],
-  ['red','Dítě — výbava','Opalovací krém SPF 50'],
-  ['green','Dítě — výbava','Sluneční klobouček'],
-  ['red','Dítě — výbava','Lékárna'],
-  ['red','Dítě — výbava','Léky pro Adámka'],
+  ['red','Dítě — výbava','Autosedačka',null,['Adámek']],
+  ['yellow','Dítě — výbava','Nosítko',null,['Adámek']],
+  ['yellow','Dítě — výbava','Pláštěnka na nosítko',null,['Adámek']],
+  ['yellow','Dítě — výbava','Kočárek + pláštěnka na něj',null,['Adámek']],
+  ['yellow','Dítě — výbava','Nosící bunda, vsadka',null,['Adámek']],
+  ['red','Dítě — výbava','Plenky',null,['Adámek']],
+  ['yellow','Dítě — výbava','Vlhčené ubrousky',null,['Adámek']],
+  ['yellow','Dítě — výbava','Přebalovací podložka',null,['Adámek']],
+  ['yellow','Dítě — výbava','Sáčky na plenky, sáčky na zvracení',null,['Adámek']],
+  ['green','Dítě — výbava','Nočník',null,['Adámek']],
+  ['yellow','Dítě — výbava','Lahvičky / hrníček, misky',null,['Adámek']],
+  ['red','Dítě — výbava','Jídlo (Beba 2–3×, ovocné přesnídávky, ovesné vločky, chia semínka, skořice, tyčinky apod.)',null,['Adámek']],
+  ['yellow','Dítě — výbava','Lžičky',null,['Adámek']],
+  ['green','Dítě — výbava','Bryndáky',null,['Adámek']],
+  ['yellow','Dítě — výbava','Oblíbená hračka',null,['Adámek']],
+  ['yellow','Dítě — výbava','Deka',null,['Adámek']],
+  ['red','Dítě — výbava','Opalovací krém SPF 50',null,['Adámek']],
+  ['green','Dítě — výbava','Sluneční klobouček',null,['Adámek']],
+  ['red','Dítě — výbava','Lékárna',null,['Adámek']],
+  ['red','Dítě — výbava','Léky pro Adámka',null,['Adámek']],
 
   // — Pes —
-  ['red','Pes','EU pas + očkování'],
-  ['yellow','Pes','Obojek'],
-  ['yellow','Pes','Postroj'],
-  ['yellow','Pes','Vodítko + dlouhé vodítko'],
-  ['green','Pes','Batoh pro psa'],
-  ['yellow','Pes','Granule'],
-  ['green','Pes','Pamlsky'],
-  ['yellow','Pes','Misky (cestovní + normální)'],
-  ['yellow','Pes','Sáčky na exkrementy'],
-  ['green','Pes','Ručník'],
-  ['yellow','Pes','Deka'],
-  ['yellow','Pes','Léky (pokud jsou potřeba)'],
+  ['red','Pes','EU pas + očkování',null,['Monty']],
+  ['yellow','Pes','Obojek',null,['Monty']],
+  ['yellow','Pes','Postroj',null,['Monty']],
+  ['yellow','Pes','Vodítko + dlouhé vodítko',null,['Monty']],
+  ['green','Pes','Batoh pro psa',null,['Monty']],
+  ['yellow','Pes','Granule',null,['Monty']],
+  ['green','Pes','Pamlsky',null,['Monty']],
+  ['yellow','Pes','Misky (cestovní + normální)',null,['Monty']],
+  ['yellow','Pes','Sáčky na exkrementy',null,['Monty']],
+  ['green','Pes','Ručník',null,['Monty']],
+  ['yellow','Pes','Deka',null,['Monty']],
+  ['yellow','Pes','Léky (pokud jsou potřeba)',null,['Monty']],
 
   // — Jídlo + výbava —
   ['yellow','Jídlo + výbava','Káva + čaj'],
@@ -461,9 +494,11 @@ const PRIO_RANK = {red:0, yellow:1, green:2};
 const PRIO_LABEL = {red:'🔴 nutné', yellow:'🟡 důležité', green:'🟢 dobré mít'};
 const PRIO_CYCLE = {red:'yellow', yellow:'green', green:'red'};
 
-// posádka, na kterou jde položka přiřadit (položka může mít víc lidí; všichni = celá posádka)
-const PEOPLE = ['Lucie','Vladimír','Jiří','Jaroslava'];
-const NAME_FIX = {Jirka:'Jiří', Jarka:'Jaroslava'};
+// členové posádky, kterým jde položka přiřadit (položka může mít víc členů; všichni = společná věc)
+const PEOPLE = ['Vladimír','Lucie','Jiří','Jaroslava','Adámek','Monty'];
+const TILE_FOTO = {'Vladimír':'foto/vladimir.jpg','Lucie':'foto/lucie.jpg','Jiří':'foto/jiri.jpg',
+                   'Jaroslava':'foto/jaroslava.jpg','Adámek':'foto/adam.jpg','Monty':'foto/monty.jpg'};
+const NAME_FIX = {Jirka:'Jiří', Jarka:'Jaroslava', Adam:'Adámek', Adámek:'Adámek'};
 const fixName = n => NAME_FIX[n] || n;
 const whoSlug = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
 const whoClass = s => 'w-' + (s ? whoSlug(s) : 'none');
@@ -472,6 +507,11 @@ const isAll = arr => arr.length>0 && PEOPLE.every(p=>arr.includes(p));
 const whoLabel = arr => !arr.length ? '👤 přiřadit' : (isAll(arr) ? '👥 Všichni' : '👤 '+arr.join(', '));
 const whoBadgeClass = arr => !arr.length ? 'w-none' : (isAll(arr) ? 'w-all' : (arr.length===1 ? whoClass(arr[0]) : 'w-multi'));
 let newWhoSel = [];
+
+// dvě velké sekce: bez přiřazení (nebo se všemi členy) = společná věc, jinak patří vybraným členům
+const isShared = it => { const w = whoArr(it); return w.length === 0 || isAll(w); };
+const inPersonScope = (it, p) => { const w = whoArr(it); return w.includes(p) && !isAll(w); };
+let viewPerson = null; // null = přehled (dlaždice + společné věci), jinak otevřená podstránka člena
 
 // odškrtávání sbalení: sledované per osobu (klíč '_' = obecně, když není nikdo přiřazený)
 const doneMap = it => it.doneBy || {};
@@ -483,30 +523,28 @@ const doneUnitsFor = it => { const w=whoArr(it); return w.length ? w.filter(p=>i
 
 const $ = id => document.getElementById(id);
 const listEl=$('list'), statusEl=$('status'), footEl=$('footnote'), filterNote=$('filterNote');
-const fSearch=$('fSearch'), fCat=$('fCat'), fPrio=$('fPrio'), fStatus=$('fStatus'), fWho=$('fWho'), fGroup=$('fGroup');
+const fSearch=$('fSearch'), fCat=$('fCat'), fPrio=$('fPrio'), fStatus=$('fStatus'), fGroup=$('fGroup');
 
 for(const c of CATS){
   fCat.insertAdjacentHTML('beforeend', `<option value="${c}">${c}</option>`);
   $('newCat').insertAdjacentHTML('beforeend', `<option value="${c}">${c}</option>`);
 }
-fWho.insertAdjacentHTML('beforeend', `<option value="__none">👤 Nepřiřazené</option>`);
-for(const p of PEOPLE){
-  fWho.insertAdjacentHTML('beforeend', `<option value="${p}">👤 ${p}</option>`);
-}
 
 let items = [];
 const esc = s => (s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const filtersActive = () => !!(fSearch.value.trim() || fCat.value || fPrio.value || fStatus.value || fWho.value);
+const filtersActive = () => !!(fSearch.value.trim() || fCat.value || fPrio.value || fStatus.value);
+
+// položky aktuálního pohledu: podstránka člena = jen jeho věci, přehled = jen společné věci
+const scopeItems = () => items.filter(it => viewPerson ? inPersonScope(it, viewPerson) : isShared(it));
 
 function visibleItems(){
   const q = fSearch.value.trim().toLowerCase();
-  return items.filter(it=>{
+  return scopeItems().filter(it=>{
+    const done = viewPerson ? isDoneFor(it, viewPerson) : fullyDone(it);
     if(fCat.value && it.cat !== fCat.value) return false;
     if(fPrio.value && it.prio !== fPrio.value) return false;
-    if(fStatus.value === 'open' && fullyDone(it)) return false;
-    if(fStatus.value === 'done' && !fullyDone(it)) return false;
-    if(fWho.value === '__none' && whoArr(it).length) return false;
-    if(fWho.value && fWho.value !== '__none' && !whoArr(it).includes(fWho.value)) return false;
+    if(fStatus.value === 'open' && done) return false;
+    if(fStatus.value === 'done' && !done) return false;
     if(q && !(it.text||'').toLowerCase().includes(q)) return false;
     return true;
   });
@@ -514,14 +552,50 @@ function visibleItems(){
 
 function renderProgress(){
   let total=0, done=0;
-  for(const it of items){ total += unitsFor(it); done += doneUnitsFor(it); }
+  if(viewPerson){
+    for(const it of items){ if(inPersonScope(it, viewPerson)){ total++; if(isDoneFor(it, viewPerson)) done++; } }
+  }else{
+    for(const it of items){ total += unitsFor(it); done += doneUnitsFor(it); }
+  }
   const pct = total ? Math.round(done/total*100) : 0;
-  $('progLbl').textContent = `Hotovo ${done} / ${total}`;
+  $('progLbl').textContent = (viewPerson ? `Sbaleno (${viewPerson}) ` : 'Hotovo ') + `${done} / ${total}`;
   $('progPct').textContent = pct + ' %';
   $('progBar').style.width = pct + '%';
 }
 
-// forPerson: pokud je zadán (seskupení podle řešitele), checkbox řeší jen sbalení té jedné osoby
+function personStats(p){
+  const mine = items.filter(it => inPersonScope(it, p));
+  const done = mine.filter(it => isDoneFor(it, p)).length;
+  return {total: mine.length, done, pct: mine.length ? Math.round(done/mine.length*100) : 0};
+}
+
+function renderTiles(){
+  const grid = $('tiles');
+  grid.innerHTML = '';
+  for(const p of PEOPLE){
+    const s = personStats(p);
+    const t = document.createElement('div');
+    t.className = 'ptile';
+    t.innerHTML = `<img src="${TILE_FOTO[p]}" alt="${esc(p)}" loading="lazy">
+      <b>${esc(p)}</b>
+      <span class="pstat">${s.done} / ${s.total} sbaleno</span>
+      <div class="pbar"><i style="width:${s.pct}%"></i></div>`;
+    t.addEventListener('click', ()=>{ location.hash = 'clen=' + encodeURIComponent(p); });
+    grid.appendChild(t);
+  }
+}
+
+function renderViewHead(){
+  const vh = $('viewHead');
+  if(!viewPerson){ vh.style.display='none'; vh.innerHTML=''; return; }
+  const s = personStats(viewPerson);
+  vh.innerHTML = `<img src="${TILE_FOTO[viewPerson]}" alt="">
+    <div><b>${esc(viewPerson)}</b><div class="pstat">${s.done} / ${s.total} sbaleno · věci, které se týkají tohoto člena posádky</div></div>
+    <a class="btn ghost back" href="#">← Zpět na přehled</a>`;
+  vh.style.display='flex';
+}
+
+// forPerson: pokud je zadán (podstránka člena posádky), checkbox i fotka patří jen tomuto členovi
 function makeRow(it, dndOff, forPerson){
   const w = whoArr(it);
   const multi = !forPerson && w.length > 1;
@@ -535,7 +609,8 @@ function makeRow(it, dndOff, forPerson){
   const pchecksHtml = multi ? `<div class="pchecks">${w.map(p=>
     `<label class="pcheck${isDoneFor(it,p)?' on':''}" data-p="${esc(p)}"><input type="checkbox" ${isDoneFor(it,p)?'checked':''}> ${esc(p)}</label>`
   ).join('')}</div>` : '';
-  const pv = it.thumb || it.photo; // miniatura (it.photo = starší formát s fotkou přímo v položce)
+  const pKey = forPerson || '_'; // čí fotka se u položky ukazuje ('_' = společná)
+  const pv = effThumb(it, pKey);
 
   row.innerHTML = `
     <span class="grip${dndOff?' off':''}" title="${dndOff?'Řazení vypnuto při filtru/seskupení':'Přetáhni pro změnu pořadí'}">⠿</span>
@@ -579,9 +654,9 @@ function makeRow(it, dndOff, forPerson){
     if(!isNaN(n) && n>0) backend.update(it.id, {qty: n});
   });
   row.querySelector('.who-badge').addEventListener('click', (e)=> openAssign(e.currentTarget, w, sel=> backend.update(it.id, {who: sel})));
-  row.querySelector('.photo').addEventListener('click', e=> openPhotoMenu(e.currentTarget, it));
+  row.querySelector('.photo').addEventListener('click', e=> openPhotoMenu(e.currentTarget, it, pKey));
   const th = row.querySelector('.thumb');
-  if(th) th.addEventListener('click', ()=> openLightbox(it));
+  if(th) th.addEventListener('click', ()=> openLightbox(it, pKey));
   row.querySelector('.edit').addEventListener('click', ()=>{
     const t = prompt('Upravit položku:', it.text);
     if(t!=null && t.trim()) backend.update(it.id, {text: t.trim()});
@@ -594,32 +669,27 @@ function makeRow(it, dndOff, forPerson){
 }
 
 function render(){
+  renderViewHead();
   renderProgress();
+  $('sekcePosadka').style.display = viewPerson ? 'none' : '';
+  $('sharedHead').style.display = viewPerson ? 'none' : '';
+  if(!viewPerson) renderTiles();
+
   const vis = visibleItems();
+  const scoped = scopeItems();
+  if(!viewPerson) $('sharedCnt').textContent = `(${scoped.filter(i=>!fullyDone(i)).length} nesbalených / ${scoped.length})`;
   const grouping = fGroup.value;
   const blocked = filtersActive() || !!grouping;
+  const rowDone = it => viewPerson ? isDoneFor(it, viewPerson) : fullyDone(it);
   filterNote.textContent = blocked
-    ? `Zobrazeno ${vis.length} z ${items.length}. Ruční řazení přetažením je vypnuté — zruš filtry i seskupení pro změnu pořadí.`
-    : (items.length ? 'Pořadí změníš přetažením za ⠿.' : '');
+    ? `Zobrazeno ${vis.length} z ${scoped.length}. Ruční řazení přetažením je vypnuté — zruš filtry i seskupení pro změnu pořadí.`
+    : (scoped.length ? 'Pořadí změníš přetažením za ⠿.' : '');
 
   listEl.innerHTML = '';
   if(vis.length === 0){
-    listEl.innerHTML = `<div class="empty">${items.length ? 'Nic neodpovídá filtru.' : 'Zatím tu nejsou žádné položky.'}</div>`;
-    return;
-  }
-  if(grouping === 'who'){
-    const renderGroup = (person, grp) => {
-      if(!grp.length) return;
-      const head = document.createElement('div');
-      head.className = 'group-head';
-      head.innerHTML = `<span class="dot ${person?whoClass(person):''}"></span>`
-        + (person ? '👤 '+esc(person) : '👤 Nepřiřazené')
-        + ` <span class="cnt">(${grp.filter(i=>!(person?isDoneFor(i,person):fullyDone(i))).length} nesbalených / ${grp.length})</span>`;
-      listEl.appendChild(head);
-      for(const it of grp) listEl.appendChild(makeRow(it, blocked, person || null));
-    };
-    for(const person of PEOPLE) renderGroup(person, vis.filter(it => whoArr(it).includes(person)));
-    renderGroup('', vis.filter(it => whoArr(it).length === 0));
+    listEl.innerHTML = `<div class="empty">${scoped.length
+      ? 'Nic neodpovídá filtru.'
+      : (viewPerson ? 'Zatím tu nejsou žádné položky — přiřaď je tomuto členovi klikem na 👤.' : 'Zatím tu nejsou žádné společné položky.')}</div>`;
     return;
   }
   if(grouping === 'cat'){
@@ -628,9 +698,9 @@ function render(){
       const head = document.createElement('div');
       head.className = 'group-head';
       head.innerHTML = `<span class="dot"></span>🏷️ ${esc(cat||'Bez kategorie')}`
-        + ` <span class="cnt">(${grp.filter(i=>!fullyDone(i)).length} nesbalených / ${grp.length})</span>`;
+        + ` <span class="cnt">(${grp.filter(i=>!rowDone(i)).length} nesbalených / ${grp.length})</span>`;
       listEl.appendChild(head);
-      for(const it of grp) listEl.appendChild(makeRow(it, blocked));
+      for(const it of grp) listEl.appendChild(makeRow(it, blocked, viewPerson));
     };
     for(const cat of CATS) renderCatGroup(cat, vis.filter(it => it.cat === cat));
     renderCatGroup('', vis.filter(it => !CATS.includes(it.cat)));
@@ -642,15 +712,28 @@ function render(){
       const head = document.createElement('div');
       head.className = 'group-head';
       head.innerHTML = `<span class="dot p-${p}"></span>${PRIO_LABEL[p]}`
-        + ` <span class="cnt">(${grp.filter(i=>!fullyDone(i)).length} nesbalených / ${grp.length})</span>`;
+        + ` <span class="cnt">(${grp.filter(i=>!rowDone(i)).length} nesbalených / ${grp.length})</span>`;
       listEl.appendChild(head);
-      for(const it of grp) listEl.appendChild(makeRow(it, blocked));
+      for(const it of grp) listEl.appendChild(makeRow(it, blocked, viewPerson));
     };
     for(const p of ['red','yellow','green']) renderPrioGroup(p, vis.filter(it => it.prio === p));
     return;
   }
-  for(const it of vis) listEl.appendChild(makeRow(it, blocked));
+  for(const it of vis) listEl.appendChild(makeRow(it, blocked, viewPerson));
 }
+
+// „podstránky" členů řeší hash v adrese (#clen=Vladimír) — funguje tlačítko zpět i obnovení stránky
+function syncViewFromHash(){
+  const h = decodeURIComponent((location.hash||'').replace(/^#/,''));
+  const m = /^clen=(.+)$/.exec(h);
+  const p = m ? fixName(m[1]) : null;
+  viewPerson = (p && PEOPLE.includes(p)) ? p : null;
+  newWhoSel = viewPerson ? [viewPerson] : [];
+  renderNewWhoBtn();
+  window.scrollTo(0, 0);
+  render();
+}
+window.addEventListener('hashchange', syncViewFromHash);
 
 let dragId = null;
 function attachDnD(row){
@@ -682,8 +765,8 @@ $('addBtn').addEventListener('click', ()=>{
 });
 $('newText').addEventListener('keydown', e=>{ if(e.key==='Enter') $('addBtn').click(); });
 
-[fSearch,fCat,fPrio,fStatus,fWho,fGroup].forEach(el=> el.addEventListener('input', render));
-$('clearF').addEventListener('click', ()=>{ fSearch.value=''; fCat.value=''; fPrio.value=''; fStatus.value=''; fWho.value=''; fGroup.value=''; render(); });
+[fSearch,fCat,fPrio,fStatus,fGroup].forEach(el=> el.addEventListener('input', render));
+$('clearF').addEventListener('click', ()=>{ fSearch.value=''; fCat.value=''; fPrio.value=''; fStatus.value=''; fGroup.value=''; render(); });
 $('printBtn').addEventListener('click', ()=> window.print());
 
 const pop = document.createElement('div');
@@ -726,9 +809,11 @@ $('newWhoBtn').addEventListener('click', e=> openAssign(e.currentTarget, newWhoS
 renderNewWhoBtn();
 
 // ---- fotky u položek ----
-// Aby seznam zůstal rychlý i se stovkami fotek, ukládá se k položce jen malá miniatura (`thumb`,
-// ~5 kB) a plná fotka jde do vlastní kolekce/úložiště pod id položky — stahuje se až při zobrazení.
-// Starší formát (plná fotka v poli `photo` přímo u položky) se dál umí zobrazit.
+// Fotky jsou po členech posádky: u položky může mít každý přiřazený člen vlastní fotku, převzít
+// fotku jiného člena, nebo být bez ní (u společných věcí je jeden sdílený slot '_').
+// K položce se ukládají jen malé miniatury (`thumbs`, ~5 kB) a odkazy na převzaté fotky
+// (`thumbRef`); plné fotky jdou do vlastní kolekce pod id položky a stahují se až při zobrazení.
+// Starší formát (jedna fotka v polích `thumb`/`photo`) se dál umí zobrazit.
 // Vstup bez `capture` otevře výběr souborů/galerii, vstup s `capture` na telefonu rovnou fotoaparát.
 const photoFile = document.createElement('input');
 photoFile.type='file'; photoFile.accept='image/*'; photoFile.style.display='none';
@@ -736,8 +821,27 @@ const photoCam = document.createElement('input');
 photoCam.type='file'; photoCam.accept='image/*'; photoCam.setAttribute('capture','environment'); photoCam.style.display='none';
 document.body.append(photoFile, photoCam);
 
-let photoTarget = null;   // id položky, ke které se právě vybírá fotka
-const photoCache = {};    // už stažené plné fotky (id → data URL), ať se nestahují opakovaně
+let photoTarget = null;   // {id, key} — položka a slot (člen/'_'), pro který se právě vybírá fotka
+const photoCache = {};    // už stažené plné fotky (id → mapa slot→data URL), ať se nestahují opakovaně
+
+const thumbsOf = it => it.thumbs || {};
+const refsOf = it => it.thumbRef || {};
+// miniatura pro daný slot: vlastní → převzatá od jiného člena → starší jednofotkový formát
+function effThumb(it, k){
+  const own = thumbsOf(it)[k];
+  if(own) return own;
+  const r = refsOf(it)[k];
+  if(r && thumbsOf(it)[r]) return thumbsOf(it)[r];
+  return it.thumb || it.photo || null;
+}
+// plná fotka pro slot z mapy m (stejná přednost jako u miniatury)
+function effFull(it, k, m){
+  m = m || {};
+  if(thumbsOf(it)[k]) return m[k] || null;
+  const r = refsOf(it)[k];
+  if(r && thumbsOf(it)[r]) return m[r] || null;
+  return m.photo || it.photo || null;
+}
 
 function loadImage(file){
   const url = URL.createObjectURL(file);
@@ -760,8 +864,8 @@ function scaleToDataUrl(img, max, q){
 async function onPhotoPicked(input){
   const f = input.files && input.files[0];
   input.value = '';
-  const id_ = photoTarget; photoTarget = null;
-  if(!f || !id_) return;
+  const t = photoTarget; photoTarget = null;
+  if(!f || !t) return;
   try{
     const img = await loadImage(f);
     let max = 900, q = .72, full = '';
@@ -772,9 +876,11 @@ async function onPhotoPicked(input){
     }
     if(!full || full.length >= 900000){ alert('Fotku se nepodařilo dostatečně zmenšit, zkus jinou.'); return; }
     const thumb = scaleToDataUrl(img, 140, .6);
-    await backend.setPhoto(id_, full);                 // plná fotka zvlášť — seznam zůstává lehký
-    await backend.update(id_, {thumb, photo: null});   // miniatura k položce; photo=null smaže starší formát
-    photoCache[id_] = full;
+    await backend.setPhoto(t.id, t.key, full);   // plná fotka zvlášť — seznam zůstává lehký
+    const patch = {['thumbs.'+t.key]: thumb, ['thumbRef.'+t.key]: null};
+    if(t.key === '_'){ patch.thumb = null; patch.photo = null; } // úklid staršího formátu
+    await backend.update(t.id, patch);
+    photoCache[t.id] = Object.assign({}, photoCache[t.id], {[t.key]: full});
   }catch(e){ console.error(e); alert('Fotku se nepodařilo načíst nebo uložit.'); }
 }
 photoFile.addEventListener('change', ()=> onPhotoPicked(photoFile));
@@ -784,20 +890,31 @@ const photoPop = document.createElement('div');
 photoPop.className = 'assignpop';
 document.body.appendChild(photoPop);
 function closePhotoMenu(){ photoPop.style.display='none'; }
-function openPhotoMenu(anchor, it){
-  const has = !!(it.thumb || it.photo);
+function openPhotoMenu(anchor, it, key){
+  const has = !!effThumb(it, key);
+  const ref = refsOf(it)[key] || null;
+  // ostatní přiřazení členové s vlastní fotkou — od nich jde fotku převzít
+  const others = key === '_' ? [] : whoArr(it).filter(p => p !== key && thumbsOf(it)[p]);
   photoPop.innerHTML =
     (has ? `<label class="ppView">🖼 Zobrazit fotku</label>` : '') +
     `<label class="ppFile">📁 Ze souborů</label>
      <label class="ppCam">📷 Vyfotit</label>` +
+    others.map(p=>`<label class="ppRef" data-p="${esc(p)}">${ref===p?'✓ ':''}🔗 Převzít fotku od: ${esc(p)}</label>`).join('') +
     (has ? `<div class="apsep"></div><label class="ppDel">🗑 Odebrat fotku</label>` : '');
   const on = (sel,fn)=>{ const el = photoPop.querySelector(sel); if(el) el.addEventListener('click', ()=>{ closePhotoMenu(); fn(); }); };
-  on('.ppView', ()=> openLightbox(it));
-  on('.ppFile', ()=>{ photoTarget = it.id; photoFile.click(); });
-  on('.ppCam',  ()=>{ photoTarget = it.id; photoCam.click(); });
-  on('.ppDel',  ()=>{ if(confirm('Odebrat fotku u této položky?')){
-    backend.update(it.id, {thumb: null, photo: null});
-    backend.deletePhoto(it.id);
+  on('.ppView', ()=> openLightbox(it, key));
+  on('.ppFile', ()=>{ photoTarget = {id: it.id, key}; photoFile.click(); });
+  on('.ppCam',  ()=>{ photoTarget = {id: it.id, key}; photoCam.click(); });
+  photoPop.querySelectorAll('.ppRef').forEach(el=> el.addEventListener('click', ()=>{
+    closePhotoMenu();
+    backend.update(it.id, {['thumbRef.'+key]: el.dataset.p, ['thumbs.'+key]: null});
+    backend.clearPhotoKey(it.id, key);
+  }));
+  on('.ppDel',  ()=>{ if(confirm(key==='_' ? 'Odebrat fotku u této položky?' : `Odebrat fotku u této položky pro člena ${key}?`)){
+    const patch = {['thumbs.'+key]: null, ['thumbRef.'+key]: null};
+    if(it.thumb || it.photo){ patch.thumb = null; patch.photo = null; } // starší formát byl jeden pro celou položku
+    backend.update(it.id, patch);
+    backend.clearPhotoKey(it.id, key);
     delete photoCache[it.id];
   }});
   photoPop.style.display='flex';
@@ -818,22 +935,24 @@ document.addEventListener('mousedown', e=>{
 const lb = document.createElement('div');
 lb.className = 'lightbox';
 document.body.appendChild(lb);
-let lbFor = null; // id položky právě otevřené v lightboxu
-async function openLightbox(it){
-  const preview = it.thumb || it.photo;
+let lbFor = null; // položka+slot právě otevřené v lightboxu
+async function openLightbox(it, key){
+  const preview = effThumb(it, key);
   if(!preview) return;
-  lbFor = it.id;
-  // hned ukážeme miniaturu (nebo starší plnou fotku), plná verze se dotáhne na pozadí
-  lb.innerHTML = `<img src="${esc(photoCache[it.id] || preview)}" alt=""><div class="lbcap">${esc(it.text)}</div>`;
+  lbFor = it.id + '|' + key;
+  const ref = refsOf(it)[key];
+  const cap = it.text + (key !== '_' ? ` — ${ref ? 'fotka od: '+ref : key}` : '');
+  // hned ukážeme miniaturu, plná verze se dotáhne na pozadí
+  const cached = photoCache[it.id];
+  lb.innerHTML = `<img src="${esc((cached && effFull(it, key, cached)) || preview)}" alt=""><div class="lbcap">${esc(cap)}</div>`;
   lb.style.display='flex';
-  if(!photoCache[it.id]){
-    const full = (await backend.getPhoto(it.id)) || it.photo || null;
-    if(full){
-      photoCache[it.id] = full;
-      if(lbFor === it.id && lb.style.display !== 'none'){
-        const im = lb.querySelector('img');
-        if(im) im.src = full;
-      }
+  if(!cached){
+    const m = await backend.getPhotos(it.id);
+    photoCache[it.id] = m || {};
+    const full = effFull(it, key, photoCache[it.id]);
+    if(full && lbFor === it.id + '|' + key && lb.style.display !== 'none'){
+      const im = lb.querySelector('img');
+      if(im) im.src = full;
     }
   }
 }
@@ -856,6 +975,8 @@ function localBackend(){
   try{ data = JSON.parse(localStorage.getItem(KEY)) || []; }catch(e){ data=[]; }
   let photos={};
   try{ photos = JSON.parse(localStorage.getItem(KEY+'-fotky')) || {}; }catch(e){ photos={}; }
+  // starší formát ukládal jen jeden řetězec na položku — převedeme na mapu slotů
+  const normPhotos = id_ => { const v = photos[id_]; return typeof v === 'string' ? {photo: v} : (v || {}); };
   const quotaMsg = ()=> alert('Nepodařilo se uložit – úložiště prohlížeče je plné (fotky zabírají hodně místa).');
   const save=()=>{ try{ localStorage.setItem(KEY, JSON.stringify(data)); }catch(e){ quotaMsg(); } };
   const savePhotos=()=>{ try{ localStorage.setItem(KEY+'-fotky', JSON.stringify(photos)); }catch(e){ quotaMsg(); } };
@@ -867,8 +988,9 @@ function localBackend(){
     add(it){ data.push({id:id(), ...it}); save(); emit(); },
     update(id_, f){ const x=data.find(d=>d.id===id_); if(x){ applyPatch(x,f); save(); emit(); } },
     remove(id_){ data=data.filter(d=>d.id!==id_); save(); emit(); },
-    setPhoto(id_, dataUrl){ photos[id_]=dataUrl; savePhotos(); },
-    async getPhoto(id_){ return photos[id_] || null; },
+    setPhoto(id_, key, dataUrl){ photos[id_] = {...normPhotos(id_), [key]: dataUrl}; savePhotos(); },
+    async getPhotos(id_){ return normPhotos(id_); },
+    clearPhotoKey(id_, key){ const m = normPhotos(id_); delete m[key]; photos[id_] = m; savePhotos(); },
     deletePhoto(id_){ if(id_ in photos){ delete photos[id_]; savePhotos(); } }
   };
 }
@@ -898,14 +1020,21 @@ async function firebaseBackend(){
   }else{
     let applied = 0;
     try{ const ms = await getDoc(metaRef); if(ms.exists()) applied = ms.data().seedVersion || 0; }catch(e){}
-    if(applied < SEED_VERSION){
-      // přestavba výchozí sady: přepíšeme výchozí položky a odstraníme přebytečné
+    if(applied < 3){
+      // přestavba v3: přepíšeme výchozí položky a odstraníme přebytečné
       // (ručně přidané položky s vlastním id zůstanou zachované)
       await Promise.all(SEED.map((_,i)=> writeSeed(i)));
       const stale = snap0.docs.filter(d=>{ const m=/^seed-(\d+)$/.exec(d.id); return m && (+m[1]) >= SEED.length; });
       await Promise.all(stale.map(d=> deleteDoc(doc(col, d.id))));
-      await setDoc(metaRef, {seedVersion: SEED_VERSION});
+    }else if(applied < 4){
+      // v4: věci pro Adámka (Dítě) a Montyho (Pes) dostaly výchozí přiřazení — doplní se jen
+      // pole who; odškrtnutí, fotky ani ruční úpravy se nemění a smazané položky se neobnovují
+      await Promise.all(SEED.map((s,i)=>{
+        if(!(s[1] === 'Pes' || s[1].startsWith('Dítě'))) return null;
+        return updateDoc(doc(col, seedId(i)), {who: s[4] || []}).catch(()=>{});
+      }).filter(Boolean));
     }
+    if(applied < SEED_VERSION) await setDoc(metaRef, {seedVersion: SEED_VERSION});
   }
   return {
     start(){
@@ -921,11 +1050,12 @@ async function firebaseBackend(){
     add(it){ return addDoc(col, it); },
     update(id_, f){ return updateDoc(doc(col, id_), f); },
     remove(id_){ return deleteDoc(doc(col, id_)); },
-    setPhoto(id_, dataUrl){ return setDoc(doc(fotky, id_), {photo: dataUrl}); },
-    async getPhoto(id_){
-      try{ const s = await getDoc(doc(fotky, id_)); return s.exists() ? (s.data().photo || null) : null; }
-      catch(e){ console.error(e); return null; }
+    setPhoto(id_, key, dataUrl){ return setDoc(doc(fotky, id_), {[key]: dataUrl}, {merge:true}); },
+    async getPhotos(id_){
+      try{ const s = await getDoc(doc(fotky, id_)); return s.exists() ? (s.data() || {}) : {}; }
+      catch(e){ console.error(e); return {}; }
     },
+    clearPhotoKey(id_, key){ return setDoc(doc(fotky, id_), {[key]: null}, {merge:true}).catch(e=>console.error(e)); },
     deletePhoto(id_){ return deleteDoc(doc(fotky, id_)).catch(e=>console.error(e)); }
   };
 }
@@ -950,6 +1080,7 @@ if(useFirebase){
   statusEl.textContent='🔒 Jen na tomto zařízení.';
   footEl.textContent='Změny se ukládají jen do tohoto prohlížeče (localStorage).';
 }
+syncViewFromHash();
 backend.start();
 </script>
 </body>
