@@ -297,7 +297,7 @@ const COLLECTION = 'co-balime-norsko';
 const KEY = 'norsko2026-co-balime-v4';
 // Verze výchozí sady. Po jejím zvýšení se do sdílené databáze doplní nově přidané
 // položky (stávající data ani odškrtnutí se nemažou).
-const SEED_VERSION = 6;
+const SEED_VERSION = 7;
 // Dokument s verzí držíme uvnitř stejné kolekce, aby na něj platila stejná pravidla Firestore.
 const SEED_META_ID = '_seedmeta';
 
@@ -498,17 +498,12 @@ const SEED = [
   ['yellow','Jídlo + výbava','Voda + lahve'],
   ['green','Jídlo + výbava','Termoska'],
 
-  // — Obytné auto —
+  // — Obytné auto — (co je už ve výbavě od majitele — kabel do kempu, chemie a papír do WC,
+  // klíny, prodlužovací kabel, utěrky a jar — je jen ve vlastní poddlaždici „Výbava od majitele",
+  // ať se to tady zbytečně neduplikuje)
   ['yellow','Obytné auto','Povlečení, peřiny a polštáře'],
   ['yellow','Obytné auto','Hadice + redukce na vodu'],
-  ['yellow','Obytné auto','Kabel do kempu (elektrika)'],
-  ['red','Obytné auto','Chemie do WC'],
-  ['red','Obytné auto','Toaletní papír do WC'],
-  ['yellow','Obytné auto','Vyrovnávací klíny pod auto'],
-  ['yellow','Obytné auto','Prodlužovací kabel'],
   ['green','Obytné auto','Smetáček + lopatka'],
-  ['yellow','Obytné auto','Utěrky + houbičky'],
-  ['yellow','Obytné auto','Jar'],
   ['yellow','Obytné auto','Odpadkové pytle'],
   ['green','Obytné auto','Kolíčky + šňůra na prádlo'],
   ['yellow','Obytné auto','Prací prostředek'],
@@ -1281,6 +1276,17 @@ async function firebaseBackend(){
       // v6: nová poddlaždice „Výbava od majitele" — doplní jen tyto nové položky
       // (podle kategorie), stávající data se vůbec nedotýkají
       await Promise.all(SEED.map((s,i)=> s[1] === 'Výbava od majitele' ? writeSeed(i) : null).filter(Boolean));
+    }else if(applied < 7){
+      // v7: 7 věcí z „Obytné auto" bylo duplicitních s „Výbava od majitele" (kabel do kempu,
+      // chemie a papír do WC, klíny, prodlužovací kabel, utěrky, jar) — smažou se jen tyto
+      // konkrétní položky ze společných věcí (i s případnou fotkou), nic jiného se nemění
+      const DUPES7 = ['Kabel do kempu (elektrika)','Chemie do WC','Toaletní papír do WC',
+                      'Vyrovnávací klíny pod auto','Prodlužovací kabel','Utěrky + houbičky','Jar'];
+      const dupDocs = snap0.docs.filter(d=>{ const v=d.data(); return v.cat==='Obytné auto' && DUPES7.includes(v.text); });
+      await Promise.all(dupDocs.flatMap(d=>[
+        deleteDoc(doc(col, d.id)).catch(()=>{}),
+        deleteDoc(doc(fotky, d.id)).catch(()=>{})
+      ]));
     }
     if(applied < SEED_VERSION) await setDoc(metaRef, {seedVersion: SEED_VERSION});
   }
