@@ -506,30 +506,33 @@ const SEED = [
   ['yellow','Obytné auto','Odpadkové pytle'],
   ['green','Obytné auto','Kolíčky + šňůra na prádlo'],
   ['yellow','Obytné auto','Prací prostředek'],
-  ['yellow','Obytné auto','Příbory'],
-  ['yellow','Obytné auto','Sada vařeček'],
-  ['yellow','Obytné auto','Nože + škrabka na brambory'],
-  ['yellow','Obytné auto','Misky'],
-  ['yellow','Obytné auto','Prkénko'],
-  ['yellow','Obytné auto','Pánve'],
-  ['green','Obytné auto','Bambusový podtácek'],
-  ['yellow','Obytné auto','Sklenice'],
-  ['yellow','Obytné auto','Hrnec'],
-  ['yellow','Obytné auto','Talíře'],
-  ['yellow','Obytné auto','Poklička'],
-  ['green','Obytné auto','Podložka korek'],
-  ['green','Obytné auto','Úložné boxy Star Ware'],
-  ['green','Obytné auto','Dóza s bambusovým víkem'],
-  ['yellow','Obytné auto','Ručníky (v obytném autě)'],
-  ['yellow','Obytné auto','Štětka na WC'],
-  ['yellow','Obytné auto','Čistící prostředek na sprchový kout'],
-  ['red','Obytné auto','Lékárnička (v obytném autě)'],
-  ['red','Obytné auto','Plynová láhev – propan'],
-  ['yellow','Obytné auto','Kempingové vybavení (stůl + židle)'],
-  ['green','Obytné auto','Konev'],
-  ['yellow','Obytné auto','Kávovar + kapsle'],
-  ['green','Obytné auto','Ruční vysavač Gorenje'],
+  // pozn.: níže uvedené věci jsou dle předávacího protokolu součástí výbavy od majitele vozu
+  ['yellow','Obytné auto','Příbory',null,null,null,'Od majitele vozu'],
+  ['yellow','Obytné auto','Sada vařeček',null,null,null,'Od majitele vozu'],
+  ['yellow','Obytné auto','Nože + škrabka na brambory',null,null,null,'Od majitele vozu'],
+  ['yellow','Obytné auto','Misky',null,null,null,'Od majitele vozu'],
+  ['yellow','Obytné auto','Prkénko',null,null,null,'Od majitele vozu'],
+  ['yellow','Obytné auto','Pánve',null,null,null,'Od majitele vozu'],
+  ['green','Obytné auto','Bambusový podtácek',null,null,null,'Od majitele vozu'],
+  ['yellow','Obytné auto','Sklenice',null,null,null,'Od majitele vozu'],
+  ['yellow','Obytné auto','Hrnec',null,null,null,'Od majitele vozu'],
+  ['yellow','Obytné auto','Talíře',null,null,null,'Od majitele vozu'],
+  ['yellow','Obytné auto','Poklička',null,null,null,'Od majitele vozu'],
+  ['green','Obytné auto','Podložka korek',null,null,null,'Od majitele vozu'],
+  ['green','Obytné auto','Úložné boxy Star Ware',null,null,null,'Od majitele vozu'],
+  ['green','Obytné auto','Dóza s bambusovým víkem',null,null,null,'Od majitele vozu'],
+  ['yellow','Obytné auto','Ručníky (v obytném autě)',null,null,null,'Od majitele vozu'],
+  ['yellow','Obytné auto','Štětka na WC',null,null,null,'Od majitele vozu'],
+  ['yellow','Obytné auto','Čistící prostředek na sprchový kout',null,null,null,'Od majitele vozu'],
+  ['red','Obytné auto','Lékárnička (v obytném autě)',null,null,null,'Od majitele vozu'],
+  ['red','Obytné auto','Plynová láhev – propan',null,null,null,'Od majitele vozu'],
+  ['yellow','Obytné auto','Kempingové vybavení (stůl + židle)',null,null,null,'Od majitele vozu'],
+  ['green','Obytné auto','Konev',null,null,null,'Od majitele vozu'],
+  ['yellow','Obytné auto','Kávovar + kapsle',null,null,null,'Od majitele vozu'],
+  ['green','Obytné auto','Ruční vysavač Gorenje',null,null,null,'Od majitele vozu'],
 ];
+// od verze 5: nová vybavení vozu (indexy 175+) mají v SEED navíc 7. hodnotu = poznámka (note)
+const SEED_V5_START = 175;
 
 const PRIO_RANK = {red:0, yellow:1, green:2};
 const PRIO_LABEL = {red:'🔴 nutné', yellow:'🟡 důležité', green:'🟢 dobré mít'};
@@ -1150,7 +1153,7 @@ function localBackend(){
   const savePhotos=()=>{ try{ localStorage.setItem(KEY+'-fotky', JSON.stringify(photos)); }catch(e){ quotaMsg(); } };
   const id=()=> Date.now()+'-'+Math.random().toString(36).slice(2,7);
   const emit=()=>{ items=data.slice(); render(); };
-  if(data.length===0){ data = SEED.map((s,i)=>({id:id(), prio:s[0], cat:s[1], text:s[2], qty:(s[3] ?? null), who:(s[4] || []), split:(s[5] ?? null), doneBy:{}, order:i})); save(); }
+  if(data.length===0){ data = SEED.map((s,i)=>({id:id(), prio:s[0], cat:s[1], text:s[2], qty:(s[3] ?? null), who:(s[4] || []), split:(s[5] ?? null), note:(s[6] ?? null), doneBy:{}, order:i})); save(); }
   return {
     start(){ emit(); },
     add(it){ data.push({id:id(), ...it}); save(); emit(); },
@@ -1177,7 +1180,7 @@ async function firebaseBackend(){
     const seedId = i => 'seed-' + String(i).padStart(3,'0');
   const writeSeed = i => {
     const s = SEED[i];
-    return setDoc(doc(col, seedId(i)), {prio:s[0], cat:s[1], text:s[2], qty:(s[3] ?? null), who:(s[4] || []), split:(s[5] ?? null), doneBy:{}, order:i});
+    return setDoc(doc(col, seedId(i)), {prio:s[0], cat:s[1], text:s[2], qty:(s[3] ?? null), who:(s[4] || []), split:(s[5] ?? null), note:(s[6] ?? null), doneBy:{}, order:i});
   };
   const metaRef = doc(col, SEED_META_ID);
   const snap0 = await getDocs(col);
@@ -1201,6 +1204,10 @@ async function firebaseBackend(){
         if(!(s[1] === 'Pes' || s[1].startsWith('Dítě'))) return null;
         return updateDoc(doc(col, seedId(i)), {who: s[4] || []}).catch(()=>{});
       }).filter(Boolean));
+    }
+    if(applied < 5){
+      // v5: doplnění vybavení obytného vozu z předávacího protokolu (jen nově přidané položky)
+      await Promise.all(SEED.map((_,i)=> i>=SEED_V5_START ? writeSeed(i) : null).filter(Boolean));
     }
     if(applied < SEED_VERSION) await setDoc(metaRef, {seedVersion: SEED_VERSION});
   }
