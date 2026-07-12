@@ -291,7 +291,7 @@ const COLLECTION = 'co-balime-norsko';
 const KEY = 'norsko2026-co-balime-v4';
 // Verze výchozí sady. Po jejím zvýšení se do sdílené databáze doplní nově přidané
 // položky (stávající data ani odškrtnutí se nemažou).
-const SEED_VERSION = 4;
+const SEED_VERSION = 5;
 // Dokument s verzí držíme uvnitř stejné kolekce, aby na něj platila stejná pravidla Firestore.
 const SEED_META_ID = '_seedmeta';
 
@@ -1177,6 +1177,26 @@ async function firebaseBackend(){
       await Promise.all(SEED.map((s,i)=>{
         if(!(s[1] === 'Pes' || s[1].startsWith('Dítě'))) return null;
         return updateDoc(doc(col, seedId(i)), {who: s[4] || []}).catch(()=>{});
+      }).filter(Boolean));
+    }else if(applied < 5){
+      // v5: dle předávacího protokolu ke smlouvě o pronájmu vozu doplněny poznámky u položek,
+      // co už jsou součástí výbavy vozu — jen tam, kde ještě žádná poznámka není (ruční
+      // poznámky uživatelů se nepřepisují); odškrtnutí, fotky, množství a řešitelé se nemění
+      const NOTES5 = {
+        'Kabel do kempu (elektrika)': 'Ve voze je podle předávacího protokolu 1 ks — nemusíme brát vlastní.',
+        'Chemie do WC': 'Ve voze jsou podle protokolu 2 balení — nemusíme brát vlastní.',
+        'Toaletní papír do WC': 'Ve voze je podle protokolu na celou dobu pronájmu — nemusíme brát vlastní.',
+        'Vyrovnávací klíny pod auto': 'Ve voze jsou podle protokolu 2 ks — nemusíme brát vlastní.',
+        'Prodlužovací kabel': 'Ve voze je podle protokolu 1 ks — nemusíme brát vlastní.',
+        'Utěrky + houbičky': 'Ve voze je podle protokolu 6 utěrek a houbiček — nemusíme brát vlastní.',
+        'Jar': 'Ve voze je podle protokolu k dispozici — nemusíme brát vlastní.',
+      };
+      const byId = new Map(snap0.docs.map(d=>[d.id, d.data()]));
+      await Promise.all(SEED.map((s,i)=>{
+        if(s[1] !== 'Obytné auto' || !(s[2] in NOTES5)) return null;
+        const cur = byId.get(seedId(i));
+        if(cur && cur.note) return null;
+        return updateDoc(doc(col, seedId(i)), {note: NOTES5[s[2]]}).catch(()=>{});
       }).filter(Boolean));
     }
     if(applied < SEED_VERSION) await setDoc(metaRef, {seedVersion: SEED_VERSION});
