@@ -273,6 +273,10 @@
       <input type="number" id="fv_panel" value="12" min="0"><span class="unit">kg</span>
     </div>
     <div class="row" data-mode="podrobna">
+      <label>Kempingové vybavení <span class="hint">vlastní doplňkové věci navrch k tomu, co je ve voze od majitele — skládací lehátka, hamak, chladicí box apod.</span></label>
+      <input type="number" id="kemp_vybaveni" value="8" min="0"><span class="unit">kg</span>
+    </div>
+    <div class="row" data-mode="podrobna">
       <label>Nářadí, klíny &amp; lano</label>
       <input type="number" id="naradi" value="8" min="0"><span class="unit">kg</span>
     </div>
@@ -300,7 +304,7 @@
       <input type="number" id="elektro_jarka" value="1.5" min="0"><span class="unit">kg</span>
     </div>
 
-    <div class="subhead" data-mode="podrobna">Vybavení (např. pruty)</div>
+    <div class="subhead" data-mode="podrobna">Vybavení (mimo oblečení, osobní hygienu apod. - např. pruty)</div>
     <div class="row" data-mode="podrobna">
       <label>Lucie</label>
       <input type="number" id="vybaveni_lucie" value="3" min="0"><span class="unit">kg</span>
@@ -362,7 +366,7 @@ const ADULTS=['dosp_lucie','dosp_vladimir','dosp_jirka','dosp_jarka'];
 const ids=[...ADULTS,'dite_kg','pes','obleceni',
   'obleceni_lucie','obleceni_vladimir','obleceni_jirka','obleceni_jarka','dite','kocarek','pes_vyb','jidlo',
   'jidlo_napoje','jidlo_hotova','jidlo_priloha','jidlo_cerstve','jidlo_svacinky','jidlo_ostatni','kuchyne',
-  'voda','ostatni','markyza','nosic_kol','fv_panel','naradi','provoz',
+  'voda','ostatni','markyza','nosic_kol','fv_panel','kemp_vybaveni','naradi','provoz',
   'elektro_lucie','elektro_vladimir','elektro_jirka','elektro_jarka',
   'vybaveni_lucie','vybaveni_vladimir','vybaveni_jirka','vybaveni_jarka',
   'veci_lucie','veci_vladimir','veci_jirka','veci_jarka'];
@@ -372,7 +376,7 @@ const EQUIP={
   podrobna:['obleceni_lucie','obleceni_vladimir','obleceni_jirka','obleceni_jarka','dite','kocarek','pes_vyb',
             'jidlo_napoje','jidlo_hotova','jidlo_priloha',
             'jidlo_cerstve','jidlo_svacinky','jidlo_ostatni','kuchyne','voda',
-            'markyza','nosic_kol','fv_panel','naradi','provoz',
+            'markyza','nosic_kol','fv_panel','kemp_vybaveni','naradi','provoz',
             'elektro_lucie','elektro_vladimir','elektro_jirka','elektro_jarka',
             'vybaveni_lucie','vybaveni_vladimir','vybaveni_jirka','vybaveni_jarka',
             'veci_lucie','veci_vladimir','veci_jirka','veci_jarka']
@@ -387,7 +391,7 @@ const DEFAULTS={mode:'zakladni',
   obleceni_lucie:11.5,obleceni_vladimir:11.5,obleceni_jirka:11.5,obleceni_jarka:11.5,
   dite:6,kocarek:6,pes_vyb:10,jidlo_napoje:12,jidlo_hotova:14.6,jidlo_priloha:4.75,
   jidlo_cerstve:10.2,jidlo_svacinky:5.7,jidlo_ostatni:2.2,kuchyne:10,
-  markyza:22,nosic_kol:9,fv_panel:12,naradi:8,provoz:10,
+  markyza:22,nosic_kol:9,fv_panel:12,kemp_vybaveni:8,naradi:8,provoz:10,
   elektro_lucie:1.5,elektro_vladimir:1.5,elektro_jirka:1.5,elektro_jarka:1.5,
   vybaveni_lucie:3,vybaveni_vladimir:3,vybaveni_jirka:3,vybaveni_jarka:3,
   veci_lucie:3,veci_vladimir:3,veci_jirka:3,veci_jarka:3,
