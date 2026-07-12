@@ -157,6 +157,7 @@
   .who-badge.w-jaroslava{background:#f3ebfb;color:#7a3fb0;border-color:#dcc7f0}
   .who-badge.w-adamek{background:#fff2e2;color:#b06a00;border-color:#f0d9b0}
   .who-badge.w-monty{background:#f2ede5;color:#7a5c34;border-color:#dccbb0}
+  .who-badge.w-vybava-od-majitele{background:#e7f0fb;color:#1d5fa8;border-color:#bcd6f3}
   .who-badge.w-multi{background:#e7f0fb;color:#1d5fa8;border-color:#bcd6f3}
   .who-badge.w-all{background:#fff1e0;color:#b06a00;border-color:#f0d9b0}
   .assignpop{position:absolute;z-index:60;background:#fff;border:1px solid #cdd9e3;border-radius:10px;
@@ -297,7 +298,7 @@ const COLLECTION = 'co-balime-norsko';
 const KEY = 'norsko2026-co-balime-v4';
 // Verze výchozí sady. Po jejím zvýšení se do sdílené databáze doplní nově přidané
 // položky (stávající data ani odškrtnutí se nemažou).
-const SEED_VERSION = 7;
+const SEED_VERSION = 8;
 // Dokument s verzí držíme uvnitř stejné kolekce, aby na něj platila stejná pravidla Firestore.
 const SEED_META_ID = '_seedmeta';
 
@@ -509,37 +510,37 @@ const SEED = [
   ['yellow','Obytné auto','Prací prostředek'],
 
   // — Výbava od majitele (dle předávacího protokolu ke smlouvě — zkontrolovat při převzetí) —
-  ['yellow','Výbava od majitele','Příbory',21],
-  ['yellow','Výbava od majitele','Sada vařeček',3],
-  ['yellow','Výbava od majitele','Nože + škrabka na brambory (5 ks + 1 ks)'],
-  ['yellow','Výbava od majitele','Misky',7],
-  ['yellow','Výbava od majitele','Prkénko',1],
-  ['yellow','Výbava od majitele','Pánve',3],
-  ['yellow','Výbava od majitele','Bambusový podtácek',1],
-  ['yellow','Výbava od majitele','Sklenice',6],
-  ['yellow','Výbava od majitele','Hrnec',1],
-  ['yellow','Výbava od majitele','Utěrka',6],
-  ['yellow','Výbava od majitele','Talíře',5],
-  ['yellow','Výbava od majitele','Poklička',2],
-  ['yellow','Výbava od majitele','Podložka korek',3],
-  ['yellow','Výbava od majitele','Úložné boxy Star Ware',5],
-  ['yellow','Výbava od majitele','Dóza s bambusovým víkem',1],
-  ['yellow','Výbava od majitele','Polštář, bavlna, dekorativní',4],
-  ['yellow','Výbava od majitele','Ručníky (2 + 5 ks)'],
-  ['yellow','Výbava od majitele','Štětka na WC',1],
-  ['yellow','Výbava od majitele','Chemie do WC (2 balení)'],
-  ['yellow','Výbava od majitele','Čistící prostředek na sprchový kout',1],
-  ['yellow','Výbava od majitele','Houbička na nádobí + Jar (6 ks + 1 ks)'],
-  ['yellow','Výbava od majitele','Toaletní papír (dle doby pronájmu)'],
-  ['yellow','Výbava od majitele','Lékárnička',1],
-  ['yellow','Výbava od majitele','Vyrovnávací klíny',2],
-  ['yellow','Výbava od majitele','Připojovací el. kabel',1],
-  ['yellow','Výbava od majitele','Prodlužovací el. kabel',1],
-  ['yellow','Výbava od majitele','Plynová láhev — propan',1],
-  ['yellow','Výbava od majitele','Kempingové vybavení (stůl + židle)',5],
-  ['yellow','Výbava od majitele','Konev',1],
-  ['yellow','Výbava od majitele','Kávovar + kapsle (1 ks + 10 ks)'],
-  ['yellow','Výbava od majitele','Ruční vysavač Gorenje',1],
+  ['yellow','Výbava od majitele','Příbory',21,['Výbava od majitele']],
+  ['yellow','Výbava od majitele','Sada vařeček',3,['Výbava od majitele']],
+  ['yellow','Výbava od majitele','Nože + škrabka na brambory (5 ks + 1 ks)',null,['Výbava od majitele']],
+  ['yellow','Výbava od majitele','Misky',7,['Výbava od majitele']],
+  ['yellow','Výbava od majitele','Prkénko',1,['Výbava od majitele']],
+  ['yellow','Výbava od majitele','Pánve',3,['Výbava od majitele']],
+  ['yellow','Výbava od majitele','Bambusový podtácek',1,['Výbava od majitele']],
+  ['yellow','Výbava od majitele','Sklenice',6,['Výbava od majitele']],
+  ['yellow','Výbava od majitele','Hrnec',1,['Výbava od majitele']],
+  ['yellow','Výbava od majitele','Utěrka',6,['Výbava od majitele']],
+  ['yellow','Výbava od majitele','Talíře',5,['Výbava od majitele']],
+  ['yellow','Výbava od majitele','Poklička',2,['Výbava od majitele']],
+  ['yellow','Výbava od majitele','Podložka korek',3,['Výbava od majitele']],
+  ['yellow','Výbava od majitele','Úložné boxy Star Ware',5,['Výbava od majitele']],
+  ['yellow','Výbava od majitele','Dóza s bambusovým víkem',1,['Výbava od majitele']],
+  ['yellow','Výbava od majitele','Polštář, bavlna, dekorativní',4,['Výbava od majitele']],
+  ['yellow','Výbava od majitele','Ručníky (2 + 5 ks)',null,['Výbava od majitele']],
+  ['yellow','Výbava od majitele','Štětka na WC',1,['Výbava od majitele']],
+  ['yellow','Výbava od majitele','Chemie do WC (2 balení)',null,['Výbava od majitele']],
+  ['yellow','Výbava od majitele','Čistící prostředek na sprchový kout',1,['Výbava od majitele']],
+  ['yellow','Výbava od majitele','Houbička na nádobí + Jar (6 ks + 1 ks)',null,['Výbava od majitele']],
+  ['yellow','Výbava od majitele','Toaletní papír (dle doby pronájmu)',null,['Výbava od majitele']],
+  ['yellow','Výbava od majitele','Lékárnička',1,['Výbava od majitele']],
+  ['yellow','Výbava od majitele','Vyrovnávací klíny',2,['Výbava od majitele']],
+  ['yellow','Výbava od majitele','Připojovací el. kabel',1,['Výbava od majitele']],
+  ['yellow','Výbava od majitele','Prodlužovací el. kabel',1,['Výbava od majitele']],
+  ['yellow','Výbava od majitele','Plynová láhev — propan',1,['Výbava od majitele']],
+  ['yellow','Výbava od majitele','Kempingové vybavení (stůl + židle)',5,['Výbava od majitele']],
+  ['yellow','Výbava od majitele','Konev',1,['Výbava od majitele']],
+  ['yellow','Výbava od majitele','Kávovar + kapsle (1 ks + 10 ks)',null,['Výbava od majitele']],
+  ['yellow','Výbava od majitele','Ruční vysavač Gorenje',1,['Výbava od majitele']],
 ];
 
 const PRIO_RANK = {red:0, yellow:1, green:2};
@@ -550,26 +551,28 @@ const PRIO_CYCLE = {red:'yellow', yellow:'green', green:'red'};
 const PEOPLE = ['Vladimír','Lucie','Jiří','Jaroslava','Adámek','Monty'];
 const TILE_FOTO = {'Vladimír':'foto/vladimir.jpg','Lucie':'foto/lucie.jpg','Jiří':'foto/jiri.jpg',
                    'Jaroslava':'foto/jaroslava.jpg','Adámek':'foto/adam.jpg','Monty':'foto/monty.jpg'};
+// zvláštní „člen" navíc: věci od majitele vozu (dle předávacího protokolu) — přiřazuje se úplně
+// stejně jako komukoli z posádky (stejné menu 👤), jen místo fotky má ikonu a nepočítá se do
+// „Všichni"/společných věcí — je to vlastní poddlaždice s vlastní podstránkou
+const OWNER_CAT = 'Výbava od majitele';
 const NAME_FIX = {Jirka:'Jiří', Jarka:'Jaroslava', Adam:'Adámek', Adámek:'Adámek'};
 const fixName = n => NAME_FIX[n] || n;
-const whoSlug = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+const whoSlug = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().replace(/\s+/g,'-');
 const whoClass = s => 'w-' + (s ? whoSlug(s) : 'none');
 const whoArr = it => (Array.isArray(it.who) ? it.who : (it.who ? [it.who] : [])).filter(Boolean).map(fixName);
 const isAll = arr => arr.length>0 && PEOPLE.every(p=>arr.includes(p));
-const whoLabel = arr => !arr.length ? '👤 přiřadit' : (isAll(arr) ? '👥 Všichni' : '👤 '+arr.join(', '));
+const whoLabel = arr => !arr.length ? '👤 přiřadit'
+  : (isAll(arr) ? '👥 Všichni'
+  : (arr.length===1 && arr[0]===OWNER_CAT ? '🚐 '+OWNER_CAT : '👤 '+arr.join(', ')));
 const whoBadgeClass = arr => !arr.length ? 'w-none' : (isAll(arr) ? 'w-all' : (arr.length===1 ? whoClass(arr[0]) : 'w-multi'));
 let newWhoSel = [];
 
-// zvláštní poddlaždice: věci od majitele vozu (dle předávacího protokolu) — netýkají se
-// žádného člena posádky, mají vlastní kategorii a vlastní podstránku, ne fotku ale ikonu
-const OWNER_CAT = 'Výbava od majitele';
-const isOwnerItem = it => it.cat === OWNER_CAT;
-
 // dvě velké sekce: bez přiřazení (nebo se všemi členy) = společná věc, jinak patří vybraným členům
+// nebo majiteli; isAll/„Všichni" se počítá jen z opravdové posádky (PEOPLE), ne z majitele
+const isOwnerItem = it => whoArr(it).includes(OWNER_CAT);
 const isShared = it => !isOwnerItem(it) && (whoArr(it).length === 0 || isAll(whoArr(it)));
 const inPersonScope = (it, p) => { const w = whoArr(it); return w.includes(p) && !isAll(w); };
-let viewPerson = null; // null = přehled (dlaždice + společné věci), jinak otevřená podstránka člena
-let viewOwner = false;  // true = otevřená podstránka „Výbava od majitele"
+let viewPerson = null; // null = přehled (dlaždice + společné věci); jméno člena, nebo OWNER_CAT = podstránka
 
 // odškrtávání sbalení: sledované per osobu (klíč '_' = obecně, když není nikdo přiřazený)
 const doneMap = it => it.doneBy || {};
@@ -592,10 +595,9 @@ let items = [];
 const esc = s => (s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const filtersActive = () => !!(fSearch.value.trim() || fCat.value || fPrio.value || fStatus.value);
 
-// položky aktuálního pohledu: podstránka člena = jen jeho věci, podstránka majitele = jen jeho
-// výbava, přehled = jen společné věci
-const scopeItems = () => items.filter(it =>
-  viewPerson ? inPersonScope(it, viewPerson) : viewOwner ? isOwnerItem(it) : isShared(it));
+// položky aktuálního pohledu: podstránka (člena nebo majitele) = jen její věci, přehled = jen
+// společné věci; majitel se řeší úplně stejně jako kdokoli z PEOPLE, přes inPersonScope
+const scopeItems = () => items.filter(it => viewPerson ? inPersonScope(it, viewPerson) : isShared(it));
 
 function visibleItems(){
   const q = fSearch.value.trim().toLowerCase();
@@ -614,13 +616,11 @@ function renderProgress(){
   let total=0, done=0;
   if(viewPerson){
     for(const it of items){ if(inPersonScope(it, viewPerson)){ total++; if(isDoneFor(it, viewPerson)) done++; } }
-  }else if(viewOwner){
-    for(const it of items){ if(isOwnerItem(it)){ total++; if(fullyDone(it)) done++; } }
   }else{
     for(const it of items){ total += unitsFor(it); done += doneUnitsFor(it); }
   }
   const pct = total ? Math.round(done/total*100) : 0;
-  const lbl = viewPerson ? `Sbaleno (${viewPerson}) ` : viewOwner ? 'Zkontrolováno ' : 'Hotovo ';
+  const lbl = viewPerson === OWNER_CAT ? 'Zkontrolováno ' : viewPerson ? `Sbaleno (${viewPerson}) ` : 'Hotovo ';
   $('progLbl').textContent = lbl + `${done} / ${total}`;
   $('progPct').textContent = pct + ' %';
   $('progBar').style.width = pct + '%';
@@ -629,12 +629,6 @@ function renderProgress(){
 function personStats(p){
   const mine = items.filter(it => inPersonScope(it, p));
   const done = mine.filter(it => isDoneFor(it, p)).length;
-  return {total: mine.length, done, pct: mine.length ? Math.round(done/mine.length*100) : 0};
-}
-
-function ownerStats(){
-  const mine = items.filter(isOwnerItem);
-  const done = mine.filter(fullyDone).length;
   return {total: mine.length, done, pct: mine.length ? Math.round(done/mine.length*100) : 0};
 }
 
@@ -652,23 +646,23 @@ function renderTiles(){
     t.addEventListener('click', ()=>{ location.hash = 'clen=' + encodeURIComponent(p); });
     grid.appendChild(t);
   }
-  const so = ownerStats();
+  const so = personStats(OWNER_CAT);
   const ot = document.createElement('div');
   ot.className = 'ptile';
   ot.innerHTML = `<div class="ptile-ico">🚐</div>
-    <b>Výbava od majitele</b>
+    <b>${esc(OWNER_CAT)}</b>
     <span class="pstat">${so.done} / ${so.total} zkontrolováno</span>
     <div class="pbar"><i style="width:${so.pct}%"></i></div>`;
-  ot.addEventListener('click', ()=>{ location.hash = 'majitel'; });
+  ot.addEventListener('click', ()=>{ location.hash = 'clen=' + encodeURIComponent(OWNER_CAT); });
   grid.appendChild(ot);
 }
 
 function renderViewHead(){
   const vh = $('viewHead');
-  if(viewOwner){
-    const s = ownerStats();
+  if(viewPerson === OWNER_CAT){
+    const s = personStats(OWNER_CAT);
     vh.innerHTML = `<div class="vh-ico">🚐</div>
-      <div><b>Výbava od majitele</b><div class="pstat">${s.done} / ${s.total} zkontrolováno · věci, co nám k vozu přibalí majitel (dle předávacího protokolu)</div></div>
+      <div><b>${esc(OWNER_CAT)}</b><div class="pstat">${s.done} / ${s.total} zkontrolováno · věci, co nám k vozu přibalí majitel (dle předávacího protokolu)</div></div>
       <a class="btn ghost back" href="#">← Zpět na přehled</a>`;
     vh.style.display='flex';
     return;
@@ -787,7 +781,7 @@ function makeRow(it, dndOff, forPerson){
 }
 
 function render(){
-  const inSub = viewPerson || viewOwner;
+  const inSub = !!viewPerson;
   renderViewHead();
   renderProgress();
   $('sekcePosadka').style.display = inSub ? 'none' : '';
@@ -808,8 +802,8 @@ function render(){
   if(vis.length === 0){
     listEl.innerHTML = `<div class="empty">${scoped.length
       ? 'Nic neodpovídá filtru.'
-      : (viewPerson ? 'Zatím tu nejsou žádné položky — přiřaď je tomuto členovi klikem na 👤.'
-         : viewOwner ? 'Zatím tu není žádná výbava od majitele.'
+      : (viewPerson === OWNER_CAT ? 'Zatím tu není žádná výbava od majitele.'
+         : viewPerson ? 'Zatím tu nejsou žádné položky — přiřaď je tomuto členovi klikem na 👤.'
          : 'Zatím tu nejsou žádné společné položky.')}</div>`;
     return;
   }
@@ -846,13 +840,12 @@ function render(){
 // „podstránky" členů řeší hash v adrese (#clen=Vladimír) — funguje tlačítko zpět i obnovení stránky
 function syncViewFromHash(){
   const h = decodeURIComponent((location.hash||'').replace(/^#/,''));
-  viewOwner = h === 'majitel';
-  const m = !viewOwner ? /^clen=(.+)$/.exec(h) : null;
-  const p = m ? fixName(m[1]) : null;
-  viewPerson = (p && PEOPLE.includes(p)) ? p : null;
+  const m = /^clen=(.+)$/.exec(h);
+  const p = h === 'majitel' ? OWNER_CAT : (m ? fixName(m[1]) : null);   // #majitel = starší odkaz, dál funguje
+  viewPerson = (p && (PEOPLE.includes(p) || p === OWNER_CAT)) ? p : null;
   newWhoSel = viewPerson ? [viewPerson] : [];
   renderNewWhoBtn();
-  if(viewOwner) $('newCat').value = OWNER_CAT;
+  if(viewPerson === OWNER_CAT) $('newCat').value = OWNER_CAT;
   else if($('newCat').value === OWNER_CAT) $('newCat').value = '';
   window.scrollTo(0, 0);
   render();
@@ -903,16 +896,20 @@ function openAssign(anchor, current, onDone){
     `<label class="apall"><input type="checkbox" class="apAll"> 👥 Všichni</label>
      <div class="apsep"></div>` +
     PEOPLE.map(pn=>`<label><input type="checkbox" class="apOne" value="${pn}"> 👤 ${pn}</label>`).join('') +
+    `<div class="apsep"></div>
+     <label><input type="checkbox" class="apOwner" value="${OWNER_CAT}"> 🚐 ${OWNER_CAT}</label>` +
     `<div class="apsep"></div><button class="btn apDone">Hotovo</button>`;
   const ones = [...pop.querySelectorAll('.apOne')];
+  const owner = pop.querySelector('.apOwner');
   const all = pop.querySelector('.apAll');
   const cur = new Set(current);
   ones.forEach(cb=> cb.checked = cur.has(cb.value));
+  owner.checked = cur.has(OWNER_CAT);
   const syncAll = ()=> all.checked = ones.every(cb=>cb.checked);
   syncAll();
   all.addEventListener('change', ()=>{ ones.forEach(cb=> cb.checked = all.checked); });
   ones.forEach(cb=> cb.addEventListener('change', syncAll));
-  popCommit = ()=>{ const sel = ones.filter(cb=>cb.checked).map(cb=>cb.value); closeAssign(); onDone(sel); };
+  popCommit = ()=>{ const sel = [...ones, owner].filter(cb=>cb.checked).map(cb=>cb.value); closeAssign(); onDone(sel); };
   pop.querySelector('.apDone').addEventListener('click', popCommit);
   pop.style.display='flex';
   const r = anchor.getBoundingClientRect();
@@ -1287,6 +1284,19 @@ async function firebaseBackend(){
         deleteDoc(doc(col, d.id)).catch(()=>{}),
         deleteDoc(doc(fotky, d.id)).catch(()=>{})
       ]));
+    }else if(applied < 8){
+      // v8: „Výbava od majitele" se nově přiřazuje přes stejné menu 👤 jako komukoli z posádky
+      // (dřív šlo jen o kategorii) — doplní se who:['Výbava od majitele'] u položek této kategorie,
+      // co ho ještě nemají, a případné starší odškrtnutí (klíč '_', z doby kdy who bylo prázdné)
+      // se přenese na nový klíč, ať se neztratí; nic dalšího se nemění
+      const ownerDocs = snap0.docs.filter(d=> d.data().cat === OWNER_CAT);
+      await Promise.all(ownerDocs.map(d=>{
+        const v = d.data();
+        if(Array.isArray(v.who) && v.who.includes(OWNER_CAT)) return null;
+        const patch = {who: [OWNER_CAT]};
+        if(v.doneBy && v.doneBy._) patch['doneBy.'+OWNER_CAT] = true;
+        return updateDoc(doc(col, d.id), patch).catch(()=>{});
+      }).filter(Boolean));
     }
     if(applied < SEED_VERSION) await setDoc(metaRef, {seedVersion: SEED_VERSION});
   }
