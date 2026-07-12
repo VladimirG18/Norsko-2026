@@ -95,6 +95,16 @@
   .gnote{font-size:.82rem;color:var(--slabe);margin:10px 2px 0}
   .gnote a{color:var(--modra2)}
 
+  /* půdorys vozu */
+  .planwrap{margin:26px 0 0;padding-top:20px;border-top:1px solid var(--line)}
+  .planwrap h2{margin:0 0 12px;color:var(--modra);font-size:1.15rem;font-weight:800;letter-spacing:-.01em}
+  .plancard{display:block;border-radius:14px;border:1px solid var(--line);background:#fff;
+       box-shadow:var(--shadow);padding:16px;text-align:center}
+  .plancard img{max-width:100%;height:auto;display:block;margin:0 auto;border-radius:6px;
+       opacity:0;transition:opacity .5s ease}
+  .plancard img.loaded{opacity:1}
+  .plannote{font-size:.82rem;color:var(--slabe);margin:8px 2px 0}
+
   @media(max-width:620px){.crit{grid-template-columns:1fr}.feat{grid-template-columns:1fr}
        .ggrid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}}
   @media print{
@@ -321,6 +331,16 @@
       </table>
     </div>
   </details>
+
+  <div class="planwrap">
+    <h2>📐 Půdorys vozu</h2>
+    <a class="plancard" href="https://ubytkonakolech.cz/wp-content/uploads/2026/01/CI-Horon-84-XT-ELITE_pudorys.avif" target="_blank" rel="noopener">
+      <img src="https://ubytkonakolech.cz/wp-content/uploads/2026/01/CI-Horon-84-XT-ELITE_pudorys.avif"
+           alt="Půdorys CI Horon 84 XT Elite — rozmístění lůžek, kuchyně a sedací soupravy"
+           loading="lazy" referrerpolicy="no-referrer"
+           onload="this.classList.add('loaded')" onerror="this.closest('.planwrap').style.display='none'"></a>
+    <p class="plannote">Klikni pro zvětšení.</p>
+  </div>
 
   <div class="galerie">
     <h2>📸 Fotky vozu z inzerátu</h2>
