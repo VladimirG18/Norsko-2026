@@ -107,6 +107,46 @@
   .hgrid figcaption{padding:10px 13px 12px}
   .hgrid figcaption b{display:block;font-size:.94rem;color:var(--modra)}
   .hgrid figcaption span{font-size:.78rem;color:var(--slabe)}
+  .hgrid figure{cursor:pointer}
+  .hgrid figure:focus-visible{outline:3px solid var(--modra2);outline-offset:2px}
+  .himg .zoom{position:absolute;right:10px;top:10px;z-index:2;width:28px;height:28px;border-radius:50%;
+       background:rgba(255,255,255,.88);color:var(--modra);font-size:.84rem;font-weight:700;
+       display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(12,58,95,.25)}
+
+  /* ---------- MODAL MÍSTA ---------- */
+  .pmodal{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;
+       padding:20px;background:rgba(6,18,30,.72);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
+       opacity:0;pointer-events:none;transition:opacity .22s ease}
+  .pmodal.open{opacity:1;pointer-events:auto}
+  .pmodal-box{background:#fff;border-radius:20px;width:100%;max-width:640px;max-height:88vh;overflow-y:auto;
+       position:relative;box-shadow:0 30px 80px rgba(0,0,0,.45);transform:translateY(14px) scale(.98);
+       transition:transform .25s ease}
+  .pmodal.open .pmodal-box{transform:translateY(0) scale(1)}
+  .pmodal-close{position:absolute;right:12px;top:12px;z-index:6;width:38px;height:38px;border-radius:50%;
+       border:none;background:rgba(6,18,30,.55);color:#fff;font-size:1.15rem;line-height:1;cursor:pointer;
+       display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+  .pmodal-close:hover{background:rgba(6,18,30,.82)}
+  .pmodal-hero{position:relative;height:270px;overflow:hidden;background:linear-gradient(150deg,#c9dded,#e8f1f7);
+       display:flex;align-items:center;justify-content:center}
+  .pmodal-hero .ph{position:absolute;font-size:2.4rem;opacity:.5}
+  .pmodal-hero img{position:relative;width:100%;height:100%;object-fit:cover;display:block;
+       opacity:0;transition:opacity .35s ease}
+  .pmodal-hero img.loaded{opacity:1}
+  .pmodal-thumbs{display:flex;gap:8px;padding:12px 22px 0;overflow-x:auto}
+  .pmodal-thumbs button{flex:none;width:58px;height:58px;border-radius:10px;overflow:hidden;padding:0;
+       border:2px solid transparent;cursor:pointer;background:#e8f1f7;opacity:0;animation:pmfade .3s ease forwards}
+  @keyframes pmfade{to{opacity:1}}
+  .pmodal-thumbs button.active{border-color:var(--modra2)}
+  .pmodal-thumbs img{width:100%;height:100%;object-fit:cover;display:block}
+  .pmodal-body{padding:18px 24px 26px}
+  .pmodal-day{display:inline-block;background:var(--led);color:var(--modra2);font-size:.76rem;font-weight:700;
+       padding:3px 11px;border-radius:999px;margin-bottom:9px}
+  .pmodal-body h3{margin:0 0 4px;font-size:1.4rem;color:var(--modra);font-weight:800;letter-spacing:-.01em}
+  .pmodal-body .psub{margin:0 0 12px;color:var(--slabe);font-size:.9rem;font-weight:600}
+  .pmodal-body p.desc{margin:0 0 12px;color:var(--text);font-size:.95rem;line-height:1.65}
+  .pmodal-source{font-size:.8rem;color:var(--slabe)}
+  .pmodal-source a{color:var(--modra2);font-weight:600;text-decoration:none}
+  .pmodal-source a:hover{text-decoration:underline}
 
   /* ---------- UPOZORNĚNÍ ---------- */
   .crit{background:linear-gradient(150deg,#fff6f4,#fff);border:1px solid #f0ccc4;
@@ -278,6 +318,22 @@
     </ul>
   </div>
 </main>
+
+<div class="pmodal" id="pmodal" role="dialog" aria-modal="true" aria-labelledby="pmTitle">
+  <div class="pmodal-box" id="pmodalBox">
+    <button class="pmodal-close" id="pmClose" aria-label="Zavřít">✕</button>
+    <div class="pmodal-hero"><span class="ph">🏔️</span><img id="pmHero" alt="" referrerpolicy="no-referrer"></div>
+    <div class="pmodal-thumbs" id="pmThumbs"></div>
+    <div class="pmodal-body">
+      <span class="pmodal-day" id="pmDay"></span>
+      <h3 id="pmTitle"></h3>
+      <p class="psub" id="pmSub"></p>
+      <p class="desc" id="pmDesc"></p>
+      <p class="pmodal-source">Zdroj: <a id="pmWiki" href="#" target="_blank" rel="noopener">Wikipedia</a></p>
+    </div>
+  </div>
+</div>
+
 <footer>
   <span class="fjord">🏔️ ⛴️ 🎣</span>
   Sestaveno z vlastních podkladů k cestě · poslední aktualizace 2026
@@ -291,6 +347,9 @@
 // přímá http(s) adresa = použije se rovnou (např. fotky vozu z inzerátu).
 function unsplashUrl(id, px){
   return `https://images.unsplash.com/${id}?q=80&w=${px}&auto=format&fit=crop`;
+}
+function commonsUrl(file, px){
+  return `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(file)}?width=${px}`;
 }
 async function wikiUrls(title, px){
   try{
@@ -316,6 +375,7 @@ async function najdiFotku(defs, px){
   for(const def of defs){
     const urls = def.startsWith('u:') ? [unsplashUrl(def.slice(2), px)]
                : def.startsWith('w:') ? await wikiUrls(def.slice(2), px)
+               : def.startsWith('c:') ? [commonsUrl(def.slice(2), px)]
                : [def];
     for(const url of urls){
       if(await zkusObrazek(url)) return url;
@@ -359,8 +419,11 @@ const highlights=[
 const hg=document.getElementById('hgrid');
 highlights.forEach(h=>{
   const fig=document.createElement('figure');
+  fig.tabIndex=0;
+  fig.setAttribute('role','button');
+  fig.setAttribute('aria-label', `Zjistit víc o místě ${h.n}`);
   fig.innerHTML=`
-    <div class="himg"><span class="ph">🏔️</span><span class="day">${h.d}</span>
+    <div class="himg"><span class="ph">🏔️</span><span class="day">${h.d}</span><span class="zoom">🔍</span>
       <img alt="${h.n}" loading="lazy" referrerpolicy="no-referrer"></div>
     <figcaption><b>${h.n}</b><span>${h.s}</span></figcaption>`;
   hg.appendChild(fig);
@@ -370,6 +433,72 @@ highlights.forEach(h=>{
     img.onload=()=>img.classList.add('loaded');
     img.src=src;
   });
+  fig.addEventListener('click', ()=>otevriMisto(h, fig));
+  fig.addEventListener('keydown', e=>{
+    if(e.key==='Enter' || e.key===' '){ e.preventDefault(); otevriMisto(h, fig); }
+  });
+});
+
+// ---------- modal detailu místa ----------
+const pmodal=document.getElementById('pmodal'), pmodalBox=document.getElementById('pmodalBox'),
+      pmHero=document.getElementById('pmHero'), pmThumbs=document.getElementById('pmThumbs'),
+      pmDay=document.getElementById('pmDay'), pmTitle=document.getElementById('pmTitle'),
+      pmSub=document.getElementById('pmSub'), pmDesc=document.getElementById('pmDesc'),
+      pmWiki=document.getElementById('pmWiki'), pmClose=document.getElementById('pmClose');
+let pmReturnFocus=null, pmToken=0;
+
+function otevriMisto(h, trigger){
+  pmReturnFocus=trigger||null;
+  pmDay.textContent=h.d;
+  pmTitle.textContent=h.n;
+  pmSub.textContent=h.s;
+  pmDesc.textContent=h.desc||'';
+  if(h.wiki){ pmWiki.href=h.wiki; pmWiki.parentElement.style.display=''; }
+  else{ pmWiki.parentElement.style.display='none'; }
+  pmHero.classList.remove('loaded');
+  pmHero.removeAttribute('src');
+  pmThumbs.innerHTML='';
+  pmodal.classList.add('open');
+  document.body.style.overflow='hidden';
+  pmClose.focus();
+
+  const myToken=++pmToken;
+  const zdroje=(h.gallery&&h.gallery.length?h.gallery:[h.t]).slice(0,5);
+  let hlavniNastavena=false;
+  zdroje.forEach((cand, i)=>{
+    najdiFotku(cand, 1000).then(src=>{
+      if(!src || myToken!==pmToken) return;
+      const btn=document.createElement('button');
+      btn.type='button';
+      btn.setAttribute('aria-label', `Fotka ${i+1}`);
+      btn.innerHTML=`<img src="${src}" alt="" referrerpolicy="no-referrer">`;
+      btn.addEventListener('click', ()=>{
+        pmHero.classList.remove('loaded');
+        pmHero.onload=()=>pmHero.classList.add('loaded');
+        pmHero.src=src;
+        pmThumbs.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+      pmThumbs.appendChild(btn);
+      if(!hlavniNastavena){
+        hlavniNastavena=true;
+        pmHero.onload=()=>pmHero.classList.add('loaded');
+        pmHero.src=src;
+        btn.classList.add('active');
+      }
+    });
+  });
+}
+function zavriMisto(){
+  pmodal.classList.remove('open');
+  document.body.style.overflow='';
+  pmToken++;
+  if(pmReturnFocus) pmReturnFocus.focus();
+}
+pmClose.addEventListener('click', zavriMisto);
+pmodal.addEventListener('click', e=>{ if(e.target===pmodal) zavriMisto(); });
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape' && pmodal.classList.contains('open')) zavriMisto();
 });
 
 // fotky v dlaždicích rozcestníku (kandidáti oddělení svislítkem v data-foto)
