@@ -207,106 +207,145 @@ function fmtH(h){ const m=Math.round(h*60), hh=Math.floor(m/60), mm=m%60;
 const dny=[
  {den:'Den 1 · So',datum:'18. 7.',nadpis:'Odjezd z ČR → Německo',
   body:'Sraz posádky <b>~8:00 v Modřicích</b>; část týmu v <b>9:00 přebírá vůz v Rebešovicích</b> (proškolení, příprava). Po naložení posádky a zavazadel oficiální start <b>10:00–11:00 z Modřic</b>. Celodenní přejezd Německem (850–950 km) směr Dánsko. Večer dojezd za Hamburg / Flensburg, případně až do jižního Dánska. Nocleh dle Park4Night.',
-  mista:[{n:'Modřice',w:'Modřice',lang:'cs'},{n:'Hamburg',w:'Hamburg'}],
+  mista:[{n:'Modřice',foto:['cs:Modřice']},{n:'Hamburg',foto:['en:Hamburg']}],
   km:900,h:10,teplota:'Německo ~22 °C',pozn:'Před tankováním vypnout Trumu (Combi Off).'},
  {den:'Den 2 · Ne',datum:'19. 7.',nadpis:'Dánsko → večerní trajekt do Norska',
   body:'Dopoledne klidný přesun severním Dánskem (380–450 km). Zastávka <b>Ribe</b> (nejstarší dánské město) + nákup jídla a zásob. Odpoledne <b>Rubjerg Knude</b> — maják na putující duně — a maják <b>Hirtshals Fyr</b>. Příjezd do přístavu <b>Hirtshals</b> nejpozději ~19:00, <b>trajekt 20:45</b> do Norska (plavba ~2,5–3 h).',
-  mista:[{n:'Ribe',w:'Ribe'},{n:'Rubjerg Knude',w:'Rubjerg Knude'},{n:'Hirtshals',w:'Hirtshals'}],
+  mista:[{n:'Ribe',foto:['da:Ribe','en:Ribe']},{n:'Rubjerg Knude',foto:['da:Rubjerg Knude','en:Rubjerg Knude']},{n:'Hirtshals',foto:['da:Hirtshals','en:Hirtshals']}],
   km:420,h:6.5,teplota:'Dánsko ~18 °C',pozn:'Na trajektu vypnout plyn (předmrazit PET lahve). Monty zůstává v autě (volba „mazlíčci v autě"). V přístavu být s rezervou.'},
  {den:'Noc Ne/Po',datum:'19./20. 7.',nadpis:'Příjezd do Norska — Kristiansand',
   body:'Příjezd trajektem do <b>Kristiansandu</b> cca <b>23:30–00:00</b>. Krátký přesun mimo město, nocleh v okolí.',
-  mista:[{n:'Kristiansand',w:'Kristiansand'}],
+  mista:[{n:'Kristiansand',foto:['en:Kristiansand']}],
   km:30,h:0.5,teplota:'~17 °C (noc)',pozn:'Pozor: Kristiansand (jih), ne KristiansUnd!'},
  {den:'Den 3 · Po',datum:'20. 7.',nadpis:'Stavanger → Preikestolen',
   body:'Dopoledne přesun pobřežní silnicí (240–260 km). Zastávka ve <b>Stavangeru</b> — Gamle Stavanger (bílé dřevěné domky), barevná ulička <b>Fargegaten</b> (Øvre Holmegate) a přístav (parkoviště Sandviga Motorhome 30 NOK/h, platba přes EasyPark, 10 min do centra). Odjezd nejpozději 13–14 h, k parkovišti Preikestolen ~40 km (45–60 min). Odpoledne výstup na <b>Preikestolen</b> — 8 km tam i zpět, ~500 m převýšení, 4–5 h; skalní plošina 604 m nad Lysefjordem. Parking Preikestolen 1 — 275 NOK/den. Noc v okolí Lysefjordu.',
-  mista:[{n:'Stavanger',w:'Stavanger'},{n:'Preikestolen',w:'Preikestolen'}],
+  mista:[{n:'Stavanger',foto:['c:File:Gamle Stavanger.jpg','en:Gamle Stavanger','en:Stavanger','u:photo-1501785888041-af3ef285b470']},
+         {n:'Preikestolen',foto:['c:File:Lysefjorden - Preikestolen in August 08.JPG','en:Preikestolen','en:Lysefjord','u:photo-1527004013197-933c4bb611b3']}],
   km:250,h:5,teplota:'~16 °C',pozn:'Noc: kousek je area zdarma (rychle plná, lze napustit vodu / vypustit WC), poblíž placené hezčí místo (voda ano, vypouštění WC ne). Při škaredém počasí prohodit: Po Kristiansand+Stavanger, Út ráno Preikestolen a přesun do Oddy.'},
  {den:'Den 4 · Út',datum:'21. 7.',nadpis:'Låtefossen + Odda + Bondhusvatnet',
   body:'Přejezd hlouběji do západního Norska (260–320 km). Zastávka u dvojitého vodopádu <b>Låtefossen</b> (hned u silnice, ~15–20 min). 🛒 Nákup zásob v <b>Oddě</b> (KIWI / REMA 1000 / Coop Extra) — poslední větší město před horami. Výlet k <b>Bondhusvatnet</b> — tyrkysové ledovcové jezero pod Folgefonnou, ~2+2 km (od kempu 3,5–4 km), 1,5–2 h v klidu, vhodné i pro psa. Parking Bondhusdalen 125 NOK, nebo auto nechat rovnou v kempu.',
-  mista:[{n:'Låtefossen',w:'Låtefossen'},{n:'Bondhusvatnet',w:'Bondhusvatnet'},{n:'Odda',w:'Odda'}],
+  mista:[{n:'Låtefossen',foto:['no:Låtefossen','en:Låtefossen']},{n:'Bondhusvatnet',foto:['no:Bondhusvatnet','en:Bondhusvatnet']},{n:'Odda',foto:['no:Odda','en:Odda']}],
   km:290,h:5,teplota:'~16 °C',pozn:'Noc: Sundal Camping / Mauranger (320 NOK, sprchy a zázemí, blízko jezera, ~40 min na Trolltunga parking).'},
  {den:'Den 5 · St',datum:'22. 7.',nadpis:'Trolltunga — největší den cesty',
   body:'Budíček <b>5:00–5:30</b>, z kempu na parkoviště Skjeggedal <b>P2</b> ~40 min — vyrazit <b>nejpozději v 6:00!</b> Parking P2 500 NOK (mýtné + parkování). Shuttle P2→P3 ušetří ~3,5 km prudkého stoupání. Celodenní túra <b>Trolltunga</b> — 27–28 km, převýšení 800–1000 m, celkem 10–14 h; skalní jazyk 700 m nad jezerem Ringedalsvatnet. Návrat večer, spaní po cestě k Tvindefossen.',
-  mista:[{n:'Trolltunga',w:'Trolltunga'}],
+  mista:[{n:'Trolltunga',foto:['c:File:Trolltunga 2.jpg','en:Trolltunga','u:photo-1502786129293-79981df4e689']}],
   km:0,h:0,teplota:'~13 °C',pozn:'Shuttle zamluvit předem (150 NOK tam, 100 NOK zpět na místě — trolltunganorway.com). Sledovat počasí večer i ráno — nahoře není zázemí a mlha přijde během minut. Cestou doplnit vodu na „denním" parkovišti — další noc nejspíš v přírodě bez vody.'},
  {den:'Den 6 · Čt',datum:'23. 7.',nadpis:'Fjordy + Aurland (rybaření)',
   body:'Klidnější den po Trolltunze (160–200 km, 3–3,5 h). Zastávka <b>Tvindefossen</b> — vodopád padající ze 110 m hned u silnice. Vyhlídka <b>Stegastein</b> — plošina 30 m dlouhá, <b>650 m nad Aurlandsfjordem</b>. Odpoledne <b>Aurland</b> — 🎣 rybaření + relax u fjordu. Spaní po cestě v přírodě (vodu načerpat předem!) nebo až ve <b>Fjærlandu</b> (kemp, sprchy a praní za poplatek).',
-  mista:[{n:'Tvindefossen',w:'Tvindefossen'},{n:'Stegastein',w:'Stegastein'},{n:'Aurland',w:'Aurland'},{n:'Fjærland',w:'Fjærland'}],
+  mista:[{n:'Tvindefossen',foto:['no:Tvindefossen','en:Tvindefossen']},{n:'Stegastein',foto:['no:Stegastein','en:Stegastein']},
+         {n:'Aurland',foto:['no:Aurland','en:Aurland']},{n:'Fjærland',foto:['no:Fjærland','en:Fjærland']}],
   km:180,h:3.2,teplota:'~17 °C',pozn:'Cesta na Stegastein je úzká a klikatá — s obytkou opatrně.'},
  {den:'Den 7 · Pá',datum:'24. 7.',nadpis:'Ledovce + jezera',
   body:'Přejezd do ledovcové krajiny (180–240 km, 3–4 h). Krátká zastávka u ledovce <b>Bøyabreen</b> (z Fjærlandu jen ~10 min, led sahá až do údolí). <b>Lovatnet</b> — sytě tyrkysové jezero, procházka a klid u vody. Dle času a nálady <b>Kjenndalsbreen</b> — snadno přístupný ledovec s minimem turistů. Noc v kempu přímo u jezera.',
-  mista:[{n:'Bøyabreen',w:'Bøyabreen'},{n:'Lovatnet',w:'Lovatnet'},{n:'Kjenndalsbreen',w:'Kjenndalsbreen'}],
+  mista:[{n:'Bøyabreen',foto:['no:Bøyabreen','en:Bøyabreen']},
+         {n:'Lovatnet',foto:['c:File:Lovatnet, Loen, Stryn, Norwegen.jpg','en:Lovatnet','en:Loen','u:photo-1506744038136-46273834b3fb']},
+         {n:'Kjenndalsbreen',foto:['no:Kjenndalsbreen','en:Kjenndalsbreen']}],
   km:210,h:3.5,teplota:'~17 °C',pozn:'Kemp u jezera 400–500 NOK — sprchy, voda i pračka. 🧺 Ideální den na vyprání prádla a reset před dalšími horami.'},
  {den:'Den 8 · So',datum:'25. 7.',nadpis:'Geirangerfjord',
   body:'Cesta Lovatnet → <b>Dalsnibba</b> (vyhlídka ~1 500 m n. m., často sníh i v létě) → <b>Flydalsjuvet</b> (nejslavnější pohled na Geiranger) → Geiranger. Plavba <b>Geirangerfjordem</b> (UNESCO, vodopád Sedm sester) — ideálně hybridní loď 12:30 (2 h, 630 NOK) nebo klasická (75 min, 610 NOK); alternativní časy 9:00 / 11:00 / 13:00 / 16:00 / 17:30. Monty smí na palubu. Noc ideálně až v Ålesundu (parkoviště ~375 NOK).',
-  mista:[{n:'Dalsnibba',w:'Dalsnibba'},{n:'Geirangerfjord',w:'Geirangerfjorden'}],
+  mista:[{n:'Dalsnibba',foto:['c:File:Dalsnibba; Blick auf Geiranger 1 Norwegen.JPG','en:Dalsnibba','u:photo-1483347756197-71ef80e95f73']},
+         {n:'Geirangerfjord',foto:['c:File:Seven Sisters Waterfall in Geirangerfjord, Norway.JPG','en:Geirangerfjord','en:Geirangerfjorden','u:photo-1513519245088-0e12902e35ca']}],
   km:145,h:3.7,teplota:'~17 °C',pozn:'Plavbu rezervovat předem (visitgeiranger.com). Parkování v Geirangeru: obytňák 340 NOK + 40 NOK/os., sprcha 25 NOK — často plno („camping full" = nezajíždět); vedlejší kemp obytňáky nebere. Před spaním doplnit vodu.'},
  {den:'Den 9 · Ne',datum:'26. 7.',nadpis:'Ålesund — město na ostrovech',
   body:'Celodenní program v <b>Ålesundu</b> — secesní město rozeseté na ostrovech. Vyhlídka <b>Aksla</b> (~400 schodů z centra, panorama města a souostroví) a klidnější <b>Sukkertoppen</b> (3,5 km tam, divočejší výhled; parkování Ytre Hessen). Procházka po nábřeží mezi barevnými domy. Večer přesun směr Snillfjord, spaní v přírodě dle Park4Night (30–80 km za městem).',
-  mista:[{n:'Ålesund',w:'Ålesund'}],
+  mista:[{n:'Ålesund',foto:['c:File:Vista de Ålesund desde Aksla, Noruega, 2019-09-01, DD 16.jpg','en:Ålesund','u:photo-1469474968028-56623f02e42e']}],
   km:200,h:4.5,teplota:'~16 °C',pozn:'V Ålesundu doplnit vodu. Parkování pro obytňák ~375 NOK/24 h.'},
  {den:'Den 10 · Po',datum:'27. 7.',nadpis:'Atlantic Ocean Road → Snillfjord',
   body:'Přesun na severovýchod (300–380 km, 5–7 h se zastávkami). Průjezd <b>Atlantic Ocean Road</b> (Atlanterhavsvegen) — série mostů mezi ostrůvky nad otevřeným oceánem, jedna z nejikoničtějších silnic světa (za škaredého počasí vynechat). Odpoledne příjezd do <b>Snillfjordu</b> — kemp, 🎣 rybaření, procházky, 🧺 praní a nákup zásob. První opravdu pomalý den.',
-  mista:[{n:'Atlantic Ocean Road',w:'Atlantic Ocean Road'},{n:'Snillfjord',w:'Snillfjord'}],
+  mista:[{n:'Atlantic Ocean Road',foto:['no:Atlanterhavsvegen','en:Atlantic Ocean Road']},{n:'Snillfjord',foto:['no:Snillfjord','en:Snillfjord']}],
   km:340,h:6,teplota:'~16 °C'},
  {den:'Den 11 · Út',datum:'28. 7.',nadpis:'Snillfjord → Jotunheimen',
   body:'Dopoledne ještě pohoda u fjordu — rybaření, káva s výhledem, doplnění vody a příprava vozu na hory. Odpoledne přejezd do <b>Jotunheimen</b>, nejvyššího pohoří Norska (340–380 km, 5–6 h). Noc co nejblíže <b>Gjendesheim</b> / Bygdin (Park4Night) — zkrátí ranní přejezd na túru.',
-  mista:[{n:'Jotunheimen',w:'Jotunheimen'},{n:'Gjende',w:'Gjende'}],
+  mista:[{n:'Jotunheimen',foto:['c:File:Jotunheimen mountains near Memurubu.jpg','en:Jotunheimen','en:Galdhøpiggen','u:photo-1506905925346-21bda4d32df4']},
+         {n:'Gjende',foto:['no:Gjende','en:Gjende']}],
   km:360,h:5.5,teplota:'~14 °C',pozn:'Večer může teplota klesnout pod 5 °C. Dny 12 a 13 lze podle počasí prohodit — hezčí den věnovat Besseggenu.'},
  {den:'Den 12 · St',datum:'29. 7.',nadpis:'Besseggen — loď + Bandet',
   body:'Parking <b>Reinsvangen</b> (Gjendesheim) — <b>rezervace na SPZ předem!</b> Příjezd do 7:30–8:00 (rychle se plní), k lodi ~30 min pěšky. Hlavní varianta: 🚤 loď <b>Gjendesheim → Memurubu</b> (20–30 min, koupit dopředu; např. 7:45, 9:30, 10:20), pak túra <b>Memurubu → Bandet</b> — 3,5 km jedním směrem, ~400–500 m převýšení, 1,5–2 h tam. Z Bandet výhled na zelené <b>Gjende</b> a modré <b>Bessvatnet</b> vedle sebe — TOP výhled Norska, vhodné i pro dítě a psa. Návrat stejnou cestou + loď zpět (např. 14:35, 16:55, 17:55). Noc směrem Bygdin.',
-  mista:[{n:'Besseggen',w:'Besseggen'},{n:'Gjende',w:'Gjende'}],
+  mista:[{n:'Besseggen',foto:['c:File:Leirungsdalen from Besseggen.jpg','en:Besseggen','en:Gjende','u:photo-1531366936337-7c912a4589a7']},
+         {n:'Gjende',foto:['no:Gjende','en:Gjende']}],
   km:60,h:1.2,teplota:'~12 °C',pozn:'Loď i parking koupit dopředu (gjende.no, visitgjende.onepark.no). Alternativa bez lodi: z Gjendesheim na Veslfjellet (1 743 m) a zpět — 13–14 km, 700–800 m, 6–7 h, bez exponovaného hřebene. Plán B za špatného počasí: jen plavba tam a zpět + procházky u jezera. Pocitově může být jen 3–6 °C.'},
  {den:'Den 13 · Čt',datum:'30. 7.',nadpis:'Bygdin — poslední horský den',
   body:'Flexibilní den u jezera <b>Bygdin</b>. Hlavní varianta: <b>Synshorn (1 475 m) → hřeben → Heimre Fagerdalshøe (1 510 m)</b> — 10–13 km, ~600 m převýšení, 3–5 h, klidné hory bez davů s výhledy na Bygdin. Lehčí alternativa: <b>Bitihorn (1 607 m)</b> — 9,5 km, 3–4 h. Za nepočasí procházky podél jezera a odpočinek. Noc u Bygdin nebo kousek na jih.',
-  mista:[{n:'Bitihorn',w:'Bitihorn'},{n:'Bygdin',w:'Bygdin'}],
+  mista:[{n:'Bitihorn',foto:['no:Bitihorn','en:Bitihorn']},{n:'Bygdin',foto:['no:Bygdin','en:Bygdin']}],
   km:0,h:0,teplota:'~13 °C',pozn:'Ranní okno bývá pro túru nejlepší; na hřebenech vítr, pocitově 4–8 °C. Den 12 a 13 lze prohodit.'},
  {den:'Den 14 · Pá',datum:'31. 7.',nadpis:'Přesun na jih → Malmö',
   body:'Začátek návratu — 750–900 km, 10–12 h jízdy. Z Bygdin do <b>Osla</b> ~3,5 h; zastávku v Oslu spíš vynechat nebo jen projet (obytňák se tam špatně parkuje, časová ztráta). Průjezd Švédskem po E6 směr <b>Malmö</b>. Noc Malmö / okolí, případně už Dánsko.',
-  mista:[{n:'Oslo',w:'Oslo'},{n:'Malmö',w:'Malmö'}],
+  mista:[{n:'Oslo',foto:['en:Oslo']},{n:'Malmö',foto:['en:Malmö']}],
   km:830,h:11,teplota:'Oslo ~22 °C',pozn:'Velmi dlouhá jízda — střídat řidiče.'},
  {den:'Den 15 · So',datum:'1. 8.',nadpis:'Návratová část 1 — přes mosty',
   body:'Celodenní přejezd: <b>Švédsko → Dánsko → Německo</b>, 10–12 h. Mosty <b>Øresund</b> (s programem Øresundgo 364 DKK za motorhome 6–10 m) a <b>Storebælt</b> (645 DKK, obytňák do 10 m) — <b>koupit online dopředu!</b> Noc Německo / u hranic DE–CZ dle únavy.',
-  mista:[{n:'Malmö',w:'Malmö'}],
+  mista:[{n:'Malmö',foto:['en:Malmö']}],
   km:800,h:9,teplota:'~21 °C'},
  {den:'Den 16 · Ne',datum:'2. 8.',nadpis:'Návrat domů',
   body:'Poslední etapa (~350–450 km, ~5 h): Německo → ČR → <b>Modřice</b>. Příjezd do 12:00 — vyložení a vrácení obytného vozu v <b>Rebešovicích</b> (nejpozději do 13:00). Konec expedice — 16 dní, 5 zemí, ~5 400 km. 🏁',
-  mista:[{n:'Modřice',w:'Modřice',lang:'cs'}],
+  mista:[{n:'Modřice',foto:['cs:Modřice']}],
   km:400,h:5,teplota:'Brno ~25 °C'},
 ];
 
-const fotoCache={};
-function fetchFoto(img){
-  const w=img.dataset.w, lang=img.dataset.lang||'en';
-  if(!w) return;
-  const key=lang+':'+w;
-  if(key in fotoCache){ if(fotoCache[key]) img.src=fotoCache[key]; return; }
-  fetch(`https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(w)}`)
-    .then(r=>r.ok?r.json():null)
-    .then(d=>{
-      const o=d&&d.originalimage, t=d&&d.thumbnail;
-      let s=t&&t.source||'';
-      // známe-li originál (JPEG fotku), vyžádáme si ostřejší náhled na míru
-      if(o&&t&&/\.jpe?g$/i.test(o.source.split('?')[0]))
-        s = o.width>640 ? t.source.replace(/\/\d+px-/,'/640px-') : o.source;
-      fotoCache[key]=s||''; if(s) img.src=s;
-    })
-    .catch(()=>{fotoCache[key]='';});
+// Fotky míst — každé místo má víc kandidátů (Wikipedia Commons, Unsplash,
+// Wikipedia ve víc jazycích) a zkouší se popořadě; bere se první, který se
+// opravdu podaří načíst. Malá norská vesnice často nemá anglický článek
+// s fotkou (jen erb/mapu, nebo nic) — proto záloha přes "no:"/"da:" Wikipedii.
+function unsplashUrl(id, px){ return `https://images.unsplash.com/${id}?q=80&w=${px}&auto=format&fit=crop`; }
+function commonsUrl(file, px){ return `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(file)}?width=${px}`; }
+const wikiCache={};
+async function wikiUrls(lang, title, px){
+  const key=lang+':'+title;
+  if(key in wikiCache) return wikiCache[key];
+  try{
+    const r=await fetch(`https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`);
+    if(!r.ok) return (wikiCache[key]=[]);
+    const d=await r.json();
+    const o=d.originalimage, t=d.thumbnail&&d.thumbnail.source;
+    if(!t) return (wikiCache[key]=[]);
+    // známe-li originál (JPEG fotku), vyžádáme si ostřejší náhled na míru
+    let big=t;
+    if(o&&/\.jpe?g$/i.test(o.source.split('?')[0]))
+      big = o.width>px ? t.replace(/\/\d+px-/,'/'+px+'px-') : o.source;
+    return (wikiCache[key] = big!==t ? [big,t] : [t]);
+  }catch(e){ return (wikiCache[key]=[]); }
+}
+function zkusObrazek(url){
+  return new Promise(res=>{
+    const i=new Image();
+    const konec=v=>{clearTimeout(tm);res(v)};
+    const tm=setTimeout(()=>konec(false), 10000);
+    i.onload=()=>konec(true); i.onerror=()=>konec(false);
+    i.referrerPolicy='no-referrer'; i.src=url;
+  });
+}
+async function najdiFotku(defs, px){
+  for(const def of defs){
+    let urls;
+    if(def.startsWith('u:')) urls=[unsplashUrl(def.slice(2), px)];
+    else if(def.startsWith('c:')) urls=[commonsUrl(def.slice(2), px)];
+    else{
+      const m=/^([a-z]{2}):(.+)$/.exec(def);
+      urls = m ? await wikiUrls(m[1], m[2], px) : [def];
+    }
+    for(const url of urls){
+      if(await zkusObrazek(url)) return url;
+    }
+  }
+  return null;
+}
+function fetchFoto(img, mista){
+  const m=mista[+img.dataset.mi];
+  if(!m||!m.foto) return;
+  najdiFotku(m.foto, 640).then(src=>{ if(src) img.src=src; });
 }
 (function renderDny(){
   const cont=document.getElementById('dny');
   dny.forEach(d=>{
     const kmTxt = d.km ? `${d.km} km` : 'bez velkého přejezdu';
     const hChip = d.h ? ' · '+fmtH(d.h) : '';
-    const fotky = d.mista.map(m=>
-      `<figure><img class="wimg" data-w="${m.w}" data-lang="${m.lang||'en'}" alt="${m.n}" referrerpolicy="no-referrer"><figcaption>${m.n}</figcaption></figure>`).join('');
+    const fotky = d.mista.map((m,i)=>
+      `<figure><img class="wimg" data-mi="${i}" alt="${m.n}" referrerpolicy="no-referrer"><figcaption>${m.n}</figcaption></figure>`).join('');
     const el=document.createElement('div'); el.className='den';
-    const m0=d.mista[0];
     el.innerHTML=`
       <div class="hd">
         <div class="dt">${d.den}<small>${d.datum}</small></div>
-        <span class="hthumb"><img class="wimg" data-w="${m0.w}" data-lang="${m0.lang||'en'}"
-             alt="" referrerpolicy="no-referrer"></span>
+        <span class="hthumb"><img class="wimg" data-mi="0" alt="" referrerpolicy="no-referrer"></span>
         <div class="tt"><b>${d.nadpis}</b>
           <div class="chips">
             <span class="chip">🚗 ${kmTxt}${hChip}</span>
@@ -327,12 +366,12 @@ function fetchFoto(img){
       </div>`;
     el.querySelector('.hd').onclick=()=>{
       const open=el.classList.toggle('open');
-      if(open) el.querySelectorAll('.fotky img').forEach(img=>{ if(!img.getAttribute('src')) fetchFoto(img); });
+      if(open) el.querySelectorAll('.fotky img').forEach(img=>{ if(!img.getAttribute('src')) fetchFoto(img, d.mista); });
     };
     cont.appendChild(el);
     // malá fotka místa přímo v hlavičce dne
     const ht=el.querySelector('.hthumb img');
-    if(ht){ ht.addEventListener('load',()=>ht.classList.add('on')); fetchFoto(ht); }
+    if(ht){ ht.addEventListener('load',()=>ht.classList.add('on')); fetchFoto(ht, d.mista); }
   });
 })();
 
