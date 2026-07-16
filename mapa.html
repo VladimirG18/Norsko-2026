@@ -7,6 +7,8 @@
 <link rel="icon" href="favicon.ico" sizes="48x48 32x32 16x16">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<script src="offline.js" defer></script>
 <meta name="theme-color" content="#0a2c49">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -161,6 +163,8 @@ const segments=[
  {nazev:'Malmö → Modřice (přes mosty)', color:'#2ecc71', mode:'drive', kmFallback:1150, hFallback:13.5,
   coords:[[55.60,13.00],[55.68,12.57],[55.34,11.03],[55.40,10.39],[55.49,9.47],[54.04,9.92],[53.55,10.00],[52.52,13.40],[51.05,13.74],[50.08,14.44],[49.13,16.60]]},
 ];
+// Zpřístupnit trasu widgetu offline režimu (stahování mapových dlaždic).
+window.NORSKO_MAP_DATA={stops,segments};
 
 const map=L.map('map');
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{

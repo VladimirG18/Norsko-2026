@@ -1,0 +1,16 @@
+{
+  "name": "Norsko 2026 — průvodce cestou",
+  "short_name": "Norsko 2026",
+  "description": "Průvodce cestou obytným vozem po Norsku — itinerář, mapa, checklisty, kalkulačka a výdaje. Funguje i offline.",
+  "lang": "cs",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6fafd",
+  "theme_color": "#0a2c49",
+  "icons": [
+    { "src": "ikona-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "ikona-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "ikona-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

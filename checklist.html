@@ -8,6 +8,8 @@
 <link rel="icon" href="favicon.ico" sizes="48x48 32x32 16x16">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<script src="offline.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -283,10 +285,19 @@ function localBackend(){
 // ---- sdílený Firebase backend ----
 async function firebaseBackend(){
   const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
-  const { getFirestore, collection, doc, setDoc, addDoc, updateDoc, deleteDoc, onSnapshot, getDocs }
+  const { getFirestore, initializeFirestore, persistentLocalCache, persistentMultipleTabManager, enableNetwork, disableNetwork, collection, doc, setDoc, addDoc, updateDoc, deleteDoc, onSnapshot, getDocs }
     = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
   const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+  // Offline záloha dat: Firestore si drží kopii v IndexedDB zařízení, takže
+  // sdílená data fungují i bez signálu a změny se odešlou po připojení.
+  let db;
+  try {
+    db = initializeFirestore(app, { localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }) });
+  } catch (e) {
+    console.warn('Offline persistence není k dispozici:', e);
+    db = getFirestore(app);
+  }
+  if (window.NorskoOffline) NorskoOffline.registerFirestore({ db, enableNetwork, disableNetwork });
   const col = collection(db, COLLECTION);
 
   const snap0 = await getDocs(col);
@@ -299,6 +310,7 @@ async function firebaseBackend(){
   return {
     start(){
       onSnapshot(col, snap=>{
+        if (window.NorskoOffline) NorskoOffline.onData(snap.metadata.fromCache, statusEl);
         items = snap.docs.map(d=>({id:d.id, ...d.data()})).sort((a,b)=>(a.order||0)-(b.order||0));
         render();
       }, err=>{
