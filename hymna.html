@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a2c49">
+<title>Norsko 2026 — hymna cesty</title>
+<link rel="icon" href="favicon.ico" sizes="48x48 32x32 16x16">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<script src="offline.js" defer></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --modra:#0c3a5f; --modra2:#1a6ea8; --led:#eef4f9;
+    --text:#182634; --slabe:#5d6e7d; --akcent:#c0392b;
+    --aurora:#2fbf8f; --line:#dfe9f2;
+    --shadow:0 1px 2px rgba(12,58,95,.05),0 8px 24px rgba(12,58,95,.09);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Manrope',-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+       color:var(--text);background:linear-gradient(180deg,#f6fafd 0%,var(--led) 420px);line-height:1.55}
+
+  header.hero{position:relative;color:#fff;text-align:center;overflow:hidden;
+       background:linear-gradient(160deg,#0a2c49 0%,#14507e 55%,#1a6ea8 100%)}
+  .hero-in{position:relative;padding:52px 20px 68px;max-width:760px;margin:0 auto}
+  .flag{font-size:2.4rem;display:block;margin-bottom:10px;filter:drop-shadow(0 3px 8px rgba(0,0,0,.35))}
+  .hero-in h1{margin:0 0 6px;font-size:clamp(1.9rem,5.5vw,2.7rem);font-weight:800;letter-spacing:-.02em;
+       text-shadow:0 2px 18px rgba(0,0,0,.35)}
+  .hero-in p{margin:0;font-size:1.06rem;font-weight:600;opacity:.92;text-shadow:0 1px 10px rgba(0,0,0,.4)}
+  .hero-ridge{position:absolute;left:0;right:0;bottom:-1px;width:100%;height:60px;display:block}
+  .back{position:absolute;left:14px;top:14px;z-index:3;color:#dbeafc;text-decoration:none;
+       font-size:.9rem;font-weight:700;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
+       padding:6px 13px;border-radius:999px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+  .back:hover{background:rgba(255,255,255,.24);color:#fff}
+
+  main{max-width:720px;margin:-34px auto 48px;padding:0 16px;position:relative}
+  .intro{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 20px;
+       box-shadow:var(--shadow);color:var(--slabe);font-size:.94rem;margin-bottom:18px}
+  .intro b{color:var(--modra)}
+
+  .player{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px 20px 22px;
+       box-shadow:var(--shadow);margin-bottom:16px;position:relative;overflow:hidden}
+  .player::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;
+       background:linear-gradient(180deg,var(--aurora),var(--modra2))}
+  .player .num{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;
+       border-radius:9px;background:var(--led);color:var(--modra2);font-weight:800;font-size:.95rem;margin-bottom:8px}
+  .player h2{margin:0 0 3px;font-size:1.18rem;font-weight:800;color:var(--modra);letter-spacing:-.01em}
+  .player .popis{margin:0 0 14px;color:var(--slabe);font-size:.88rem}
+  .player audio{width:100%;display:block;margin-top:6px}
+  .player .chybi{display:none;margin-top:10px;background:#fff6f4;border:1px solid #f0ccc4;color:#9a3b2c;
+       border-radius:10px;padding:10px 13px;font-size:.85rem}
+  .player.nedostupna .chybi{display:block}
+  .player.nedostupna audio{opacity:.5}
+
+  .lyrics{background:#fff;border:1px solid var(--line);border-radius:16px;padding:6px 20px;
+       box-shadow:var(--shadow);margin-top:6px}
+  .lyrics summary{cursor:pointer;font-weight:800;color:var(--modra);padding:12px 0;list-style:none;
+       display:flex;align-items:center;gap:8px}
+  .lyrics summary::-webkit-details-marker{display:none}
+  .lyrics summary::before{content:"🎼"}
+  .lyrics .text{white-space:pre-wrap;color:var(--text);font-size:.94rem;line-height:1.7;padding:0 0 16px}
+  .lyrics .text.prazdny{color:var(--slabe);font-style:italic}
+
+  footer{text-align:center;color:var(--slabe);font-size:.82rem;padding:26px 16px 40px}
+  footer .fjord{display:block;font-size:1.1rem;margin-bottom:6px;opacity:.7}
+</style>
+</head>
+<body>
+<header class="hero">
+  <a class="back" href="index.html">← rozcestník</a>
+  <svg class="hero-ridge" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0,44 L130,26 260,46 390,18 520,48 660,30 800,50 930,22 1060,44 1190,16 1320,42 1440,30 L1440,60 0,60 Z" fill="#f6fafd"/>
+  </svg>
+  <div class="hero-in">
+    <span class="flag">🎵</span>
+    <!-- NÁZEV HYMNY: klidně přepiš -->
+    <h1>Hymna cesty</h1>
+    <p>Naše písnička na cestu do Norska — ve dvou provedeních</p>
+  </div>
+</header>
+
+<main>
+  <div class="intro">
+    🎧 Pusť si hymnu tady na webu. Když si stáhneš <b>offline zálohu</b> (tlačítko 🛰️ dole),
+    hraje i <b>bez signálu</b> — třeba v tunelu nebo hluboko ve fjordech.
+  </div>
+
+  <!--
+    JAK NAHRÁT NAHRÁVKY:
+    Do složky  hymna/  nahraj dva soubory přesně s těmito názvy:
+        hymna/hymna-1.mp3
+        hymna/hymna-2.mp3
+    (formát MP3 — přehraje ho každý telefon i počítač). Víc není potřeba,
+    přehrávače níže je najdou samy a offline režim je zahrne do zálohy.
+    Popisky provedení a text písně můžeš upravit v tomto souboru.
+  -->
+
+  <section class="player" id="player1">
+    <span class="num">1</span>
+    <!-- POPISEK 1. PROVEDENÍ: klidně přepiš -->
+    <h2>První provedení</h2>
+    <p class="popis">Naše hymna cesty</p>
+    <audio controls preload="none" src="hymna/hymna-1.mp3"></audio>
+    <div class="chybi">🎵 Nahrávka zatím není nahraná. Nahraj soubor <b>hymna/hymna-1.mp3</b> do webu a objeví se tu.</div>
+  </section>
+
+  <section class="player" id="player2">
+    <span class="num">2</span>
+    <!-- POPISEK 2. PROVEDENÍ: klidně přepiš -->
+    <h2>Druhé provedení</h2>
+    <p class="popis">Alternativní verze</p>
+    <audio controls preload="none" src="hymna/hymna-2.mp3"></audio>
+    <div class="chybi">🎵 Nahrávka zatím není nahraná. Nahraj soubor <b>hymna/hymna-2.mp3</b> do webu a objeví se tu.</div>
+  </section>
+
+  <details class="lyrics">
+    <summary>Text písně</summary>
+    <!-- TEXT PÍSNĚ: smaž třídu "prazdny" a nahraď text -->
+    <div class="text prazdny">Text zatím není doplněný — přidá se sem.</div>
+  </details>
+</main>
+
+<footer>
+  <span class="fjord">🎵 ⛴️ 🏔️</span>
+  Hymna expedice Norsko 2026
+</footer>
+
+<script>
+// Ověřit dostupnost nahrávek: když soubor ještě není nahraný, ukázat u přehrávače
+// vysvětlivku místo mlčenlivě nefunkčního tlačítka. Online se zkusí lehký dotaz,
+// offline se spolehneme na chybovou událost přehrávače.
+document.querySelectorAll('.player').forEach(function (box) {
+  var audio = box.querySelector('audio');
+  if (!audio) return;
+  // přehrávač sám nahlásí chybu (např. při pokusu o přehrání chybějícího souboru)
+  audio.addEventListener('error', function () { box.classList.add('nedostupna'); });
+  // preventivní kontrola, jen když jsme online (šetrný dotaz bez stažení celého souboru)
+  if (navigator.onLine) {
+    fetch(audio.getAttribute('src'), { method: 'HEAD' })
+      .then(function (r) { if (!r.ok) box.classList.add('nedostupna'); })
+      .catch(function () { /* offline / neznámo — necháme na přehrávači */ });
+  }
+});
+</script>
+</body>
+</html>

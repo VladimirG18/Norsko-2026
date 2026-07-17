@@ -15,6 +15,7 @@ const CACHE_DATA     = `${VERZE}-data`;         // Wikipedia souhrny, OSRM trasy
 const CACHE_OBRAZKY  = `${VERZE}-obrazky`;      // fotky z CORS zdrojů (Unsplash, Wikimedia)
 const CACHE_OBRAZKY_EXT = `${VERZE}-obrazky-ext`; // fotky z ostatních webů (opaque)
 const CACHE_DLAZDICE = `${VERZE}-dlazdice`;     // mapové dlaždice OSM
+const CACHE_MEDIA    = `${VERZE}-media`;        // zvuk (hymna cesty) — s podporou Range
 
 const MAX_DATA = 300;          // max záznamů v datové cache
 const MAX_OBRAZKY = 400;       // max fotek (CORS)
@@ -37,6 +38,7 @@ const LOKALNI = [
   './vydaje.html',
   './posadka.html',
   './poznamky.html',
+  './hymna.html',
   './offline.js',
   './manifest.webmanifest',
   './favicon.ico',
@@ -66,6 +68,15 @@ const CDN = [
   'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js',
   'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js',
   'https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap',
+];
+
+// Zvukové soubory (hymna cesty). Záměrně NEJSOU v přísném addAll při instalaci —
+// kdyby ještě nebyly nahrané, nesmí to shodit celou zálohu. Stáhnou se
+// best-effort v rámci plné synchronizace do samostatné media cache a přehrávají
+// se cache-first s podporou Range požadavků (viz obslouzMedia).
+const MEDIA = [
+  './hymna/hymna-1.mp3',
+  './hymna/hymna-2.mp3',
 ];
 
 // Zdroje fotek, které posílají CORS hlavičky — lze je cachovat „průhledně"
@@ -295,6 +306,55 @@ async function obslouzObrazek(req, url) {
   return net;
 }
 
+// Zvuk (hymna cesty): cache-first s podporou Range požadavků. Přehrávače,
+// hlavně Safari, si audio berou po částech (HTTP 206 Partial Content) kvůli
+// přetáčení. Do Cache API ale nelze uložit 206 — uložíme proto vždy celou
+// odpověď (200) a částečné odpovědi sestavíme z ní. Bez toho offline
+// přehrávání nebo posun v nahrávce na iOS zlobí.
+async function obslouzMedia(req, url) {
+  const cache = await caches.open(CACHE_MEDIA);
+  const rozsah = req.headers.get('range');
+  let plna = await cache.match(url.href);
+  if (!plna && !(await jeRucniOffline())) {
+    try {
+      // stáhnout vždy celé (bez hlavičky Range), ať jde odpověď uložit
+      const net = await fetch(new Request(url.href, { mode: 'same-origin' }));
+      if (net && net.ok && net.status === 200) {
+        await cache.put(url.href, net.clone());
+        plna = net;
+      } else if (!rozsah) {
+        return net;
+      }
+    } catch (e) { /* offline a nemáme v cache */ }
+  }
+  if (!plna) {
+    return new Response('Nahrávka zatím není k dispozici offline.', {
+      status: 504, headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
+  }
+  if (!rozsah) return plna.clone();
+
+  // sestavit 206 Partial Content z celé odpovědi
+  const data = await plna.clone().arrayBuffer();
+  const celkem = data.byteLength;
+  const m = /bytes=(\d*)-(\d*)/.exec(rozsah) || [];
+  let start = m[1] ? parseInt(m[1], 10) : 0;
+  let end = m[2] ? parseInt(m[2], 10) : celkem - 1;
+  if (!isFinite(start) || start < 0) start = 0;
+  if (!isFinite(end) || end >= celkem) end = celkem - 1;
+  if (start > end) { start = 0; end = celkem - 1; }
+  const vyrez = data.slice(start, end + 1);
+  return new Response(vyrez, {
+    status: 206,
+    statusText: 'Partial Content',
+    headers: {
+      'Content-Type': plna.headers.get('Content-Type') || 'audio/mpeg',
+      'Content-Range': `bytes ${start}-${end}/${celkem}`,
+      'Content-Length': String(vyrez.byteLength),
+      'Accept-Ranges': 'bytes',
+    },
+  });
+}
+
 /* ---------- směrování požadavků ---------- */
 self.addEventListener('fetch', (e) => {
   const req = e.request;
@@ -309,6 +369,11 @@ self.addEventListener('fetch', (e) => {
   if (req.mode === 'navigate') { e.respondWith(obslouzStranku(req)); return; }
 
   if (url.origin === self.location.origin) {
+    // zvuk (hymna) — cache-first s podporou Range
+    if (req.destination === 'audio' || req.destination === 'video'
+        || /\.(mp3|m4a|aac|ogg|oga|wav|flac|mp4|webm)$/i.test(url.pathname)) {
+      e.respondWith(obslouzMedia(req, url)); return;
+    }
     // fotky stačí z cache (šetří data), skripty se na pozadí obnovují
     if (req.destination === 'image') e.respondWith(cacheFirst(req, CACHE_STATICKA));
     else e.respondWith(staleWhileRevalidate(req, CACHE_STATICKA));
@@ -344,28 +409,37 @@ function plnaSynchronizace(oznam) {
   synchronizacePromise = (async () => {
     try {
       await metaSet('posledniPokusOZalohu', Date.now());
-      const cache = await caches.open(CACHE_STATICKA);
-      const vse = [...LOKALNI, ...CDN];
-      const jeCdn = new Set(CDN);
-      const fronta = vse.slice();
-      let ok = 0, chybLokalni = 0, chybCdn = 0, zpracovano = 0;
+      const cacheStat = await caches.open(CACHE_STATICKA);
+      const cacheMedia = await caches.open(CACHE_MEDIA);
+      // Každá položka ví, kam patří a jak přísná je: lokální stránky jsou
+      // povinné, CDN a zvuk (hymna) jsou best-effort — jejich výpadek zálohu
+      // neshodí (a chybějící hymna nevyvolá falešné varování).
+      const polozky = [
+        ...LOKALNI.map((u) => ({ url: u, cache: cacheStat, typ: 'lokalni' })),
+        ...CDN.map((u) => ({ url: u, cache: cacheStat, typ: 'cdn' })),
+        ...MEDIA.map((u) => ({ url: u, cache: cacheMedia, typ: 'media' })),
+      ];
+      const celkem = polozky.length;
+      const fronta = polozky.slice();
+      let ok = 0, chybLokalni = 0, chybCdn = 0, chybMedia = 0, zpracovano = 0;
       async function pracovnik() {
         while (fronta.length) {
-          const url = fronta.shift();
-          if (await stahniDoCache(cache, url, true)) ok++;
-          else if (jeCdn.has(url)) chybCdn++;
-          else chybLokalni++;
+          const p = fronta.shift();
+          if (await stahniDoCache(p.cache, p.url, true)) ok++;
+          else if (p.typ === 'lokalni') chybLokalni++;
+          else if (p.typ === 'cdn') chybCdn++;
+          else chybMedia++;
           zpracovano++;
-          if (oznam && (zpracovano % 4 === 0 || zpracovano === vse.length)) {
-            oznam({ typ: 'zaloha-prubeh', hotovo: zpracovano, celkem: vse.length });
+          if (oznam && (zpracovano % 4 === 0 || zpracovano === celkem)) {
+            oznam({ typ: 'zaloha-prubeh', hotovo: zpracovano, celkem });
           }
         }
       }
       await Promise.all([pracovnik(), pracovnik(), pracovnik(), pracovnik()]);
-      // Zálohu tvoří stránky webu — CDN selhání ji neshazuje (závislosti se
-      // docachují při běžném online prohlížení).
+      // Zálohu tvoří stránky webu — výpadek CDN ani chybějící hymna ji neshazují
+      // (CDN se docachuje při běžném prohlížení, hymna se doplní, až bude nahraná).
       if (chybLokalni === 0) await metaSet('posledniZaloha', Date.now());
-      return { ok, chyb: chybLokalni + chybCdn, chybLokalni, chybCdn, celkem: vse.length, kdy: Date.now() };
+      return { ok, chyb: chybLokalni + chybCdn, chybLokalni, chybCdn, chybMedia, celkem, kdy: Date.now() };
     } finally {
       synchronizacePromise = null;
     }
@@ -422,6 +496,7 @@ self.addEventListener('message', (e) => {
   } else if (d.typ === 'stav') {
     e.waitUntil((async () => {
       const dlazdice = await caches.open(CACHE_DLAZDICE).then((c) => c.keys()).catch(() => []);
+      const media = await caches.open(CACHE_MEDIA).then((c) => c.keys()).catch(() => []);
       odpovez({
         typ: 'stav',
         verze: VERZE,
@@ -430,6 +505,7 @@ self.addEventListener('message', (e) => {
         mapaStazena: await metaGet('mapaStazena') || 0,
         rucniOffline: await jeRucniOffline(),
         pocetDlazdic: dlazdice.length,
+        pocetMedia: media.length,
       });
     })());
   }
