@@ -56,7 +56,13 @@
 
   /* ---------- vzhled widgetu ---------- */
   var css = ''
-    + '#nrsk-off{position:fixed;right:14px;bottom:14px;z-index:320;font-family:"Manrope",-apple-system,"Segoe UI",Roboto,sans-serif}'
+    // z-index nad mapou (Leaflet jde do 1000); translateZ vynutí vlastní
+    // kompozitní vrstvu — jinak mobilní Safari fixní prvek vedle 3D-transformované
+    // mapy „probliká a schová" (známý iOS bug s position:fixed).
+    + '#nrsk-off{position:fixed;right:14px;bottom:14px;z-index:1200;'
+    + 'font-family:"Manrope",-apple-system,"Segoe UI",Roboto,sans-serif;'
+    + 'transform:translateZ(0);-webkit-transform:translateZ(0);'
+    + 'backface-visibility:hidden;-webkit-backface-visibility:hidden}'
     + '#nrsk-off.vlevo{right:auto;left:14px}'
     + '@supports(padding:env(safe-area-inset-bottom)){#nrsk-off{bottom:calc(14px + env(safe-area-inset-bottom))}}'
     + '#nrsk-pill{display:flex;align-items:center;gap:7px;border:1px solid #dfe9f2;background:#fff;color:#0c3a5f;'
@@ -86,7 +92,7 @@
     + '#nrsk-prubeh i{display:block;height:100%;width:0;background:linear-gradient(90deg,#2fbf8f,#1a6ea8);transition:width .3s}'
     + '#nrsk-toast{position:fixed;left:50%;bottom:74px;transform:translateX(-50%);background:#0c3a5f;color:#fff;'
     + 'padding:10px 18px;border-radius:999px;font-size:.84rem;font-weight:600;box-shadow:0 8px 24px rgba(12,58,95,.4);'
-    + 'z-index:321;opacity:0;pointer-events:none;transition:opacity .3s;font-family:"Manrope",sans-serif;max-width:88vw;text-align:center}'
+    + 'z-index:1201;opacity:0;pointer-events:none;transition:opacity .3s;font-family:"Manrope",sans-serif;max-width:88vw;text-align:center}'
     + '#nrsk-toast.viditelny{opacity:1}';
 
   function pridejStyl() {

@@ -9,7 +9,7 @@
  */
 'use strict';
 
-const VERZE = 'norsko-2026-v1';
+const VERZE = 'norsko-2026-v2';
 const CACHE_STATICKA = `${VERZE}-staticka`;     // stránky + lokální soubory + CDN
 const CACHE_DATA     = `${VERZE}-data`;         // Wikipedia souhrny, OSRM trasy
 const CACHE_OBRAZKY  = `${VERZE}-obrazky`;      // fotky z CORS zdrojů (Unsplash, Wikimedia)
