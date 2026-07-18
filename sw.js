@@ -54,6 +54,7 @@ const LOKALNI = [
   './foto/monty.jpg',
   './foto/vladimir.jpg',
   './foto/posadka-kolaz.jpg',
+  './foto/hymna-dlazdice.jpg',
   './foto/vuz/alkovna.jpg',
   './foto/vuz/kuchyn-zasuvka.jpg',
   './foto/vuz/luzko-detail.jpg',
